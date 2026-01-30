@@ -3,9 +3,9 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 
-# ----------------------------
+# -------------------------------
 # 1. Fetch historical BTC data from Binance
-# ----------------------------
+# -------------------------------
 BINANCE_URL = "https://api.binance.com/api/v3/klines"
 
 
