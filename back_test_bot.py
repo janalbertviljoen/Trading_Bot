@@ -68,9 +68,6 @@ def fetch_btc_history(interval="1h", start_date="2024-01-01", symbol="BTCUSDT"):
     return df[["timestamp", "high", "low", "price", "volume"]].reset_index(drop=True)
 
 
-# ----------------------------
-# 2. Compute rolling VWAP
-# ----------------------------
 def rolling_vwap(df, price_col="price", volume_col="volume", window=50):
     """
     Computes the volume-weighted average price (VWAP) over a rolling window.
@@ -90,9 +87,6 @@ def rolling_vwap(df, price_col="price", volume_col="volume", window=50):
     return vwap
 
 
-# ----------------------------
-# 3. Detect significant deviations (>3%)
-# ----------------------------
 def detect_large_moves(df, unit_price="price", metric_name="vwap", threshold=0.03):
     """
     Detects significant price deviations from metric, uses volume-weighted average price as default.
@@ -116,17 +110,29 @@ def trade_direction(df):
 
     :param df (pandas.DataFrame): DataFrame containing price 'deviation' from reference metric and 'signal' columns
 
-    :return (pandas.DataFrame): DataFrame with added 'trade' column indicating 'Buy', 'Sell', or 'Wait'
+    :return (pandas.DataFrame): DataFrame with added 'trade' column indicating direction of trade: 1 for Buy, -1 for Sell, 0 for No Trade
     """
-    df["trade"] = "Wait"
-    df.loc[(df["signal"]) & (df["deviation"] > 0), "trade"] = "Sell"
-    df.loc[(df["signal"]) & (df["deviation"] < 0), "trade"] = "Buy"
+    df["trade"] = 0
+    df.loc[(df["signal"]) & (df["deviation"] > 0), "trade"] = -1
+    df.loc[(df["signal"]) & (df["deviation"] < 0), "trade"] = 1
     return df
 
 
-# ----------------------------
-# 4. Compute max profit for the perfect bot
-# ----------------------------
+def trade_volume(df, unit_price="price", wallet_fraction=0.01):
+    """
+    Assigns trade volume based on trade signal and value of wallet.
+
+    :param df (pandas.DataFrame): DataFrame containing 'trade' column
+    :param unit_price (str): Name of the price column to use for calculating trade volume (default is "price")
+    :param wallet_fraction (float): Fraction of total wallet value to use for each trade (default is 0.01)
+
+    :return (pandas.DataFrame): DataFrame with added 'trade_volume' column
+    """
+    df["trade_volume"] = wallet_fraction * df["signal"] * df["total_wallet_value"]
+    df["trade_volume_price"] = df[unit_price] * df["trade_volume"]
+    return df
+
+
 def best_bot(df):
     """Copmutes the theoretical maximum profit possible given high and low prices in time interval selected.
 
@@ -136,11 +142,6 @@ def best_bot(df):
     """
     df["max_profit"] = df["high"] - df["low"]
     return df
-
-
-# ----------------------------
-#### Fourier Transform
-# ----------------------------
 
 
 def detrend_series(series, method="log_return"):
