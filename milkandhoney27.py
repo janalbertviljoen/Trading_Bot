@@ -207,7 +207,7 @@ def update(n, cache_json, alert_state):
                           json={"chat_id": "-4924532972", "text": msg, "parse_mode": "Markdown"})
             alert_state['last_res_ts'] = time.time()
             alert_state["fake_active"] = False
-
+###########################################
     # 5. UI ELEMENTS & CHART FIX
     midnight = now_lon.replace(hour=0, minute=0, second=0, microsecond=0)
     forecast = [html.Div(f"W{w} @ {(midnight + dt.timedelta(minutes=w * TERNARY_SEGMENT_MINS)).strftime('%H:%M')}", className="small") for w in SNIPER_WEDGES if (midnight + dt.timedelta(minutes=w * TERNARY_SEGMENT_MINS)) > now_lon][:5]
