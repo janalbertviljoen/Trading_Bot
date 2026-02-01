@@ -165,6 +165,7 @@ def update_wallet(df, wallet_value: float, wallet_value_fraction: float = 0.01):
     df.loc[0, "trade_value"] = 0.0
     df.loc[0, "trade_volume"] = 0.0
     df.loc[0, "total_wallet_value"] = wallet_value
+    df.loc[0, "normalised_wallet_value"] = 1.0
 
     for i in range(1, len(df)):
         price = df.loc[i, "price"]
@@ -201,6 +202,10 @@ def update_wallet(df, wallet_value: float, wallet_value_fraction: float = 0.01):
         df.loc[i, "wallet_value_available"] = cash
         df.loc[i, "wallet_volume_available"] = volume
         df.loc[i, "total_wallet_value"] = cash + volume * price
+        df.loc[i, "normalised_wallet_value"] = (
+            df.loc[i, "total_wallet_value"] / wallet_value
+        )
+        df.loc[i, "normalised_price"] = df.loc[i, "price"] / df.loc[0, "price"]
 
     return df
 
