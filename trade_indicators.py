@@ -1,6 +1,11 @@
+ALL_METRICS = ["vwap"]
+
+
 def detect_all(df, threshold, rolling_window):
     df = rolling_vwap(df, rolling_window)
-    df = detect_deviation(df, threshold=threshold)
+    for metric in ALL_METRICS:
+        df = detect_deviation(df, metric_name=metric, threshold=threshold)
+        print(f"Reference metric: {metric} - detection threshold: {threshold}")
     return df
 
 
@@ -26,7 +31,7 @@ def rolling_vwap(df, rolling_window, price_col="price", volume_col="volume"):
     return df
 
 
-def detect_deviation(df, unit_price="price", metric_name="vwap", threshold=0.03):
+def detect_deviation(df, metric_name: str, threshold: float, unit_price="price"):
     """
     Detects significant price deviations from metric, uses volume-weighted average price as default.
 
