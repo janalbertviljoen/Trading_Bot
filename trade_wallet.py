@@ -4,7 +4,11 @@ from datetime import datetime, timedelta
 
 
 def make_trades(
-    df, initial_investment=100, trade_fraction_cash=0.1, trade_fraction_volume=0.1
+    df,
+    initial_investment=100,
+    initial_trade_fraction=0.5,
+    trade_fraction_cash=0.1,
+    trade_fraction_volume=0.1,
 ):
     """
     Initiate all trades, determine the direction of trade and update the wallet values of both cash value and comodity volume.
@@ -15,7 +19,11 @@ def make_trades(
     """
     df = trade_direction(df)
     df = update_wallet(
-        df, initial_investment, trade_fraction_cash, trade_fraction_volume
+        df,
+        initial_investment,
+        initial_trade_fraction,
+        trade_fraction_cash,
+        trade_fraction_volume,
     )
     return df
 
@@ -38,6 +46,7 @@ def trade_direction(df):
 def update_wallet(
     df,
     initial_investment: float,
+    initial_trade_fraction: float,
     trade_fraction_cash: float,
     trade_fraction_volume: float,
 ):
@@ -94,9 +103,11 @@ def update_wallet(
         - wallet_volume_available
         - total_wallet_value
     """
-
-    df.loc[0, "wallet_value_available"] = initial_investment
-    df.loc[0, "wallet_volume_available"] = 0.0
+    initial_trade = initial_trade_fraction * initial_investment
+    df.loc[0, "wallet_value_available"] = initial_investment - initial_trade
+    df.loc[0, "wallet_volume_available"] = price_to_unit_conversion(
+        initial_trade, df.loc[0, "price"]
+    )
     df.loc[0, "trade_value"] = 0.0
     df.loc[0, "trade_volume"] = 0.0
     df.loc[0, "total_wallet_value"] = initial_investment

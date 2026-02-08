@@ -22,6 +22,7 @@ class PromisedLandTrader:
         dict_detect_trades: dict,
         dict_trade_logic: dict,
         dict_detect_range: dict,
+        dict_trade_range: dict,
     ):
         """
         Initialise the trading bot using structured configuration sections.
@@ -30,20 +31,28 @@ class PromisedLandTrader:
         self.detect_config = dict_detect_trades
         self.trade_config = dict_trade_logic
         self.detect_config_range = dict_detect_range
+        self.trade_config_range = dict_trade_range
 
-    def optimise_strategy(self):
-        self.evalaute_strategy()
+    def optimise_strategy(self, extract=True):
+        self.evalaute_strategy(extract=extract)
         self.df_timeseries = self.df_base.copy()
+        self.df_timeseries["normalised_price"] = self.df["normalised_price"]
         self.strategic_points = []
 
         i = 1
         optimise_detection = self.generate_combinations()
         for dict in optimise_detection:
+            print(f"Progress: {(i / len(optimise_detection)*100):.2f} %", end="\r")
+            if not dict:
+                continue
             for param, p in dict.items():
-                self.detect_config[param] = p
-                self.evalaute_strategy(extract=False)
-                self.summarise_performance(coord=f"{i}")
-                i += 1
+                if param in self.detect_config.keys():
+                    self.detect_config[param] = p
+                elif param in self.trade_config.keys():
+                    self.trade_config[param] = p
+            self.evalaute_strategy(extract=False)
+            self.summarise_performance(coord=f"{i}")
+            i += 1
 
         self.df_strategic_points = pd.DataFrame(self.strategic_points)
 
@@ -59,20 +68,24 @@ class PromisedLandTrader:
 
     def generate_combinations(self):
         # Generate all combinations
-        keys = self.detect_config_range.keys()
-        values = self.detect_config_range.values()
+        param_config = self.detect_config_range | self.trade_config_range
+        keys = param_config.keys()
+        values = param_config.values()
 
         combinations = [dict(zip(keys, combo)) for combo in itertools.product(*values)]
         return combinations
 
     def summarise_performance(self, coord: int):
         df = self.df.copy()
+
+        mean = df["normalised_wallet_value"].mean()
         performance = df.tail(1).to_dict(orient="records")[0]
         df = self.rename_columns(df, tag=coord)
         self.df_timeseries = self.df_timeseries.merge(df, on="timestamp")
 
         paramaters = self.read_config | self.detect_config | self.trade_config
         paramaters["coordinate"] = coord
+        paramaters["mean_normalised_wallet"] = mean
         paramaters = paramaters | performance
         self.strategic_points.append(paramaters)
 
