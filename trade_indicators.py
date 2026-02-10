@@ -5,7 +5,6 @@ def detect_all(df, threshold, rolling_window):
     df = rolling_vwap(df, rolling_window)
     for metric in ALL_METRICS:
         df = detect_deviation(df, metric_name=metric, threshold=threshold)
-        print(f"Reference metric: {metric} - detection threshold: {threshold}")
     return df
 
 
