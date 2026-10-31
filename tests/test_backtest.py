@@ -1,6 +1,5 @@
-import pytest
-
 import backtest
+import pytest
 
 
 def test_split_is_chronological(prices):

@@ -1,13 +1,13 @@
 import subprocess
 import sys
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 from fastmcp import FastMCP
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import backtest  # noqa: E402
+import backtest
 
 READ_ONLY = {"readOnlyHint": True, "destructiveHint": False, "openWorldHint": False}
 
@@ -30,7 +30,7 @@ def fetch_market_data(
     interval: str = "1h",
     start_date: str = "2024-01-01",
     end_date: str | None = None,
-) -> dict:
+) -> dict[str, Any]:
     """Download Binance klines and cache them under data/ as a reusable dataset.
 
     Pin end_date (YYYY-MM-DD) so the dataset stays fixed and results are comparable
@@ -40,7 +40,7 @@ def fetch_market_data(
 
 
 @mcp.tool(annotations=READ_ONLY)
-def list_datasets() -> list[dict]:
+def list_datasets() -> list[dict[str, Any]]:
     """List cached datasets with their row counts and time ranges."""
     return backtest.list_datasets()
 
@@ -54,7 +54,7 @@ def run_backtest(
     trade_fraction_cash: float | None = None,
     trade_fraction_volume: float | None = None,
     holdout_fraction: float = 0.3,
-) -> dict:
+) -> dict[str, Any]:
     """Run the current repo strategy (VWAP deviation + wallet logic) on a cached dataset.
 
     Omitted params use the defaults. With holdout_fraction > 0 the last part of the
@@ -86,7 +86,7 @@ def optimise_strategy(
         "max_drawdown",
     ] = "excess_vs_buy_and_hold",
     top_n: int = 5,
-) -> dict:
+) -> dict[str, Any]:
     """Grid-search strategy parameters in-sample and re-score the best out-of-sample.
 
     param_grid maps parameter names (threshold, rolling_window, initial_trade_fraction,
@@ -100,7 +100,7 @@ def optimise_strategy(
 
 
 @mcp.tool(annotations={"readOnlyHint": False, "destructiveHint": False})
-def regression_check(dataset: str, update_baseline: bool = False) -> dict:
+def regression_check(dataset: str, update_baseline: bool = False) -> dict[str, Any]:
     """Compare the default-config backtest against benchmarks/baseline.json.
 
     Use after refactors: status 'unchanged' proves behaviour is preserved. The first
@@ -111,16 +111,21 @@ def regression_check(dataset: str, update_baseline: bool = False) -> dict:
 
 
 @mcp.tool(annotations=READ_ONLY)
-def run_checks() -> dict:
+def run_checks() -> dict[str, Any]:
     """Run black --check and pytest on the repo and return pass/fail with output."""
     python = sys.executable
-    results = {}
+    results: dict[str, Any] = {}
     for name, cmd in {
         "black": [python, "-m", "black", "--check", "--exclude", r"\.venv|data", "."],
         "pytest": [python, "-m", "pytest", "-q", "tests"],
     }.items():
         proc = subprocess.run(
-            cmd, cwd=backtest.REPO_ROOT, capture_output=True, text=True, timeout=600
+            cmd,
+            cwd=backtest.REPO_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=600,
+            check=False,
         )
         results[name] = {
             "passed": proc.returncode == 0,

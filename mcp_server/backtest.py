@@ -6,10 +6,13 @@ in-sample / out-of-sample segments, runs the repo strategy
 performance against buy-and-hold.
 """
 
+from __future__ import annotations
+
 import itertools
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -31,7 +34,7 @@ TRADE_KEYS = [
     "trade_fraction_cash",
     "trade_fraction_volume",
 ]
-DEFAULT_CONFIG = {
+DEFAULT_CONFIG: dict[str, float] = {
     "threshold": 0.03,
     "rolling_window": 24,
     "initial_investment": 100,
@@ -57,7 +60,9 @@ def dataset_path(symbol: str, interval: str, start_date: str, end_date: str) -> 
     return DATA_DIR / f"{symbol}_{interval}_{start_date}_{end_date}.csv"
 
 
-def fetch_dataset(symbol, interval, start_date, end_date) -> dict:
+def fetch_dataset(
+    symbol: str, interval: str, start_date: str, end_date: str | None
+) -> dict[str, Any]:
     """Fetch price history from Binance and cache it as a CSV for reproducible backtests.
 
     Args:
@@ -82,15 +87,16 @@ def fetch_dataset(symbol, interval, start_date, end_date) -> dict:
     )
     if end_date:
         df = df[df["timestamp"] < pd.Timestamp(end_date)].reset_index(drop=True)
+        last_date = end_date
     else:
-        end_date = df["timestamp"].max().strftime("%Y-%m-%d")
-    path = dataset_path(symbol, interval, start_date, end_date)
+        last_date = str(df["timestamp"].max().strftime("%Y-%m-%d"))
+    path = dataset_path(symbol, interval, start_date, last_date)
     DATA_DIR.mkdir(exist_ok=True)
     df.to_csv(path, index=False)
     return describe_dataset(path)
 
 
-def describe_dataset(path: Path) -> dict:
+def describe_dataset(path: Path) -> dict[str, Any]:
     """Summarise a cached dataset.
 
     Args:
@@ -113,7 +119,7 @@ def describe_dataset(path: Path) -> dict:
     }
 
 
-def list_datasets() -> list[dict]:
+def list_datasets() -> list[dict[str, Any]]:
     """List all cached datasets.
 
     Returns:
@@ -145,7 +151,9 @@ def load_dataset(dataset: str) -> pd.DataFrame:
     return pd.read_csv(path, parse_dates=["timestamp"])
 
 
-def split_dataset(df: pd.DataFrame, holdout_fraction: float):
+def split_dataset(
+    df: pd.DataFrame, holdout_fraction: float
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Split a time series chronologically into in-sample and out-of-sample parts.
 
     Formula:
@@ -174,7 +182,7 @@ def split_dataset(df: pd.DataFrame, holdout_fraction: float):
     return train, test
 
 
-def simulate(df: pd.DataFrame, config: dict) -> pd.DataFrame:
+def simulate(df: pd.DataFrame, config: dict[str, Any]) -> pd.DataFrame:
     """Run the repo's signal detection and wallet logic on a copy of the price data.
 
     Args:
@@ -197,7 +205,7 @@ def simulate(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     return trade_wallet.make_trades(df, **trade)
 
 
-def summarise(df: pd.DataFrame) -> dict:
+def summarise(df: pd.DataFrame) -> dict[str, Any]:
     """Compute performance metrics of a simulated run against buy-and-hold.
 
     Formula:
@@ -252,7 +260,9 @@ def summarise(df: pd.DataFrame) -> dict:
     }
 
 
-def run_backtest(dataset: str, config: dict, holdout_fraction: float = 0.0) -> dict:
+def run_backtest(
+    dataset: str, config: dict[str, Any], holdout_fraction: float = 0.0
+) -> dict[str, Any]:
     """Backtest one configuration on a cached dataset.
 
     Args:
@@ -273,7 +283,7 @@ def run_backtest(dataset: str, config: dict, holdout_fraction: float = 0.0) -> d
     """
     config = DEFAULT_CONFIG | config
     df = load_dataset(dataset)
-    result = {"dataset": dataset, "config": config}
+    result: dict[str, Any] = {"dataset": dataset, "config": config}
     if holdout_fraction:
         train, test = split_dataset(df, holdout_fraction)
         result["in_sample"] = summarise(simulate(train, config))
@@ -285,12 +295,12 @@ def run_backtest(dataset: str, config: dict, holdout_fraction: float = 0.0) -> d
 
 def optimise(
     dataset: str,
-    param_grid: dict,
-    base_config: dict,
+    param_grid: dict[str, list[Any]],
+    base_config: dict[str, Any],
     holdout_fraction: float,
     rank_by: str,
     top_n: int,
-) -> dict:
+) -> dict[str, Any]:
     """Grid-search parameters in-sample and re-score the best candidates out-of-sample.
 
     Args:
@@ -319,7 +329,7 @@ def optimise(
     if unknown:
         raise ValueError(f"Unknown parameters {unknown}. Valid: {list(DEFAULT_CONFIG)}")
     combinations = [
-        dict(zip(param_grid, combo))
+        dict(zip(param_grid, combo, strict=True))
         for combo in itertools.product(*param_grid.values())
     ]
     if len(combinations) > MAX_COMBINATIONS:
@@ -329,15 +339,15 @@ def optimise(
 
     config = DEFAULT_CONFIG | base_config
     train, test = split_dataset(load_dataset(dataset), holdout_fraction)
-    scored = []
+    scored: list[tuple[dict[str, Any], dict[str, Any]]] = []
     for combo in combinations:
         candidate = config | combo
         scored.append((candidate, summarise(simulate(train, candidate))))
 
     scored.sort(key=lambda item: item[1][rank_by], reverse=rank_by != "max_drawdown")
-    top = []
+    top: list[dict[str, Any]] = []
     for candidate, in_sample in scored[:top_n]:
-        entry = {
+        entry: dict[str, Any] = {
             "params": {k: candidate[k] for k in param_grid},
             "in_sample": in_sample,
         }
@@ -353,7 +363,7 @@ def optimise(
     }
 
 
-def regression_check(dataset: str, update: bool) -> dict:
+def regression_check(dataset: str, update: bool) -> dict[str, Any]:
     """Compare the default-config backtest with the stored baseline.
 
     Args:
@@ -371,7 +381,9 @@ def regression_check(dataset: str, update: bool) -> dict:
         equality of the rounded ``summarise`` values.
     """
     current = run_backtest(dataset, {})["full"]
-    baselines = json.loads(BASELINE_PATH.read_text()) if BASELINE_PATH.exists() else {}
+    baselines: dict[str, dict[str, Any]] = (
+        json.loads(BASELINE_PATH.read_text()) if BASELINE_PATH.exists() else {}
+    )
 
     if update or dataset not in baselines:
         baselines[dataset] = current
@@ -380,7 +392,7 @@ def regression_check(dataset: str, update: bool) -> dict:
         return {"status": "baseline_written", "dataset": dataset, "metrics": current}
 
     baseline = baselines[dataset]
-    diffs = {
+    diffs: dict[str, dict[str, Any]] = {
         k: {"baseline": baseline[k], "current": current[k]}
         for k in current
         if baseline.get(k) != current[k]

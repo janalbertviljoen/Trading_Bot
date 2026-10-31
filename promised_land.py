@@ -7,16 +7,20 @@ performance of each combination (``df_strategic_points``) and the wallet time se
 of each run side by side (``df_timeseries``).
 """
 
-import pandas as pd
-import itertools
+from __future__ import annotations
 
+import itertools
+from typing import Any, cast
+
+import pandas as pd
+
+import plot_analysis
 import read_data
 import trade_indicators
 import trade_wallet
-import plot_analysis
 
 # import trade_perforpance
-EXTRACT_COL = [
+EXTRACT_COL: list[str] = [
     "timestamp",
     "total_wallet_value",
     "normalised_wallet_value",
@@ -41,12 +45,12 @@ class PromisedLandTrader:
 
     def __init__(
         self,
-        dict_read_data: dict,
-        dict_detect_trades: dict,
-        dict_trade_logic: dict,
-        dict_detect_range: dict,
-        dict_trade_range: dict,
-    ):
+        dict_read_data: dict[str, Any],
+        dict_detect_trades: dict[str, Any],
+        dict_trade_logic: dict[str, Any],
+        dict_detect_range: dict[str, list[Any]],
+        dict_trade_range: dict[str, list[Any]],
+    ) -> None:
         """Store the configuration sections used by every run.
 
         Args:
@@ -74,8 +78,13 @@ class PromisedLandTrader:
         self.trade_config = dict_trade_logic
         self.detect_config_range = dict_detect_range
         self.trade_config_range = dict_trade_range
+        self.df_base: pd.DataFrame
+        self.df: pd.DataFrame
+        self.df_timeseries: pd.DataFrame
+        self.df_strategic_points: pd.DataFrame
+        self.strategic_points: list[dict[str, Any]] = []
 
-    def optimise_strategy(self, extract=True):
+    def optimise_strategy(self, extract: bool = True) -> None:
         """Run the strategy for every parameter combination and collect the results.
 
         Computes:
@@ -115,9 +124,9 @@ class PromisedLandTrader:
             if not dict:
                 continue
             for param, p in dict.items():
-                if param in self.detect_config.keys():
+                if param in self.detect_config:
                     self.detect_config[param] = p
-                elif param in self.trade_config.keys():
+                elif param in self.trade_config:
                     self.trade_config[param] = p
             self.evalaute_strategy(extract=False)
             self.summarise_performance(coord=f"{i}")
@@ -125,7 +134,7 @@ class PromisedLandTrader:
 
         self.df_strategic_points = pd.DataFrame(self.strategic_points)
 
-    def evalaute_strategy(self, extract=True):
+    def evalaute_strategy(self, extract: bool = True) -> None:
         """Run one pass of signal detection and wallet simulation.
 
         Computes:
@@ -155,7 +164,7 @@ class PromisedLandTrader:
         df = trade_wallet.make_trades(df, **self.trade_config)
         self.df = df
 
-    def generate_combinations(self):
+    def generate_combinations(self) -> list[dict[str, Any]]:
         """Build the Cartesian product of the detection and wallet parameter grids.
 
         Returns:
@@ -172,10 +181,12 @@ class PromisedLandTrader:
         keys = param_config.keys()
         values = param_config.values()
 
-        combinations = [dict(zip(keys, combo)) for combo in itertools.product(*values)]
+        combinations = [
+            dict(zip(keys, combo, strict=True)) for combo in itertools.product(*values)
+        ]
         return combinations
 
-    def summarise_performance(self, coord: int):
+    def summarise_performance(self, coord: str) -> None:
         """Record the latest run's parameters, final state and wallet time series.
 
         Computes:
@@ -185,8 +196,7 @@ class PromisedLandTrader:
 
         Args:
             coord (str): Label of this combination, used as the column suffix in
-                ``df_timeseries`` and as ``coordinate`` in the record (passed as a
-                string such as "3", despite the ``int`` hint).
+                ``df_timeseries`` and as ``coordinate`` in the record, e.g. "3".
 
         Returns:
             None. Appends to ``strategic_points`` and inner-joins the run's
@@ -199,7 +209,8 @@ class PromisedLandTrader:
         df = self.df.copy()
 
         mean = df["normalised_wallet_value"].mean()
-        performance = df.tail(1).to_dict(orient="records")[0]
+        # Column labels are str, so the record is keyed by str.
+        performance = cast("dict[str, Any]", df.tail(1).to_dict(orient="records")[0])
         df = self.rename_columns(df, tag=coord)
         self.df_timeseries = self.df_timeseries.merge(df, on="timestamp")
 
@@ -209,7 +220,7 @@ class PromisedLandTrader:
         paramaters = paramaters | performance
         self.strategic_points.append(paramaters)
 
-    def rename_columns(self, df, tag="0"):
+    def rename_columns(self, df: pd.DataFrame, tag: str = "0") -> pd.DataFrame:
         """Select ``EXTRACT_COL`` and suffix every column except ``timestamp``.
 
         Args:
@@ -228,7 +239,7 @@ class PromisedLandTrader:
         df_p = df[EXTRACT_COL].rename(columns=rename_col)
         return df_p
 
-    def perform_analysis(self, sample_size=None):
+    def perform_analysis(self, sample_size: int | None = None) -> None:
         """Plot trade events, wallet outcomes and normalised wallet for the latest run.
 
         Args:
@@ -238,10 +249,7 @@ class PromisedLandTrader:
         Returns:
             None. Draws three matplotlib figures (see ``plot_analysis``).
         """
-        if sample_size:
-            df_sample = self.df.tail(sample_size)
-        else:
-            df_sample = self.df.copy()
+        df_sample = self.df.tail(sample_size) if sample_size else self.df.copy()
         plot_analysis.plot_trade_events(df_sample)
         plot_analysis.plot_wallet_outcomes(df_sample)
         plot_analysis.plot_normalised_wallet(df_sample)

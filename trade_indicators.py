@@ -1,9 +1,13 @@
 """Price indicators and deviation signals that feed ``trade_wallet``."""
 
-ALL_METRICS = ["vwap"]
+from __future__ import annotations
+
+import pandas as pd
+
+ALL_METRICS: list[str] = ["vwap"]
 
 
-def detect_all(df, threshold, rolling_window):
+def detect_all(df: pd.DataFrame, threshold: float, rolling_window: int) -> pd.DataFrame:
     """Compute every indicator in ``ALL_METRICS`` and flag deviations from it.
 
     Args:
@@ -25,7 +29,12 @@ def detect_all(df, threshold, rolling_window):
     return df
 
 
-def rolling_vwap(df, rolling_window, price_col="price", volume_col="volume"):
+def rolling_vwap(
+    df: pd.DataFrame,
+    rolling_window: int,
+    price_col: str = "price",
+    volume_col: str = "volume",
+) -> pd.DataFrame:
     """Compute the volume-weighted average price over a trailing rolling window.
 
     Formula:
@@ -55,7 +64,9 @@ def rolling_vwap(df, rolling_window, price_col="price", volume_col="volume"):
     return df
 
 
-def detect_deviation(df, metric_name: str, threshold: float, unit_price="price"):
+def detect_deviation(
+    df: pd.DataFrame, metric_name: str, threshold: float, unit_price: str = "price"
+) -> pd.DataFrame:
     """Flag rows where price deviates from a reference metric by more than a threshold.
 
     Formula:

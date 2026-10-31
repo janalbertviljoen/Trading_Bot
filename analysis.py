@@ -1,6 +1,12 @@
 """Post-processing of a ``PromisedLandTrader`` grid search: parameter robustness statistics."""
 
+from __future__ import annotations
+
+from collections.abc import Iterable
+
 import numpy as np
+import pandas as pd
+
 from promised_land import PromisedLandTrader
 
 
@@ -19,7 +25,7 @@ class PromisedLandExplorer:
         highest_coor (pandas.Series): Coordinates whose time series were extracted.
     """
 
-    def __init__(self, trader: PromisedLandTrader):
+    def __init__(self, trader: PromisedLandTrader) -> None:
         """Take the results of a finished grid search.
 
         Args:
@@ -35,7 +41,7 @@ class PromisedLandExplorer:
         self.params_detect = list(trader.detect_config_range.keys())
         self.params_trade = list(trader.trade_config_range.keys())
 
-    def pre_process(self, metric="mean_normalised_wallet"):
+    def pre_process(self, metric: str = "mean_normalised_wallet") -> None:
         """Score parameter robustness and extract the top runs' time series.
 
         Computes:
@@ -85,11 +91,11 @@ class PromisedLandExplorer:
         df_ts = self.df_ts
         highest_comb = self.df_sp.head(5)["coordinate"].reset_index(drop=True)
         col_name = self.extract_ts_cols(self.df_ts, highest_comb)
-        df_ts_top = df_ts[["timestamp"] + col_name]
+        df_ts_top = df_ts[["timestamp", *col_name]]
         normalised_columns = list(
             df_ts_top.columns[df_ts_top.columns.str.contains("normalised_wallet")]
         )
-        df_ts_top = df_ts_top[["timestamp"] + normalised_columns]
+        df_ts_top = df_ts_top[["timestamp", *normalised_columns]]
         df_ts_norm = df_ts[normalised_columns].div(df_ts["normalised_price"], axis=0)
         df_ts_norm = df_ts_norm.merge(
             df_ts[["timestamp"]], left_index=True, right_index=True
@@ -102,7 +108,9 @@ class PromisedLandExplorer:
         self.df_ts_norm = df_ts_norm
         self.highest_coor = highest_comb
 
-    def calc_stat(self, df, params, metric):
+    def calc_stat(
+        self, df: pd.DataFrame, params: list[str], metric: str
+    ) -> pd.DataFrame:
         """Compute the mean and standard deviation of a metric per parameter group.
 
         Args:
@@ -120,14 +128,14 @@ class PromisedLandExplorer:
             ValueError: ``params`` is empty (``groupby([])``).
         """
         df_grp = (
-            df[[metric] + params]
+            df[[metric, *params]]
             .groupby(params)[metric]
             .agg(["mean", "std"])
             .reset_index()
         )
         return df_grp
 
-    def calc_weighted_metric(self, df, type):
+    def calc_weighted_metric(self, df: pd.DataFrame, type: str) -> pd.DataFrame:
         """Add a stability-weighted score and prefix the statistic columns.
 
         Formula:
@@ -151,13 +159,15 @@ class PromisedLandExplorer:
         df = df.rename(columns=rename)
         return df
 
-    def extract_ts_cols(self, df, coordinates: list):
+    def extract_ts_cols(
+        self, df: pd.DataFrame, coordinates: Iterable[str]
+    ) -> list[str]:
         """List the time-series columns belonging to the given run coordinates.
 
         Args:
             df (pandas.DataFrame): ``df_timeseries`` with ``<col>_<coordinate>``
                 columns.
-            coordinates (list[str]): Run coordinates, e.g. ``["3", "12"]``.
+            coordinates (Iterable[str]): Run coordinates, e.g. ``["3", "12"]``.
 
         Returns:
             list[str]: Column names ending in ``_<coordinate>``, grouped by
@@ -166,7 +176,7 @@ class PromisedLandExplorer:
         Edge cases:
             Coordinates are used in a regex unescaped; numeric strings are safe.
         """
-        col_name = []
+        col_name: list[str] = []
         for c in coordinates:
             col_name += list(df.columns[df.columns.str.contains(f"_{c}$")])
         return col_name

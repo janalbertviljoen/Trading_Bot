@@ -1,10 +1,17 @@
 """Performance and cycle-analysis helpers for price series (not used by the wallet run)."""
 
+from __future__ import annotations
+
+from collections.abc import Hashable
+from typing import Any, cast
+
 import numpy as np
+import numpy.typing as npt
+import pandas as pd
 
 
 # TODO: Split to seperate file: "performance.py"
-def best_bot(df):
+def best_bot(df: pd.DataFrame) -> pd.DataFrame:
     """Compute the theoretical maximum profit per time step from the high-low range.
 
     Formula:
@@ -30,7 +37,9 @@ def best_bot(df):
     return df
 
 
-def detrend_series(series, method="log_return"):
+def detrend_series(
+    series: pd.Series[float], method: str = "log_return"
+) -> pd.Series[float]:
     """Remove the trend from a price series.
 
     Formula:
@@ -49,14 +58,17 @@ def detrend_series(series, method="log_return"):
         ValueError: Unknown ``method``.
     """
     if method == "log_return":
-        return np.log(series).diff().dropna()
+        # numpy ufuncs return a Series for Series input; the stubs say ndarray.
+        return cast("pd.Series[float]", np.log(series)).diff().dropna()
     elif method == "demean":
         return series - series.rolling(50).mean()
     else:
         raise ValueError("Unknown detrending method")
 
 
-def rolling_fft(series, window):
+def rolling_fft(
+    series: pd.Series[float], window: int
+) -> tuple[npt.NDArray[np.float64], list[Hashable]]:
     """Compute the FFT magnitude spectrum over a trailing rolling window.
 
     Formula:
@@ -76,11 +88,11 @@ def rolling_fft(series, window):
     Edge cases:
         n <= window -> empty array of shape (0,) and an empty list.
     """
-    fft_results = []
-    index = []
+    fft_results: list[npt.NDArray[np.float64]] = []
+    index: list[Hashable] = []
 
     for i in range(window, len(series)):
-        segment = series.iloc[i - window : i].values
+        segment = series.iloc[i - window : i].to_numpy()
         fft_vals = np.fft.fft(segment)
         fft_mag = np.abs(fft_vals)
 
@@ -90,7 +102,9 @@ def rolling_fft(series, window):
     return np.array(fft_results), index
 
 
-def fft_frequencies(window, sampling_interval=1.0):
+def fft_frequencies(
+    window: int, sampling_interval: float = 1.0
+) -> npt.NDArray[np.floating[Any]]:
     """Return the FFT sample frequencies for a window length.
 
     Args:
@@ -105,7 +119,9 @@ def fft_frequencies(window, sampling_interval=1.0):
     return np.fft.fftfreq(window, d=sampling_interval)
 
 
-def dominant_cycle(series, window, sampling_interval=1.0):
+def dominant_cycle(
+    series: pd.Series[float], window: int, sampling_interval: float = 1.0
+) -> npt.NDArray[np.floating[Any]]:
     """Find the dominant cycle length in each rolling window.
 
     Formula:

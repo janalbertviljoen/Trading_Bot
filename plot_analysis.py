@@ -1,12 +1,19 @@
 """Matplotlib plots of wallet runs and parameter-grid statistics."""
 
-import pylab as plt
+# matplotlib's own annotations leave many keyword arguments untyped, which strict mode
+# reports on every call; only that check is relaxed here.
+# pyright: reportUnknownMemberType=false
+
+from __future__ import annotations
+
+import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 import numpy as np
+import pandas as pd
 from matplotlib.patches import Rectangle
 
 
-def plot_trade_events(df):
+def plot_trade_events(df: pd.DataFrame) -> None:
     """Plot price, VWAP and deviation with BUY / SELL markers.
 
     Args:
@@ -16,7 +23,7 @@ def plot_trade_events(df):
     Returns:
         None. Draws one figure.
     """
-    fig, ax = plt.subplots(figsize=(10, 8))
+    _fig, ax = plt.subplots(figsize=(10, 8))
     df.plot(ax=ax, x="timestamp", y="price")
     df.plot(ax=ax, x="timestamp", y="deviation", secondary_y=True, alpha=0.2, ls="-.")
     df.plot(ax=ax, x="timestamp", y="vwap", color="k", ls=":")
@@ -29,7 +36,7 @@ def plot_trade_events(df):
     ax.legend(ncols=5)
 
 
-def plot_wallet_outcomes(df):
+def plot_wallet_outcomes(df: pd.DataFrame) -> None:
     """Plot total wallet value against price, and held volume, over time.
 
     Args:
@@ -39,7 +46,7 @@ def plot_wallet_outcomes(df):
     Returns:
         None. Draws one figure with two panels (axis labels assume USD / BTC).
     """
-    fig, ax = plt.subplots(ncols=2, figsize=(18, 6))
+    _fig, ax = plt.subplots(ncols=2, figsize=(18, 6))
 
     # Left panel
     df.plot(
@@ -69,7 +76,7 @@ def plot_wallet_outcomes(df):
     ax[1].ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
 
 
-def plot_normalised_wallet(df):
+def plot_normalised_wallet(df: pd.DataFrame) -> None:
     """Plot the normalised wallet value against the buy-and-hold normalised price.
 
     Args:
@@ -79,7 +86,7 @@ def plot_normalised_wallet(df):
     Returns:
         None. Draws one figure.
     """
-    fig, ax = plt.subplots(figsize=(8, 6))
+    _fig, ax = plt.subplots(figsize=(8, 6))
     df.plot(
         ax=ax,
         x="timestamp",
@@ -90,7 +97,7 @@ def plot_normalised_wallet(df):
     df.plot(ax=ax, x="timestamp", y="normalised_price", alpha=0.5)
 
 
-def plot_imshow(df_stat):
+def plot_imshow(df_stat: pd.DataFrame) -> None:
     """Plot a 2-D parameter grid as a heatmap and outline its maximum cell.
 
     Args:
@@ -127,8 +134,8 @@ def plot_imshow(df_stat):
     ax.set_yticklabels(df_stat.index)
 
     # Labels
-    ax.set_xlabel(df_stat.columns.name if df_stat.columns.name else "Range")
-    ax.set_ylabel(df_stat.index.name if df_stat.index.name else "Index")
+    ax.set_xlabel(str(df_stat.columns.name) if df_stat.columns.name else "Range")
+    ax.set_ylabel(str(df_stat.index.name) if df_stat.index.name else "Index")
 
     # Colorbar
     fig.colorbar(img, ax=ax)

@@ -13,18 +13,20 @@ Input contract (one row per time step, ``RangeIndex`` starting at 0):
 Output columns added by ``make_trades`` are documented on ``update_wallet``.
 """
 
+from __future__ import annotations
+
+from typing import cast
+
 import pandas as pd
-import numpy as np
-from datetime import datetime, timedelta
 
 
 def make_trades(
-    df,
-    initial_investment=100,
-    initial_trade_fraction=0.5,
-    trade_fraction_cash=0.1,
-    trade_fraction_volume=0.1,
-):
+    df: pd.DataFrame,
+    initial_investment: float = 100,
+    initial_trade_fraction: float = 0.5,
+    trade_fraction_cash: float = 0.1,
+    trade_fraction_volume: float = 0.1,
+) -> pd.DataFrame:
     """Run the full wallet simulation: derive trade directions, then update balances.
 
     Computes:
@@ -63,7 +65,7 @@ def make_trades(
     return df
 
 
-def trade_direction(df):
+def trade_direction(df: pd.DataFrame) -> pd.DataFrame:
     """Assign a BUY / SELL / no-trade direction to each row (mean-reversion rule).
 
     Computes:
@@ -94,12 +96,12 @@ def trade_direction(df):
 
 # TODO: Split to seperate file: "trading_logic.py"
 def update_wallet(
-    df,
+    df: pd.DataFrame,
     initial_investment: float,
     initial_trade_fraction: float,
     trade_fraction_cash: float,
     trade_fraction_volume: float,
-):
+) -> pd.DataFrame:
     """Simulate the wallet row by row and record cash, volume and total value.
 
     Trading rules:
@@ -167,22 +169,23 @@ def update_wallet(
         KeyError: ``price`` or ``direction`` missing, or index does not contain 0.
     """
     initial_trade = initial_trade_fraction * initial_investment
+    initial_price = _float_at(df, 0, "price")
     df.loc[0, "wallet_value_available"] = initial_investment - initial_trade
     df.loc[0, "wallet_volume_available"] = price_to_unit_conversion(
-        initial_trade, df.loc[0, "price"]
+        initial_trade, initial_price
     )
     df.loc[0, "trade_value"] = 0.0
     df.loc[0, "trade_volume"] = 0.0
     df.loc[0, "total_wallet_value"] = initial_investment
     df.loc[0, "normalised_wallet_value"] = 1.0
-    df["normalised_price"] = df["price"] / df.loc[0, "price"]
+    df["normalised_price"] = df["price"] / initial_price
 
     for i in range(1, len(df)):
-        price = df.loc[i, "price"]
-        direction = df.loc[i, "direction"]
+        price = _float_at(df, i, "price")
+        direction = _float_at(df, i, "direction")
 
-        prev_cash = df.loc[i - 1, "wallet_value_available"]
-        prev_volume = df.loc[i - 1, "wallet_volume_available"]
+        prev_cash = _float_at(df, i - 1, "wallet_value_available")
+        prev_volume = _float_at(df, i - 1, "wallet_volume_available")
 
         cash = prev_cash
         volume = prev_volume
@@ -213,15 +216,22 @@ def update_wallet(
         df.loc[i, "wallet_volume_available"] = volume
         df.loc[i, "total_wallet_value"] = cash + volume * price
         df.loc[i, "normalised_wallet_value"] = (
-            df.loc[i, "total_wallet_value"] / initial_investment
+            _float_at(df, i, "total_wallet_value") / initial_investment
         )
 
     return df
 
 
+def _float_at(df: pd.DataFrame, row: int, column: str) -> float:
+    """Read one numeric cell as a Python float."""
+    # pandas-stubs types a scalar lookup as any scalar (Period, Interval, ...); the
+    # wallet columns are numeric, so the value converts exactly.
+    return float(cast("float", df.loc[row, column]))
+
+
 def trade_value(
     direction: float, wallet_value_available: float, wallet_fraction: float
-):
+) -> float:
     """Size a trade as a signed fraction of an available balance.
 
     Formula:
@@ -241,7 +251,7 @@ def trade_value(
     return trade_value
 
 
-def price_to_unit_conversion(trade_value: float, unit_price: float):
+def price_to_unit_conversion(trade_value: float, unit_price: float) -> float:
     """Convert a value in base currency to a number of asset units.
 
     Formula:
@@ -263,7 +273,7 @@ def price_to_unit_conversion(trade_value: float, unit_price: float):
 
 def total_wallet_value(
     wallet_value_available: float, wallet_volume_available: float, unit_price: float
-):
+) -> float:
     """Compute total wallet value as cash plus the market value of held units.
 
     Formula:
@@ -284,7 +294,7 @@ def total_wallet_value(
     return total_value
 
 
-def unit_to_price_conversion(trade_units: float, unit_price: float):
+def unit_to_price_conversion(trade_units: float, unit_price: float) -> float:
     """Convert a number of asset units to a value in base currency.
 
     Formula:

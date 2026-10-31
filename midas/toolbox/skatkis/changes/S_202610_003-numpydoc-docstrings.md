@@ -44,5 +44,7 @@ Recorded here for the improver work, not fixed by this change:
 ## Done when
 
 - Every module under `Toolbox/` (except `SandBox/`) follows `.claude/rules/docstrings.md`.
+- The temporary ruff `D` exemption for the root modules and `mcp_server/` in
+  `pyproject.toml` (added 2026-10-31 with the type annotations) is removed.
 - Spec §1.3 matches.
 - The AST check shows no code change; Black and pytest pass.

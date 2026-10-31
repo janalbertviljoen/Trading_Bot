@@ -1,12 +1,18 @@
 """Price-data ingestion from the Binance public klines API."""
 
-import requests
+from __future__ import annotations
+
+from typing import Any
+
 import pandas as pd
+import requests
 
 BINANCE_URL = "https://api.binance.com/api/v3/klines"
 
 
-def fetch_btc_history(interval="1h", start_date="2024-01-01", symbol="BTCUSDT"):
+def fetch_btc_history(
+    interval: str = "1h", start_date: str = "2024-01-01", symbol: str = "BTCUSDT"
+) -> pd.DataFrame:
     """Fetch historical OHLCV bars from Binance, paging 1000 bars per request.
 
     Args:
@@ -37,9 +43,9 @@ def fetch_btc_history(interval="1h", start_date="2024-01-01", symbol="BTCUSDT"):
         requests.RequestException: Network failure.
     """
     start_ts = int(pd.Timestamp(start_date, tz="UTC").timestamp() * 1000)
-    end_ts = int(pd.Timestamp.utcnow().timestamp() * 1000)
+    end_ts = int(pd.Timestamp.now(tz="UTC").timestamp() * 1000)
 
-    all_data = []
+    all_data: list[list[Any]] = []
 
     while start_ts < end_ts:
         params = {
@@ -50,7 +56,7 @@ def fetch_btc_history(interval="1h", start_date="2024-01-01", symbol="BTCUSDT"):
         }
 
         r = requests.get(BINANCE_URL, params=params)
-        data = r.json()
+        data: list[list[Any]] = r.json()
 
         if not data:
             break
