@@ -1,0 +1,70 @@
+# Midas
+
+Midas is this repository's AI development assistant: one agent persona that wears
+different hats (developer, secretary, researcher, warden, guard), plus a component
+index served over MCP. This file is its governing description: what it is, what it may
+do, and the decisions that shaped it.
+
+## 1. Purpose
+
+Midas helps build and maintain a deterministic value-investing research system:
+S&P 500 fundamentals extracted point-in-time, Graham / Buffett / Munger rules, a
+quarterly top 10 and bottom 10, and a backtest wallet that evaluates and optimises
+strategies. The aim is a value-investing sleeve for about 10% of new investments that
+beats the S&P 500 by a margin, traded quarterly; the S&P 500 total-return index is the
+benchmark for every strategy. It assists; it does not approve. The user decides methodology, data
+sources and anything marked `DECISION REQUIRED` in the specification.
+
+## 2. The hats
+
+The hats, what each may write and the change lifecycle are defined in
+[instructions/AGENTS.md](instructions/AGENTS.md), "Midas and its hats".
+
+## 3. The MCP server
+
+One server, `midas`, with two profiles:
+
+| Profile | Serves | May |
+|---|---|---|
+| `index` | Questions about the code, docstrings, rules, the specification and Midas's records: `find_calculation`, `list_components`, `describe_module`, `describe_symbol`, `describe_layer`, `find_owner`, `describe_column`, `rules_for`, `spec_section`, `document`, `search`, `health`, `rebuild_index` | read only; never runs a pipeline, never writes files, never returns data values |
+| `lab` | Backtests and data: `list_datasets`, `fetch_market_data`, `run_backtest`, `optimise_strategy`, `regression_check`, `run_checks` | run the strategy on cached datasets, write cached datasets to `data/` and baselines to `benchmarks/` (baselines only with `update_baseline`, which needs the user's approval) |
+
+Every index answer carries its `provenance` (`code` or `docs`) and the git `commit` and
+`dirty` flag it was built from. Where code and documentation disagree, the code is
+trusted and `health` reports the contradiction.
+
+Status: the `lab` tools are served today as the `trading-bot` server
+(`Toolbox/skatkis/midas/server.py`), running the BTC harness in `Toolbox/SandBox/btc_vwap/`
+until the portfolio engine (S_202610_006) replaces it. The index and the rename to
+`midas` are change
+[S_202610_002](toolbox/skatkis/changes/S_202610_002-midas-index-server.md).
+
+## 4. Controls
+
+- Agents stay inside the repository; the rest of the machine is off limits.
+- Vendor API keys are read from the environment at the command line only, never stored
+  in the repository, records or prompts.
+- Cached vendor data lives in the git-ignored `data/` and is never committed or sent to
+  another service.
+- Baselines (`benchmarks/baseline.json`) and hand-computed reference values are
+  protected; changing them needs the user's approval
+  ([S_202610_004](toolbox/skatkis/changes/S_202610_004-claude-code-guard.md)).
+- Nothing is committed unless the user asks.
+
+## 5. Decision log
+
+| Date | Decision | By |
+|---|---|---|
+| 2026-10-31 | The repository follows the layout and governance of the example in `docs/attachments.zip`, renamed: `Toolbox/` for code, `Toolbox/skatkis/` for the shared core, `midas/` for the agent workspace; no client folders | user |
+| 2026-10-31 | One agent, Midas, with hats: developer, secretary, researcher, warden, guard | user |
+| 2026-10-31 | Docstrings follow the example's numpydoc structure (Owns, Must not, Public API, Computes) so the index can parse them; this replaces Google style in spec §1.3 | user |
+| 2026-10-31 | One MCP server with two profiles: `index` (read-only) and `lab` (backtests and data) | user |
+| 2026-10-31 | Lifecycle order: build until the framework produces plots → warden's report → documentation (docstrings for agents, README for people) → unit tests last, which may be committed directly | user |
+| 2026-10-31 | The MCP server lives in `Toolbox/skatkis/midas/`; its lab tools run the BTC harness in `Toolbox/SandBox/btc_vwap/`, a temporary dependency of `skatkis` on the sandbox until S_202610_006 (S_202610_001; awaits the user's explicit confirmation) | developer |
+| 2026-10-31 | `midas/instructions/quant.md` holds what the developer and the researcher share about data: the sources, their traps and the working rules; the detailed source reference is official documentation, in the tool README | user |
+| 2026-10-31 | A second tool, `hand_o_midas` (machine learning, prefix `HOM`), beside `value_investing`; both read one shared data package (sources, cleaned tables, shared metrics) between `skatkis` and the tools, so `skatkis` stays free of domain knowledge | user |
+| 2026-10-31 | No scripts in `notebooks/`: repeatable work runs as terminal commands or MCP tools; plots and reports go to a `results/` folder tracked in git (so changed plots show in review), per source under `market_analysis/` and per tool | user |
+| 2026-10-31 | Changes to Midas's records (`midas/`) are staged directly after writing; commits still wait for the user | user |
+| 2026-10-31 | Reports are LaTeX documents compiled to PDF; the secretary owns their writing and formatting (text in `config/report_*.toml`), the developer the rendering code | user |
+| 2026-10-31 | When asked to run updates, the data update, the check and the LaTeX compile run outside the sandbox (local settings file, git-ignored) | user |
+| 2026-10-31 | Current focus: the value-investing tool, starting with S&P 500 data extraction, and the wallet as backtest engine; the BTC strategy moves to the sandbox | user |

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "trading-bot": {
+      "command": ".venv/bin/python",
+      "args": ["Toolbox/skatkis/midas/server.py"]
+    }
+  }
+}

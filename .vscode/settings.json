@@ -1,6 +1,4 @@
 {
-    "python-envs.pythonProjects": [],
-
     "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
 
     "[python]": {
@@ -11,5 +9,12 @@
     "black-formatter.args": [
         "--line-length",
         "88"
-    ]
+    ],
+
+    // Hidden from the explorer only; Python still needs these files.
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/__init__.py": true,
+        "**/__main__.py": true
+    }
 }

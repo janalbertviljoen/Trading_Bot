@@ -1,0 +1,67 @@
+# Configuration of the shared market data package (Toolbox/market_data).
+# API keys and the SEC User-Agent are never stored here: they are read from the
+# environment at the command line (SEC_USER_AGENT, FRED_API_KEY).
+
+[sources.edgar]
+# SEC allows at most 10 requests per second; stay below it.
+max_requests_per_second = 8.0
+timeout_seconds = 30.0
+max_retries = 3
+backoff_seconds = 1.0
+
+[sources.yahoo]
+# Unofficial endpoint: keep the rate low. Daily prices from 2006 (the analysis period);
+# dividends and splits from 1986 through monthly bars, for the 20-year dividend record.
+start = 2006-01-01
+events_start = 1986-01-01
+max_requests_per_second = 1.0
+timeout_seconds = 60.0
+max_retries = 5
+backoff_seconds = 2.0
+
+[sources.fred]
+# DEXSFUS (ZAR per USD) starts in 1980; requested from 2006, the analysis period.
+# The API allows 120 requests per minute.
+start = 2006-01-01
+max_requests_per_second = 1.0
+timeout_seconds = 60.0
+max_retries = 5
+backoff_seconds = 2.0
+
+[sources.wikipedia]
+# MediaWiki API: S&P 500 members (GICS, CIK) and the history of index changes.
+max_requests_per_second = 1.0
+timeout_seconds = 60.0
+max_retries = 5
+backoff_seconds = 2.0
+
+[universe]
+# Sectors left out of the stock universe (decided 2026-10-31: financial companies and
+# REITs, whose balance sheets the value rules do not fit).
+excluded_sectors = ["Financials", "Real Estate"]
+
+[benchmarks]
+# Total-return benchmarks: the market, and per GICS sector the SPDR sector fund, whose
+# adjusted close includes dividends (the S&P sector indices on Yahoo are price-only).
+market = "^SP500TR"
+
+[benchmarks.sectors]
+"Communication Services" = "XLC"
+"Consumer Discretionary" = "XLY"
+"Consumer Staples" = "XLP"
+"Energy" = "XLE"
+"Financials" = "XLF"
+"Health Care" = "XLV"
+"Industrials" = "XLI"
+"Information Technology" = "XLK"
+"Materials" = "XLB"
+"Real Estate" = "XLRE"
+"Utilities" = "XLU"
+
+[analysis]
+# The report's main text ranks and plots the most recent years; the appendix the full
+# history (for back-testing and optimisation).
+recent_years = 5
+long_years = 10
+main_companies = 5
+appendix_companies = 10
