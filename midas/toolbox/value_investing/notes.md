@@ -59,6 +59,30 @@ The user's plan after VI_202610_002, in order:
    BTC VWAP work in `notebooks/optimise_strategies.ipynb` (high-frequency triggers
    there; one quarterly decision here). → S_202610_006
 
+### Follow-ups pencilled in after the warden's first run (2026-10-31, open)
+
+Put off by the user as not urgent (2026-10-31); details in VI_202610_006, "Warden
+report":
+
+1. The tag-choice fix (point-in-time label choice), with the user's approval; the two
+   strict-xfail tests then pass (MD_202610_002).
+2. Historical S&P 500 members, to remove the survivorship bias (MD_202610_002).
+3. JSE data and the Top 40 comparison: returns-only first, or a paid fundamentals
+   source (MD_202610_003).
+4. Whether the picks are available in the EasyEquities USD account (the user checks in
+   the app).
+5. The warden's should-fix items S3 to S9, S11 and S12: one owner for forward excess
+   return and rank correlation, evaluation logic out of `__main__`, the universe
+   filter out of `pipeline`, thresholds into config, G4 phase-in, docstrings, record
+   references out of docstrings, housekeeping of change files, a fixture for the
+   truncation test.
+6. Documentation (tool README, spec departures, skatkis reference) and the unit tests
+   the warden listed.
+7. Report conventions the user set, to record as standing rules for the secretary:
+   tables kept whole on one page where they fit, benchmarks thick and black (S&P 500
+   dashed, Berkshire dash-dot), full company names in the concluding parts, a recent
+   investor as the reference.
+
 ### Spec §1.3 docstring style (2026-10-31, → S_202610_003)
 
 Spec §1.3 prescribes Google style; the user chose the numpydoc structure of
