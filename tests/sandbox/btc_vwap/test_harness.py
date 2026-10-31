@@ -1,5 +1,6 @@
-import backtest
 import pytest
+
+from Toolbox.SandBox.btc_vwap import harness as backtest
 
 
 def test_split_is_chronological(prices):

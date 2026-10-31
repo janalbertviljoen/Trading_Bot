@@ -1,4 +1,4 @@
-"""Reproducible backtest harness behind the trading-bot MCP server.
+"""Reproducible BTC backtest harness behind the lab tools of the Midas MCP server.
 
 Caches price datasets as CSV under ``data/``, splits them chronologically into
 in-sample / out-of-sample segments, runs the repo strategy
@@ -10,22 +10,18 @@ from __future__ import annotations
 
 import itertools
 import json
-import sys
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import pandas as pd
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[3]
 DATA_DIR = REPO_ROOT / "data"
 BASELINE_PATH = REPO_ROOT / "benchmarks" / "baseline.json"
 
-sys.path.insert(0, str(REPO_ROOT))
-
-import read_data  # noqa: E402
-import trade_indicators  # noqa: E402
-import trade_wallet  # noqa: E402
+from Toolbox.SandBox.btc_vwap import read_data, trade_indicators
+from Toolbox.skatkis.backtest import wallet as trade_wallet
 
 DETECT_KEYS = ["threshold", "rolling_window"]
 TRADE_KEYS = [

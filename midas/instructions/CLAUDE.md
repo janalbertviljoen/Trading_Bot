@@ -15,7 +15,7 @@ it. This file holds only what is specific to Claude Code.
   `midas-records.md` brings in `secretary.md` for `midas/`, `midas-index.md` brings in
   `developer.md` for Midas's server code.
 - **MCP.** The server is registered in `.mcp.json` (today as `trading-bot`, from
-  `mcp_server/server.py`; it becomes `midas` with change S_202610_002). Edits to its
+  `Toolbox/skatkis/midas/server.py`; it becomes `midas` with change S_202610_002). Edits to its
   code reach the running server only after Claude Code restarts it.
 - **Commands.** Use `.venv/bin/python -m …` for pytest, Black, ruff and pyright.
 - **No prompts the user did not need.** Read and search with Read and Grep; keep Bash

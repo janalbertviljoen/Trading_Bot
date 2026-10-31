@@ -48,9 +48,10 @@ on out-of-sample excess return over the S&P 500 total-return index.
 - `midas/`: Midas's workspace: these instructions, change logs, notes and designs. No
   code.
 
-The layout above is the target agreed on 2026-10-31; until change
-[S_202610_001](../toolbox/skatkis/changes/S_202610_001-repository-layout.md) is done,
-the code still sits at the repository root and in `mcp_server/`.
+The layout was agreed on 2026-10-31 and put in place by
+[S_202610_001](../toolbox/skatkis/changes/S_202610_001-repository-layout.md). Code is
+imported from the repository root as `Toolbox.<package>` (pytest sets `pythonpath`;
+notebooks add the root to `sys.path`).
 
 ## Authority order
 

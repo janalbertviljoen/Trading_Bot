@@ -47,13 +47,11 @@ extend-exclude = '''
 )
 '''
 
-# Spec §1.4. Covers the target layout (S_202610_001) and, until it moves, the wallet
-# framework at the root and mcp_server/. Excluded: the sandbox, notebooks, data and
-# milkandhoney27.py (bound for Toolbox/SandBox).
+# Spec §1.4. The sandbox and notebooks are outside the standard.
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-extend-exclude = ["Toolbox/SandBox", "notebooks", "data", "milkandhoney27.py", "*.ipynb"]
+extend-exclude = ["Toolbox/SandBox", "notebooks", "data", "*.ipynb"]
 
 [tool.ruff.lint]
 select = ["E", "W", "F", "I", "B", "UP", "N", "D", "ANN", "SIM", "RUF", "PL", "PD", "NPY"]
@@ -64,19 +62,22 @@ convention = "numpy"
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["D", "ANN", "PLR2004"]
-# Root modules still carry Google-style docstrings; the numpydoc conversion is
-# S_202610_003, after which this exemption is removed.
-"{analysis,plot_analysis,promised_land,read_data,trade_indicators,trade_perforpance,trade_wallet}.py" = ["D"]
+# The package root is called Toolbox by decision (midas/midas.md, decision log).
+"Toolbox/**/__init__.py" = ["N999"]
+# The wallet and server still carry Google-style docstrings; the numpydoc conversion
+# is S_202610_003, after which the D exemptions are removed.
+"Toolbox/skatkis/backtest/wallet.py" = ["D"]
 # MCP tool signatures are the tools' input schemas, so they take many arguments.
-"mcp_server/**" = ["D", "PLR0913", "PLR0917"]
+"Toolbox/skatkis/midas/**" = ["D", "PLR0913", "PLR0917"]
 
 [tool.pyright]
 typeCheckingMode = "strict"
 pythonVersion = "3.11"
-include = ["Toolbox", "mcp_server", "*.py"]
-exclude = ["Toolbox/SandBox", "milkandhoney27.py", "**/__pycache__", ".venv", "data"]
+include = ["Toolbox"]
+exclude = ["Toolbox/SandBox", "**/__pycache__"]
 venvPath = "."
 venv = ".venv"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]

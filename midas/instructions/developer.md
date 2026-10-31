@@ -128,7 +128,7 @@ Midas's index server is the read-only component index; `midas/` holds no code.
 
 | Part | Location |
 |---|---|
-| Docstring parser, index, server | `Toolbox/skatkis/midas/` (today: `mcp_server/`) |
+| Server (lab tools today), docstring parser and index (S_202610_002) | `Toolbox/skatkis/midas/` |
 | Tests | `tests/skatkis/midas/` |
 | Registration | `.mcp.json` |
 

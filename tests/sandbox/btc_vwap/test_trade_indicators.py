@@ -1,6 +1,6 @@
 import numpy as np
 
-import trade_indicators
+from Toolbox.SandBox.btc_vwap import trade_indicators
 
 
 def test_rolling_vwap_equals_mean_for_constant_volume(prices):

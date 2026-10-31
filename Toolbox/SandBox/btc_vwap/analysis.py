@@ -7,7 +7,7 @@ from collections.abc import Iterable
 import numpy as np
 import pandas as pd
 
-from promised_land import PromisedLandTrader
+from Toolbox.SandBox.btc_vwap.promised_land import PromisedLandTrader
 
 
 class PromisedLandExplorer:

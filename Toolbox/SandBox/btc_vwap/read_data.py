@@ -32,7 +32,7 @@ def fetch_btc_history(
 
     Assumptions:
         Data runs up to the moment of the call, so results are not reproducible
-        between calls; use ``mcp_server/backtest.fetch_dataset`` with a pinned
+        between calls; use ``Toolbox.SandBox.btc_vwap.harness.fetch_dataset`` with a pinned
         ``end_date`` for backtests.
 
     Edge cases:

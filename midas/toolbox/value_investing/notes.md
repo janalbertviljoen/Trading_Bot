@@ -15,9 +15,13 @@ fundamentals over many years.
 
 From `docs/value_investing_bot_spec.md` §9; each blocks the changes noted.
 
-1. Data: paid vendor budget, or EDGAR only? → VI_202610_001
+1. Data: paid vendor budget, or EDGAR only? Decided 2026-10-31: free sources (EDGAR,
+   Wikipedia or `fja05680`, `yfinance`); survivorship gap accepted for now
+   → VI_202610_001
 2. Bottom ten: sell/avoid, or short? → S_202610_006
-3. Financials and REITs: exclude, or separate scoring? → VI_202610_001, VI_202610_002
+3. Financials and REITs: exclude, or separate scoring? Decided 2026-10-31: REITs and
+   financial companies excluded; bonds are outside this tool
+   → VI_202610_001, VI_202610_002, VI_202610_003
 4. Wallet interface: signals, target weights or orders? → S_202610_006
 5. Reporting currency: USD or ZAR? → VI_202610_001
 6. DAG engine: stdlib `graphlib` registry or Hamilton/Dagster? → VI_202610_001

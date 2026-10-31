@@ -5,7 +5,7 @@
 | Status | ready |
 | Priority | medium |
 | Kind | new capability |
-| Depends on | S_202610_001, S_202610_005, VI_202610_001; spec §9.3 (financials and REITs) |
+| Depends on | S_202610_001, S_202610_005, VI_202610_003 |
 | Raised | 2026-10-31 |
 
 ## Description
@@ -54,14 +54,19 @@ Fitted to the SOP layout (§3.3) and the spec's stage and node split (§5, §6.2
 - **Registry or plain functions.** With a fixed rule set, the rules could be plain
   functions in the layers. The registry pays off if gates and the composite rank choose
   rules from config. Recommendation: registry.
-- **Spec §9.3, financials and REITs:** exclude, or score separately (e.g. P/B and ROE).
-  Decides whether G2, E1, E2 and NN apply to every company or through a sector-specific
-  rule set.
-- **Dependency gap:** stage 2 (`fundamentals.point_in_time`, TTM and 10–20 year
-  history) has no change yet. Raise it separately, or fold it into VI_202610_001.
 - **Hard-gate subset:** which of G2, G3 and E1–E3 are hard gates by default (spec §3,
   item 1); belongs to the ranking change but fixes which pass flags this change must
   emit.
+
+## Decisions
+
+- 2026-10-31 (user): REITs and financial companies are excluded from the universe (spec
+  §9.3), so one rule set applies to every company scored; no sector-specific rules.
+- 2026-10-31 (user): a missing input gives NaN for the rule; no filling or
+  interpolation until the data has been looked at.
+- 2026-10-31 (user): product first; validation stays minimal (declared columns only)
+  until the framework runs end to end.
+- 2026-10-31: the point-in-time panel this change consumes is VI_202610_003.
 
 ## Kickoff prompt
 

@@ -1,7 +1,6 @@
 ---
 paths:
   - "Toolbox/skatkis/midas/**"
-  - "mcp_server/**"
   - "tests/skatkis/midas/**"
   - ".mcp.json"
 ---

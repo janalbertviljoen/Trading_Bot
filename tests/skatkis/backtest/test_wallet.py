@@ -1,7 +1,7 @@
 import numpy as np
 
-import trade_indicators
-import trade_wallet
+from Toolbox.SandBox.btc_vwap import trade_indicators
+from Toolbox.skatkis.backtest import wallet as trade_wallet
 
 
 def run(prices, **kwargs):

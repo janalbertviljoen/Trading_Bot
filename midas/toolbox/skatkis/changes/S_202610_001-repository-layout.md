@@ -2,11 +2,11 @@
 
 | Field | Value |
 |---|---|
-| Status | in discussion |
+| Status | in progress |
 | Priority | high |
 | Kind | refactor |
 | Depends on | none |
-| Branch | `feature/value-investing-sp500-pipeline` (or its own, user's choice) |
+| Branch | `feature/value-investing-sp500-pipeline` |
 | Raised | 2026-10-31 |
 
 ## Description
@@ -17,20 +17,20 @@ MCP server in `mcp_server/`. The agreed target layout (`midas/instructions/AGENT
 exploratory code and notebooks, so ownership is visible from the tree and the index can
 be configured by path.
 
-## Approach
+## Agreed approach
 
 A pure move, no behaviour change; `regression_check` must stay `unchanged`.
 
 | Today | Target |
 |---|---|
 | `trade_wallet.py` | `Toolbox/skatkis/backtest/wallet.py` |
-| `mcp_server/backtest.py` | `Toolbox/skatkis/backtest/harness.py` |
+| `mcp_server/backtest.py` | `Toolbox/SandBox/btc_vwap/harness.py` (see Decisions) |
 | `mcp_server/server.py` | `Toolbox/skatkis/midas/server.py` (lab tools; index added in S_202610_002) |
 | `trade_perforpance.py` (`detrend_series`, FFT) | `Toolbox/SandBox/btc_vwap/` (cycle analysis is BTC research) |
 | `trade_indicators.py`, `read_data.py`, `promised_land.py`, `analysis.py`, `plot_analysis.py`, `milkandhoney27.py` | `Toolbox/SandBox/btc_vwap/` |
 | `run_bot.ipynb`, `optimise_strategies.ipynb` | `notebooks/` |
 | `_init_.py` (empty, misnamed) | removed |
-| `tests/test_*.py` | `tests/skatkis/backtest/…`, `tests/sandbox/…` mirroring `Toolbox/` |
+| `tests/test_*.py` | `tests/skatkis/backtest/test_wallet.py`, `tests/sandbox/btc_vwap/test_harness.py`, `tests/sandbox/btc_vwap/test_trade_indicators.py` |
 | — | `Toolbox/value_investing/` (empty package with README stub; filled by VI changes) |
 | — | `pyproject.toml` with Black, ruff, pyright and pytest config (spec §1.4): added 2026-10-31 with the virtual environment, scoped to `Toolbox/`; widen if the move changes paths |
 
@@ -39,12 +39,28 @@ the wallet belongs in `skatkis` (shared engine) or in the tool is the main desig
 question: it is proposed for `skatkis` because every strategy and future tool backtests
 through it.
 
-## Open decisions (user)
+## Decisions
 
-- Wallet in `Toolbox/skatkis/backtest/` (proposed) or in the tool?
-- Do the BTC modules move to the sandbox (proposed), or stay a second tool
-  (`Toolbox/btc_vwap/`) under the standard?
-- Own branch `feature/skatkis/s-202610-001-repository-layout`, or the current branch?
+- 2026-10-31 (user): carry out the layout; the proposals stand: the wallet goes to
+  `Toolbox/skatkis/backtest/`, the BTC modules to `Toolbox/SandBox/btc_vwap/`, and the
+  work stays on the current branch.
+- 2026-10-31 (developer, deviation from the table): the harness (`mcp_server/backtest.py`)
+  runs the BTC VWAP strategy, so it went to `Toolbox/SandBox/btc_vwap/harness.py`
+  instead of `skatkis`, which must not depend on tool or sandbox code. The server in
+  `Toolbox/skatkis/midas/` imports it for the lab tools; this one dependency of
+  `skatkis` on the sandbox stays until S_202610_006 provides the portfolio engine.
+
+## Notes
+
+- 2026-10-31: moved with `git mv`; imports use `Toolbox.<package>` from the repository
+  root, with aliases keeping the old names (`wallet as trade_wallet`, `harness as
+  backtest`) so calling code is unchanged. Notebooks add the root to `sys.path`.
+  `_init_.py` removed; `pyproject.toml` scope updated (`Toolbox/**/__init__.py` exempt
+  from N999 because `Toolbox` is capitalised by decision).
+- 2026-10-31: refactor verified: `regression_check` on
+  `BTCUSDT_1h_2025-06-01_2025-10-01` is `unchanged`; pytest 9 passed; Black, ruff and
+  pyright (strict) clean; the server loads from its new path with all six lab tools.
+  The notebooks were not executed.
 
 ## Kickoff prompt
 

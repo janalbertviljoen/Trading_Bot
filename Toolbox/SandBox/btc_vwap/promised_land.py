@@ -14,10 +14,8 @@ from typing import Any, cast
 
 import pandas as pd
 
-import plot_analysis
-import read_data
-import trade_indicators
-import trade_wallet
+from Toolbox.SandBox.btc_vwap import plot_analysis, read_data, trade_indicators
+from Toolbox.skatkis.backtest import wallet as trade_wallet
 
 # import trade_perforpance
 EXTRACT_COL: list[str] = [

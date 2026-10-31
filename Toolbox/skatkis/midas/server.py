@@ -1,3 +1,9 @@
+"""Midas MCP server: the lab tools (backtests and market data) for this repository.
+
+The read-only index profile is added by S_202610_002. Until the portfolio engine
+(S_202610_006) exists, the lab tools run the BTC harness in ``Toolbox/SandBox``.
+"""
+
 import subprocess
 import sys
 from pathlib import Path
@@ -5,9 +11,10 @@ from typing import Any, Literal
 
 from fastmcp import FastMCP
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+# Started as a script by .mcp.json, so make the repository root importable.
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-import backtest
+from Toolbox.SandBox.btc_vwap import harness as backtest
 
 READ_ONLY = {"readOnlyHint": True, "destructiveHint": False, "openWorldHint": False}
 
