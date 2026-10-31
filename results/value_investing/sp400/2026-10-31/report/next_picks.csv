@@ -1,0 +1,6 @@
+decision_date,score_date,symbol,score,side,weight,amount,date,gics_sector,score_share
+2026-10-30,2026-09-18,UFPI,41.7996,buy,0.2253,22.5308,2026-09-18,Industrials,0.8403
+2026-10-30,2026-09-18,INGR,39.0262,buy,0.2104,21.0358,2026-09-18,Consumer Staples,0.7845
+2026-10-30,2026-09-18,SSD,36.1987,buy,0.1951,19.5117,2026-09-18,Industrials,0.7277
+2026-10-30,2026-09-18,HOG,34.3577,buy,0.1852,18.5194,2026-09-18,Consumer Discretionary,0.7674
+2026-10-30,2026-09-18,RS,34.1404,buy,0.1840,18.4023,2026-09-18,Materials,0.6863

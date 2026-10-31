@@ -134,7 +134,7 @@ Fitted to the SOP layout (§3.3) and the spec's stage and node split (§5, §6.2
   3. Rules are phased in: a rule gives NaN until its window is full at the rebalance
      date, and gates and the composite rank treat NaN as "not yet available", so the
      backtest can start before every rule applies.
-- 2026-10-31 (user): G4 follows decision 3. It is NaN when the company's price history
+- 2026-11-01 (user): G4 follows decision 3. It is NaN when the company's price history
   (Yahoo monthly bars, from 1986) starts less than 20 years before the date; a
   company with the full history that missed a year still fails. Fixes warden finding
   S7. A methodology change: young companies' G4 moves from fail to not evaluated, so

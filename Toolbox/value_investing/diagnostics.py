@@ -7,8 +7,9 @@ These tables describe the data; they are diagnostics, not evidence that a strate
 works, which is judged on out-of-sample results only. ``sample``
 picks the companies with the highest and lowest mean score from a date, a casual sample
 for looking at the data. ``forward_excess`` gives each company's total return from one
-rebalance date to the next less ``^SP500TR``'s; ``score_returns`` and
-``information_coefficient`` relate the score to it.
+rebalance date to the next less the benchmark's (a different window from
+``value_investing.inputs.window_returns``, which runs a fixed number of months);
+``score_returns`` and ``information_coefficient`` relate the score to it.
 
 Owns
 ----
@@ -40,7 +41,7 @@ Computes
 mean buyability score : sample
     Mean of ``score`` over the rebalance dates from ``mean_from``.
 score times relative growth, buyability signal : sample_paths
-    signal(t) = score(t) * R(t), R the growth over ``^SP500TR`` since ``start``
+    signal(t) = score(t) * R(t), R the growth over the benchmark since ``start``
     (``skatkis.financial_logic.relative_growth``): high when a company scores well and
     has beaten the market, low when it scores badly and has lagged.
 mean excess return by score : score_returns
@@ -120,7 +121,7 @@ def forward_excess(
     dates : Sequence[pd.Timestamp]
         Rebalance dates, sorted.
     benchmark : str
-        Total-return benchmark symbol (``^SP500TR``).
+        Total-return benchmark symbol (the index's, e.g. ``^SP500TR``).
 
     Returns
     -------

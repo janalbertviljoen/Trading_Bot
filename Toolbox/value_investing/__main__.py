@@ -96,6 +96,8 @@ class _Index:
     key: str
     label: str
     benchmark: str
+    benchmark_name: str
+    membership: str
     interim: Path
     tables: Path
     members: Path
@@ -111,6 +113,8 @@ def _index(args: argparse.Namespace) -> _Index:
         key=args.index,
         label=str(entry["label"]),
         benchmark=str(entry["benchmark"]),
+        benchmark_name=str(entry["benchmark_name"]),
+        membership=str(entry["membership"]),
         interim=interim,
         tables=interim / "value_investing" / as_of / args.index,
         members=interim / "constituents" / as_of / args.index,
@@ -510,6 +514,7 @@ def _report(args: argparse.Namespace) -> int:
         right_on=["symbol", "date"],
     )
     upcoming = upcoming.rename(columns={str(settings["share_column"]): "score_share"})
+    changes = read_table(index.members / "changes.parquet")
     paths = pd.concat([held.paths, managed.paths], ignore_index=True)
 
     folder = index.results / "report"
@@ -562,12 +567,16 @@ def _report(args: argparse.Namespace) -> int:
         weighting=weighting,
         peers=peer_view,
         lookahead=check,
-        survivorship=diagnostics.survivorship(
-            read_table(index.members / "changes.parquet"), start_years
-        ),
+        survivorship=diagnostics.survivorship(changes, start_years),
         reference=int(settings["reference_start"]),
         names=_company_names(index.members / "constituents.parquet"),
         index_label=index.label,
+        benchmark_name=index.benchmark_name,
+        membership=index.membership,
+        record_start=pd.Timestamp(changes["date"].min()),
+        pick_scenario=int(settings["pick_scenario"]),
+        pick_years=int(settings["pick_years"]),
+        pick_ends=int(settings["pick_ends"]),
         rules={
             rule_id: {**rules["valuation"], **thresholds}
             for rule_id, thresholds in rules["rules"].items()

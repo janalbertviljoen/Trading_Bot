@@ -1,0 +1,6 @@
+decision_date,score_date,symbol,score,side,weight,amount,date,gics_sector,score_share
+2026-10-30,2026-09-18,LNN,41.8310,buy,0.2065,20.6548,2026-09-18,Materials,0.8046
+2026-10-30,2026-09-18,INVA,41.4517,buy,0.2047,20.4675,2026-09-18,Health Care,0.8405
+2026-10-30,2026-09-18,BCC,39.8993,buy,0.1970,19.7010,2026-09-18,Industrials,0.8202
+2026-10-30,2026-09-18,ALG,39.6967,buy,0.1960,19.6009,2026-09-18,Industrials,0.7635
+2026-10-30,2026-09-18,LRN,39.6454,buy,0.1958,19.5756,2026-09-18,Consumer Discretionary,0.8150

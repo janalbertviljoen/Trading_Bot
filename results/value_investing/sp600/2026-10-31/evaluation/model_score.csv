@@ -1,0 +1,4 @@
+period,decisions,first_decision,last_end,wallet_growth,benchmark_growth,annualised_excess,mean_hit_rate
+in-sample,2,2020-01-02,2022-01-04,1.4104,1.4479,-0.0130,0.4000
+held-out,4,2022-01-03,2026-01-02,1.2033,1.0878,0.0256,0.5094
+all,6,2020-01-02,2026-01-02,1.6971,1.5750,0.0125,0.4729

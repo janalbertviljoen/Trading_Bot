@@ -15,15 +15,17 @@
 
 title = "Value investing: buy-and-hold results"
 abstract = """Each January and July since {first_year}, a rule-based value score picks {picks} \
-{index} companies, and {amount} USD is invested in them, weighted by score and never sold. Investors who \
-started in 2016, 2020, 2023 and 2025 are followed to {end}, each against the same money in the \
-{index} total-return index and in Berkshire Hathaway. The reference is the investor who started in \
-{ref_start}: the data hold only today's index members, and {ref_removed} companies have left the \
-index since then against {first_removed} since {first_year_start}, so fewer failed companies are \
-missing. That investor's {ref_invested} USD is worth {ref_wallet} USD, against {ref_sp} USD in \
-the {index} and {ref_brk} USD in Berkshire Hathaway; a second wallet that also sells holdings whose \
-score has fallen is worth {ref_managed} USD. The report closes with the next picks: {next_picks}. \
-The result rests on few decisions and few companies, with {best_company_share} of the value in one \
+{index} companies, and {amount} USD is invested in them, weighted by score and never sold. \
+Investors who started in 2016, 2020, 2023 and 2025 (an earlier start buys from {first_year}) are \
+followed to {end}, each against the same money in {benchmark_name}, and in Berkshire Hathaway. \
+The reference is the investor who started in {ref_start}: the data hold only today's index \
+members, and by the index's list of changes, which starts in {record_start}, {ref_removed} \
+companies have left the index since then against {first_removed} since {first_year_start}, so \
+fewer failed companies are missing. That investor's {ref_invested} USD is worth {ref_wallet} USD, \
+against {ref_sp} USD in the benchmark and {ref_brk} USD in Berkshire Hathaway; a second wallet \
+that also sells holdings whose score has fallen is worth {ref_managed} USD. The report closes with \
+the next picks: {next_picks}. The result rests on few decisions and few companies, with \
+{best_company_share} of the value in one \
 company; it is a research result, not evidence of a lasting edge."""
 
 [method]
@@ -188,14 +190,14 @@ figure = "Mean points per rule (0 to 5) of the Magnificent 7 and of our picks on
 [history]
 title = "Price history of the picks"
 text = """Figure [[fig:pick-prices]] shows the share price of every company the investor who \
-started in 2023 bought or sold, and of the next picks, over the last five years. The price is \
+started in {pick_scenario} bought or sold, and of the next picks, over the last {pick_years} years. The price is \
 split-adjusted and excludes dividends, as a price chart shows it; the companies run from the best to the worst price change over \
-the five years, given beside each name; when they do not fit on one page, only the five best and the five \
+the {pick_years} years, given beside each name; when they do not fit on one page, only the {pick_ends} best and the {pick_ends} \
 worst are shown. Each purchase is marked in green \
 and each sale in red, at the price on the decision date; a larger marker means more money. Figure \
 [[fig:trade-amounts]] gives the same trades in USD per company and decision date."""
-prices_figure = "Share price (USD, split-adjusted, dividends excluded) over the last five years, one panel per company, ordered from the best to the worst price change over the period; purchases (green) and sales (red) of the investor who started in 2023, marker area in proportion to the USD traded."
-amounts_figure = "USD bought (green, positive) and sold (red, negative) by the investor who started in 2023, per company and decision date."
+prices_figure = "Share price (USD, split-adjusted, dividends excluded) over the last {pick_years} years, one panel per company, ordered from the best to the worst price change over the period; purchases (green) and sales (red) of the investor who started in {pick_scenario}, marker area in proportion to the USD traded."
+amounts_figure = "USD bought (green, positive) and sold (red, negative) by the investor who started in {pick_scenario}, per company and decision date."
 
 [next]
 title = "The next picks"
@@ -203,11 +205,11 @@ text = """On the latest score date, {next_score_date}, the five highest-scoring 
 {next_picks} (Table [[tab:next]]). Each would receive its share of the next decision's {amount} USD and of any \
 proceeds from sales. The decision is taken on the first trading day of January with the scores \
 known then, which include the annual reports filed until that day; these picks are a preview and \
-may change. Figure [[fig:next-prices]] shows each pick's share price over the last five years, \
-with the earlier purchases of the investor who started in 2023 and the potential purchase \
+may change. Figure [[fig:next-prices]] shows each pick's share price over the last {pick_years} years, \
+with the earlier purchases of the investor who started in {pick_scenario} and the potential purchase \
 at today's price."""
 table_caption = "The next picks on the latest score date: score, score on the 0-to-1 scale, weight and USD of each 100 USD."
-prices_figure = "Share price of each next pick (USD, split-adjusted, dividends excluded) over the last five years: earlier purchases of the investor who started in 2023 in green, the potential purchase at the latest price in orange."
+prices_figure = "Share price of each next pick (USD, split-adjusted, dividends excluded) over the last {pick_years} years: earlier purchases of the investor who started in {pick_scenario} in green, the potential purchase at the latest price in orange."
 sell_title = "Sell check"
 sell_caption = "Holdings the rule would sell in part: value today, score on the 0-to-1 scale, share to sell and amount."
 sell_text = """The investor who started in {first_start} holds {holdings} companies. With the \
@@ -341,8 +343,8 @@ runs as a unit test. A rule whose window reaches back further than a company's p
 (the 20-year dividend record of a younger company) is not evaluated rather than failed.
 
 Three sources of forward information are outside this test. Only today's {index} members \
-are scored: companies join the universe only from the date they entered the index, but \
-companies that later left it are missing, which flatters every result. Sectors are \
+are scored. {membership} Companies that later left the index are missing, which flatters every \
+result. Sectors are \
 today's, used to leave out Financials and Real Estate in earlier years. And the score's \
 design and settings were chosen while looking at 2016 to 2026, so no period tests it fairly: \
 2022 onwards, once meant as a held-out test, was used to choose between models."""
@@ -351,7 +353,9 @@ survivors_text = """Table [[tab:survivors]] counts the companies that left the {
 start year; none of them is in the data, of any sector. Most left through an acquisition, often at \
 a premium; those that dropped out on their market value are the likely losers a real investor could \
 have picked. The later the start, the fewer are missing, which is why the investor who started in \
-{ref_start} is the reference of this report. The bias is removed only when the historical members \
-of the index are added to the data."""
+{ref_start} is the reference of this report. The count starts with the index's list of changes, \
+which begins in {record_start}: removals before that are not counted, so for earlier start years \
+it understates the gap. The bias is removed only when the historical members of the index are \
+added to the data."""
 survivors_caption = "Companies that left the {index} since each start year, all missing from the data: in all, on their market value, and through an acquisition or another reason."
 table_caption = "Truncation check: companies scored on the date, companies whose score differs when every input is cut at the date (per score), and whether the five picks are the same."

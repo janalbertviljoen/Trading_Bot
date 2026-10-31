@@ -1,0 +1,17 @@
+side,period,horizon_months,positions,hit_rate,mean_excess,median_excess
+buy,held-out,1,171,0.6257,0.0235,0.0177
+buy,held-out,3,171,0.5380,0.0207,0.0078
+buy,held-out,12,132,0.5455,0.0455,0.0143
+buy,held-out,24,90,0.5111,0.0439,0.0309
+buy,in-sample,1,105,0.4000,-0.0017,-0.0126
+buy,in-sample,3,105,0.5429,0.0063,0.0098
+buy,in-sample,12,105,0.5143,0.0220,0.0103
+buy,in-sample,24,105,0.5524,0.0987,0.0624
+sell,held-out,1,577,0.5130,0.0016,0.0010
+sell,held-out,3,577,0.4922,-0.0181,-0.0018
+sell,held-out,12,435,0.4920,-0.0343,-0.0076
+sell,held-out,24,306,0.4967,-0.0547,-0.0058
+sell,in-sample,1,301,0.4950,-0.0042,-0.0003
+sell,in-sample,3,301,0.4751,-0.0179,-0.0077
+sell,in-sample,12,301,0.4651,-0.0567,-0.0205
+sell,in-sample,24,301,0.4551,-0.1364,-0.0576

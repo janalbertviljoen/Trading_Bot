@@ -118,9 +118,8 @@ class ReportInputs:
     weighting : pd.DataFrame
         ``value_investing.holding.rule_weighting`` output.
     peers : Peers or None
-        None when no company of the peer group is in the index: the peer section is
-        left out.
-        The peer group compared with the picks.
+        The peer group compared with the picks; None when no company of the group is
+        in the index, and the peer section is then left out.
     lookahead : pd.DataFrame
         ``value_investing.lookahead.truncation_check`` output.
     survivorship : pd.DataFrame
@@ -134,6 +133,14 @@ class ReportInputs:
         Each company's full name by symbol, for the concluding parts.
     index_label : str
         The index's name (``S&P MidCap 400``), the ``{index}`` of the text.
+    benchmark_name : str
+        How the text names the benchmark (``{benchmark_name}``).
+    membership : str
+        The text's note on how membership dates are known (``{membership}``).
+    record_start : pd.Timestamp
+        The first date of the index's list of changes (``{record_start}``).
+    pick_scenario, pick_years, pick_ends : int
+        The price-history settings (``[report]``), named in the text.
     rules : Mapping[str, Mapping[str, Any]]
         Each rule's thresholds (``[rules.<ID>]``, with ``[valuation]`` merged in), to
         fill the rule descriptions.
@@ -142,7 +149,7 @@ class ReportInputs:
         ``pick_prices``, ``trade_amounts``, ``next_prices``, ``peers`` (when there is a
         peer group) and ``value_<start year>`` per scenario.
     compare : Sequence[str]
-        The comparisons, S&P 500 first (``^SP500TR``, ``BRK-B``).
+        The comparisons: the index's benchmark first, then ``BRK-B``.
     amount : float
         USD invested per decision.
     picks : int
@@ -166,6 +173,12 @@ class ReportInputs:
     survivorship: pd.DataFrame
     names: Mapping[str, str]
     index_label: str
+    benchmark_name: str
+    membership: str
+    record_start: pd.Timestamp
+    pick_scenario: int
+    pick_years: int
+    pick_ends: int
     reference: int
     rules: Mapping[str, Mapping[str, Any]]
     figures: Mapping[str, Path]
@@ -191,7 +204,13 @@ def report_facts(inputs: ReportInputs, names: Mapping[str, str]) -> dict[str, st
         "picks": str(inputs.picks),
         "amount": f"{inputs.amount:,.0f}",
         "index": inputs.index_label,
+        "benchmark_name": inputs.benchmark_name,
+        "record_start": f"{inputs.record_start:%B %Y}",
+        "pick_scenario": str(inputs.pick_scenario),
+        "pick_years": str(inputs.pick_years),
+        "pick_ends": str(inputs.pick_ends),
     }
+    facts["membership"] = inputs.membership.format(record_start=facts["record_start"])
     summary = pd.concat([held.summary, inputs.managed.summary], ignore_index=True)
     for row in summary.to_dict("records"):
         name = {**NAMES, inputs.compare[0]: "sp"}.get(

@@ -99,11 +99,8 @@ report":
    source (MD_202610_003).
 4. Whether the picks are available in the EasyEquities USD account (the user checks in
    the app).
-5. The warden's should-fix items S3 to S9, S11 and S12: one owner for forward excess
-   return and rank correlation, evaluation logic out of `__main__`, the universe
-   filter out of `pipeline`, thresholds into config, G4 phase-in, docstrings, record
-   references out of docstrings, housekeeping of change files, a fixture for the
-   truncation test.
+5. The warden's should-fix items S3 to S9, S11 and S12: done 2026-11-01 (VI_202610_006,
+   "Fixes after the report"); the follow-up run's findings are in VI_202610_007.
 6. Documentation (tool README, spec departures, skatkis reference) and the unit tests
    the warden listed.
 7. Report conventions the user set, to record as standing rules for the secretary:

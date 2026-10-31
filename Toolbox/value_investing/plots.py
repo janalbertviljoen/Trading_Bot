@@ -23,9 +23,9 @@ score_spread(table)
 rule_rates(table, pass_columns, *, evaluable)
     Per rule, the share of companies passing (or evaluable) over time.
 sample_paths(paths, group)
-    Score and growth relative to ``^SP500TR`` of the sampled companies.
+    Score and growth relative to the benchmark of the sampled companies.
 sample_signal(paths, group)
-    Score times growth relative to ``^SP500TR`` of the sampled companies.
+    Score times growth relative to the benchmark of the sampled companies.
 wallet_paths(wallet_table, *, horizon, benchmark)
     Growth of the chained buy wallet, the sold stocks and the benchmark.
 horizon_profile(summary, *, y, ylabel, title, threshold)
@@ -106,7 +106,7 @@ def score_spread(table: pd.DataFrame) -> Figure:
         x="date",
         left="score",
         right="n_available",
-        title="Buyability score across the S&P 500 (ex Financials, Real Estate)",
+        title="Buyability score across the index (ex Financials, Real Estate)",
         left_label="Score (share of evaluable rules passed)",
         right_label="Rules evaluable",
     )
@@ -144,7 +144,7 @@ def rule_rates(
 
 
 def sample_paths(paths: pd.DataFrame, group: str) -> Figure:
-    """Plot score (solid) and growth relative to ``^SP500TR`` (dashed) per company."""
+    """Plot score (solid) and growth relative to the benchmark (dashed) per company."""
     own = paths[paths["group"] == group]
     return plot_pair_series(
         own,
@@ -152,23 +152,23 @@ def sample_paths(paths: pd.DataFrame, group: str) -> Figure:
         left="score",
         right="relative_growth",
         group="symbol",
-        title=f"The ten {group}-scoring companies: score and growth over ^SP500TR",
+        title=f"The ten {group}-scoring companies: score and growth over the benchmark",
         left_label="Score (share passed)",
-        right_label="Growth relative to ^SP500TR",
+        right_label="Growth relative to the benchmark",
         log_right=True,
     )
 
 
 def sample_signal(paths: pd.DataFrame, group: str) -> Figure:
-    """Plot score * growth relative to ``^SP500TR`` since 2016, one line per company."""
+    """Plot score * growth relative to the benchmark since 2016, one line per company."""
     own = paths[paths["group"] == group]
     return plot_series(
         own,
         x="date",
         y="signal",
         group="symbol",
-        title=f"The ten {group}-scoring companies: score * growth over ^SP500TR",
-        ylabel="Score * growth relative to ^SP500TR",
+        title=f"The ten {group}-scoring companies: score * growth over the benchmark",
+        ylabel="Score * growth relative to the benchmark",
     )
 
 
@@ -476,7 +476,7 @@ def wallet_contents(
     scenario : int
         The start year shown.
     compare : Sequence[str]
-        The comparisons (``^SP500TR``, ``BRK-B``).
+        The comparisons: the index's benchmark first, then ``BRK-B``.
     limit : int
         Most holdings drawn; with more, the ``limit`` worth most on the last date.
 

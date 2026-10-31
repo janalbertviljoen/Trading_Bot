@@ -201,6 +201,7 @@ verdict_band = 0.3
 pick_scenario = 2023
 pick_years = 5
 # More companies than pick_page (one page of panels): only the pick_ends best and the
-# pick_ends worst are shown.
+# pick_ends worst are shown. pick_page also caps the holdings drawn in the wallet-contents
+# figure (the pick_page worth most today).
 pick_page = 20
 pick_ends = 5

@@ -6,10 +6,11 @@ Buy and hold: a fixed amount at every decision (January and July) into its picks
 Each decision date, ``amount_usd`` buys the companies picked (``value_investing.
 evaluation.ranked_positions``, buy side) at their weights; every purchase (a lot) is
 held to ``end`` with dividends reinvested (``adj_close``). The same amount on the same
-dates goes into each comparison (``^SP500TR``, ``BRK-B``). An investor who starts in a
-given year buys at every decision from then on, so a scenario is the set of lots from its start
-year. ``rule_profile`` compares the rule points of the picks that beat the S&P 500 since
-purchase with those of the picks that did not.
+dates goes into each comparison (the index's benchmark first, then ``BRK-B``). An
+investor who starts in a given year buys at every decision from then on, so a scenario
+is the set of lots from its start year. ``rule_profile`` compares the rule points of the
+picks that beat the index's benchmark since purchase with those of the picks that did
+not.
 
 Owns
 ----
@@ -28,10 +29,10 @@ BuyAndHold(lots, yearly, paths, summary)
 buy_and_hold(positions, prices, *, compare, amount_usd, start_years, end)
     Lots, value over time and summary per start year.
 rule_profile(lots, table, rule_ids)
-    Dollar-weighted mean points per rule of the picks that beat the S&P 500 and of
+    Dollar-weighted mean points per rule of the picks that beat the benchmark and of
     those that did not.
 dollar_view(lots)
-    Dollars ahead of the S&P 500 of the winning and losing picks, and the payoff ratio.
+    Dollars ahead of the benchmark of the winning and losing picks, and the payoff ratio.
 rule_weighting(lots, table, rule_ids)
     Per rule, its weights in the score against how well it told winners from losers.
 weighting_quality(check)
@@ -51,14 +52,14 @@ dollars ahead of the benchmark : buy_and_hold
     ahead = value(end) - a * (1 + b), a the USD invested and b the benchmark's total
     return from purchase to ``end``.
 annualised excess of a pick : buy_and_hold
-    ((1 + r) / (1 + b))^(1 / Y) - 1, r and b the pick's and ``^SP500TR``'s total return
+    ((1 + r) / (1 + b))^(1 / Y) - 1, r and b the pick's and the benchmark's total return
     from purchase to ``end``, Y the years between.
 money-weighted annual return of a scenario : buy_and_hold
     ``skatkis.financial_logic.money_weighted_return`` of the yearly amounts and the
     value at ``end``.
 weighting check, rule information coefficient over picks : rule_weighting
     Per rule: the mean rule weight w_r on the picks' score dates (overall, for the
-    picks that beat the S&P 500 and for the others); gap = mean points of the picks
+    picks that beat the benchmark and for the others); gap = mean points of the picks
     that beat it - mean points of the others, each pick weighted by |ahead|
     (dollar-weighted); IC = Spearman correlation across picks of the rule's points and
     the pick's annualised excess.
@@ -153,7 +154,7 @@ def buy_and_hold(  # noqa: PLR0913  one keyword per setting of the run
         Columns ``symbol``, ``date``, ``close``, ``adj_close``, including ``compare``.
     compare : Sequence[str]
         Comparisons bought with the same money on the same dates; the first is the
-        benchmark of ``annualised_excess`` (``^SP500TR``).
+        benchmark of ``annualised_excess`` (the index's, e.g. ``^SP500TR``).
     amount_usd : float
         Money per decision.
     start_years : Sequence[int]
@@ -344,7 +345,7 @@ def rule_profile(
     pd.DataFrame
         Columns ``rule``, ``group`` (``beat the index`` or ``did not``), ``points``
         (mean, 0 to 5, each pick weighted by the size of its dollars ahead or behind
-        the S&P 500) and ``picks``; a pick with a missing point is left out of that
+        the benchmark) and ``picks``; a pick with a missing point is left out of that
         rule's mean.
     """
     columns = [points_column(r) for r in rule_ids]

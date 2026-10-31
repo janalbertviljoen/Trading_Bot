@@ -109,6 +109,11 @@ benchmark per universe in the wallet's comparison.
   members date from December 2019 (its change table starts there), so its 2016
   investor starts buying in 2020. Survivorship is larger in both than in the S&P 500.
 
+## Warden report (follow-up)
+
+The follow-up run of 2026-11-01 covers this change too; it is recorded in
+[VI_202610_007](../../value_investing/changes/VI_202610_007-pick-price-history.md#warden-report).
+
 ## Kickoff prompt
 
 Pick up MD_202610_004. Read the agreed approach and the exchanges survey in

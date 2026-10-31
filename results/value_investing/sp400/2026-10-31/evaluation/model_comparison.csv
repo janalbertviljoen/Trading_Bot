@@ -1,0 +1,73 @@
+universe,model,period,decisions,first_decision,last_end,wallet_growth,benchmark_growth,annualised_excess,mean_hit_rate
+on_date,"buy score >= 0.6, equal",in-sample,5,2017-01-03,2022-01-04,2.0913,1.8817,(0.021342326662782574+0j),0.5090
+on_date,"buy score >= 0.6, equal",held-out,4,2022-01-03,2026-01-02,1.4735,1.2226,(0.047802749071592654+0j),0.5580
+on_date,"buy score >= 0.6, equal",all,9,2017-01-03,2026-01-02,3.0815,2.3005,(0.03302206542397479+0j),0.5308
+on_date,"every scored company, equal (reference)",in-sample,5,2017-01-03,2022-01-04,2.2114,1.8817,(0.03280451229566839+0j),0.5047
+on_date,"every scored company, equal (reference)",held-out,4,2022-01-03,2026-01-02,1.3550,1.2226,(0.02606196185152654+0j),0.5008
+on_date,"every scored company, equal (reference)",all,9,2017-01-03,2026-01-02,2.9965,2.3005,(0.029813398369908484+0j),0.5030
+on_date,"top 5, score, score weights",in-sample,5,2017-01-03,2022-01-04,2.8879,1.8817,(0.08941368530758842+0j),0.6292
+on_date,"top 5, score, score weights",held-out,4,2022-01-03,2026-01-02,1.6041,1.2226,(0.07030293690350864+0j),0.6564
+on_date,"top 5, score, score weights",all,9,2017-01-03,2026-01-02,4.6325,2.3005,(0.08090900788689082+0j),0.6413
+on_date,"top 5, score, score weights, short book",in-sample,5,2017-01-03,2022-01-04,1.5479,1.8817,(-0.038287238800393975+0j),0.5364
+on_date,"top 5, score, score weights, short book",held-out,4,2022-01-03,2026-01-02,0.7101,1.2226,(-0.1271054161467141+0j),0.4500
+on_date,"top 5, score, score weights, short book",all,9,2017-01-03,2026-01-02,1.0991,2.3005,(-0.07882509592440035+0j),0.4980
+on_date,"top 5, score_binned, score weights",in-sample,5,2017-01-03,2022-01-04,2.1761,1.8817,(0.0294950987585878+0j),0.5218
+on_date,"top 5, score_binned, score weights",held-out,4,2022-01-03,2026-01-02,1.4489,1.2226,(0.043398071925251136+0j),0.5674
+on_date,"top 5, score_binned, score weights",all,9,2017-01-03,2026-01-02,3.1530,2.3005,(0.035658461809132014+0j),0.5421
+on_date,"top 5, score_binned, score weights, short book",in-sample,5,2017-01-03,2022-01-04,1.1649,1.8817,(-0.09141969209656975+0j),0.4867
+on_date,"top 5, score_binned, score weights, short book",held-out,4,2022-01-03,2026-01-02,1.2485,1.2226,(0.005263479608837551+0j),0.6500
+on_date,"top 5, score_binned, score weights, short book",all,9,2017-01-03,2026-01-02,1.4544,2.3005,(-0.049694612309574726+0j),0.5593
+on_date,"top 5, score_binned_weighted, score weights",in-sample,5,2017-01-03,2022-01-04,2.2127,1.8817,(0.03292728489786456+0j),0.5246
+on_date,"top 5, score_binned_weighted, score weights",held-out,4,2022-01-03,2026-01-02,1.5992,1.2226,(0.06949078944863851+0j),0.6008
+on_date,"top 5, score_binned_weighted, score weights",all,9,2017-01-03,2026-01-02,3.5386,2.3005,(0.04902621947064301+0j),0.5585
+on_date,"top 5, score_binned_weighted, score weights, short book",in-sample,5,2017-01-03,2022-01-04,0.9082,1.8817,(-0.13552721755079877+0j),0.3600
+on_date,"top 5, score_binned_weighted, score weights, short book",held-out,4,2022-01-03,2026-01-02,1.7599,1.2226,(0.09541531241639256+0j),0.8000
+on_date,"top 5, score_binned_weighted, score weights, short book",all,9,2017-01-03,2026-01-02,1.5983,2.3005,(-0.039672706446692185+0j),0.5556
+on_date,"top 5, score_ic, score weights",in-sample,5,2017-01-03,2022-01-04,2.1299,1.8817,(0.025084449067076298+0j),0.5180
+on_date,"top 5, score_ic, score weights",held-out,4,2022-01-03,2026-01-02,0.9625,1.2226,(-0.05808769158372373+0j),0.4016
+on_date,"top 5, score_ic, score weights",all,9,2017-01-03,2026-01-02,2.0500,2.3005,(-0.01273231007081832+0j),0.4662
+on_date,"top 5, score_ic, score weights, short book",in-sample,5,2017-01-03,2022-01-04,0.8702,1.8817,(-0.14288415455537906+0j),0.4533
+on_date,"top 5, score_ic, score weights, short book",held-out,4,2022-01-03,2026-01-02,1.0428,1.2226,(-0.039010870107590745+0j),0.5429
+on_date,"top 5, score_ic, score weights, short book",all,9,2017-01-03,2026-01-02,0.9074,2.3005,(-0.09823793611524634+0j),0.4931
+on_date,"top 5, score_ic_static, score weights",in-sample,5,2017-01-03,2022-01-04,2.2540,1.8817,(0.036759110367394765+0j),0.5119
+on_date,"top 5, score_ic_static, score weights",held-out,4,2022-01-03,2026-01-02,1.6302,1.2226,(0.07462636730191052+0j),0.4992
+on_date,"top 5, score_ic_static, score weights",all,9,2017-01-03,2026-01-02,3.6745,2.3005,(0.05342787254407133+0j),0.5062
+on_date,"top 5, score_ic_static, score weights, short book",in-sample,5,2017-01-03,2022-01-04,2.0281,1.8817,(0.015096161497394345+0j),0.4900
+on_date,"top 5, score_ic_static, score weights, short book",held-out,4,2022-01-03,2026-01-02,0.8167,1.2226,(-0.09600969952311489+0j),0.4667
+on_date,"top 5, score_ic_static, score weights, short book",all,9,2017-01-03,2026-01-02,1.6563,2.3005,(-0.0358577294518061+0j),0.4796
+current,"buy score >= 0.6, equal",in-sample,5,2017-01-03,2022-01-04,2.5254,1.8817,(0.06059256500129773+0j),0.5532
+current,"buy score >= 0.6, equal",held-out,4,2022-01-03,2026-01-02,1.5220,1.2226,(0.0563187628925812+0j),0.5686
+current,"buy score >= 0.6, equal",all,9,2017-01-03,2026-01-02,3.8436,2.3005,(0.05871049841178744+0j),0.5601
+current,"every scored company, equal (reference)",in-sample,5,2017-01-03,2022-01-04,2.9401,1.8817,(0.09332636625254165+0j),0.5347
+current,"every scored company, equal (reference)",held-out,4,2022-01-03,2026-01-02,1.5645,1.2226,(0.06362658509441954+0j),0.5180
+current,"every scored company, equal (reference)",all,9,2017-01-03,2026-01-02,4.5998,2.3005,(0.08005878240348019+0j),0.5273
+current,"top 5, score, score weights",in-sample,5,2017-01-03,2022-01-04,2.8888,1.8817,(0.08948140270349803+0j),0.6466
+current,"top 5, score, score weights",held-out,4,2022-01-03,2026-01-02,1.2880,1.2226,(0.013125553774538057+0j),0.5436
+current,"top 5, score, score weights",all,9,2017-01-03,2026-01-02,3.7208,2.3005,(0.05489754624605747+0j),0.6008
+current,"top 5, score, score weights, short book",in-sample,5,2017-01-03,2022-01-04,-0.6125,1.8817,(-0.3534545982850733+0.469487986051329j),0.4467
+current,"top 5, score, score weights, short book",held-out,4,2022-01-03,2026-01-02,1.0239,1.2226,(-0.0434125938457508+0j),0.6167
+current,"top 5, score, score weights, short book",all,9,2017-01-03,2026-01-02,-0.6272,2.3005,(-0.18674927971757704+0.296121354383183j),0.5222
+current,"top 5, score_binned, score weights",in-sample,5,2017-01-03,2022-01-04,2.2029,1.8817,(0.03201114859312981+0j),0.5192
+current,"top 5, score_binned, score weights",held-out,4,2022-01-03,2026-01-02,1.9367,1.2226,(0.12196082337612402+0j),0.6655
+current,"top 5, score_binned, score weights",all,9,2017-01-03,2026-01-02,4.2663,2.3005,(0.07106049650013446+0j),0.5842
+current,"top 5, score_binned, score weights, short book",in-sample,5,2017-01-03,2022-01-04,-0.1088,1.8817,(-0.542365788005676+0.3323104053752669j),0.3857
+current,"top 5, score_binned, score weights, short book",held-out,4,2022-01-03,2026-01-02,0.6599,1.2226,(-0.14296164776513753+0j),0.5032
+current,"top 5, score_binned, score weights, short book",all,9,2017-01-03,2026-01-02,-0.0718,2.3005,(-0.36088940835078354+0.23271334322837092j),0.4379
+current,"top 5, score_binned_weighted, score weights",in-sample,5,2017-01-03,2022-01-04,1.9417,1.8817,(0.006295900570014279+0j),0.4783
+current,"top 5, score_binned_weighted, score weights",held-out,4,2022-01-03,2026-01-02,1.8671,1.2226,(0.11173693852118083+0j),0.6106
+current,"top 5, score_binned_weighted, score weights",all,9,2017-01-03,2026-01-02,3.6253,2.3005,(0.05185192266139649+0j),0.5371
+current,"top 5, score_binned_weighted, score weights, short book",in-sample,5,2017-01-03,2022-01-04,0.2668,1.8817,(-0.3232808360863799+0j),0.3600
+current,"top 5, score_binned_weighted, score weights, short book",held-out,4,2022-01-03,2026-01-02,0.5457,1.2226,(-0.18274225276055556+0j),0.5000
+current,"top 5, score_binned_weighted, score weights, short book",all,9,2017-01-03,2026-01-02,0.1456,2.3005,(-0.2641856439710506+0j),0.4222
+current,"top 5, score_ic, score weights",in-sample,5,2017-01-03,2022-01-04,4.5004,1.8817,(0.19044769651065585+0j),0.7775
+current,"top 5, score_ic, score weights",held-out,4,2022-01-03,2026-01-02,1.2729,1.2226,(0.010135462835322517+0j),0.5173
+current,"top 5, score_ic, score weights",all,9,2017-01-03,2026-01-02,5.7285,2.3005,(0.10672691866551332+0j),0.6618
+current,"top 5, score_ic, score weights, short book",in-sample,5,2017-01-03,2022-01-04,-0.1710,1.8817,(-0.4990025146304743+0.3637985821243657j),0.3887
+current,"top 5, score_ic, score weights, short book",held-out,4,2022-01-03,2026-01-02,0.7757,1.2226,(-0.1075898345479952+0j),0.4926
+current,"top 5, score_ic, score weights, short book",all,9,2017-01-03,2026-01-02,-0.1327,2.3005,(-0.3157101969481393+0.24916402557866646j),0.4349
+current,"top 5, score_ic_static, score weights",in-sample,5,2017-01-03,2022-01-04,2.8169,1.8817,(0.0840040956924415+0j),0.6441
+current,"top 5, score_ic_static, score weights",held-out,4,2022-01-03,2026-01-02,1.7035,1.2226,(0.08652645450336438+0j),0.5498
+current,"top 5, score_ic_static, score weights",all,9,2017-01-03,2026-01-02,4.7986,2.3005,(0.08515071615865444+0j),0.6022
+current,"top 5, score_ic_static, score weights, short book",in-sample,5,2017-01-03,2022-01-04,0.4746,1.8817,(-0.24071178280575944+0j),0.5067
+current,"top 5, score_ic_static, score weights, short book",held-out,4,2022-01-03,2026-01-02,0.8349,1.2226,(-0.09101624459329882+0j),0.5217
+current,"top 5, score_ic_static, score weights, short book",all,9,2017-01-03,2026-01-02,0.3962,2.3005,(-0.17758165421666183+0j),0.5133

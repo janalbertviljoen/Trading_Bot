@@ -55,10 +55,10 @@ rules either look ahead or use restated values.
 - 2026-10-31 (user): 20 years of history where EDGAR has it; shorter histories stay as
   they are, and rules needing more years return NaN.
 - 2026-10-31 (user): REITs and financial companies are excluded from the universe.
-- 2026-10-31 (user): the tag choice is made point-in-time. The rule above stands (the
+- 2026-11-01 (user): the tag choice is made point-in-time. The rule above stands (the
   most recently used tag is canonical), but on each date only filings made by then
   decide which tag is the latest. Fixes the look-ahead the warden confirmed
-  (VI_202610_006, warden report N1). A methodology change: scores on dates before a
+  (VI_202610_006, warden report, "What the developer said, checked"). A methodology change: scores on dates before a
   company switched tags may change; expected small, as the picks were the same on the
   three check dates.
 
