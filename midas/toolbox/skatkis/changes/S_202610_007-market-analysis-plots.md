@@ -181,6 +181,12 @@ heat maps, wallet outcomes, normalised series).
   `notebooks/check_data.py` for 13 data-check plots. The spread plot (percentile bands
   over time) follows with the shared metrics. A file-level pyright directive covers
   matplotlib's untyped `**kwargs`.
+- 2026-10-31: the branch `feature/value-investing/vi-202610-001-sp500-data-sources` is
+  merged into `main` with this change still in progress (user). Left for a follow-up
+  branch before closing: the warden's should-fix findings 3 (trim EDGAR values to 2006),
+  4 (relative return calculated in four places), 5 (constants to config), 6 (comments on
+  type ignores and casts), 7 (dead code in `metrics.py`) and 9 (stale instructions); the
+  unit tests for the new code.
 
 ## Warden report
 

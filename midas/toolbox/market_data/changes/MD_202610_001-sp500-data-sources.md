@@ -239,6 +239,12 @@ Per source:
   membership cross-checked against S&P DJI announcements, and `yfinance` or Tiingo for
   prices while prototyping. Gap: prices of delisted members, which the free sources
   miss; survivorship-free backtests need a paid price source.
+- 2026-10-31: the branch `feature/value-investing/vi-202610-001-sp500-data-sources` is
+  merged into `main` with this change still in progress (user). Left for a follow-up
+  branch before closing: the warden's should-fix findings 3 (trim EDGAR values to 2006),
+  4 (relative return calculated in four places), 5 (constants to config), 6 (comments on
+  type ignores and casts), 7 (dead code in `metrics.py`) and 9 (stale instructions); the
+  unit tests for the new code.
 
 ## Warden report
 
