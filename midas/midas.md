@@ -66,4 +66,5 @@ until the portfolio engine (S_202610_006) replaces it. The index and the rename 
 | 2026-10-31 | No scripts in `notebooks/`: repeatable work runs as terminal commands or MCP tools; plots and reports go to a `results/` folder tracked in git (so changed plots show in review), per source under `market_analysis/` and per tool | user |
 | 2026-10-31 | Changes to Midas's records (`midas/`) are staged directly after writing; commits still wait for the user | user |
 | 2026-10-31 | Reports are LaTeX documents compiled to PDF; the secretary owns their writing and formatting (text in `config/report_*.toml`), the developer the rendering code | user |
+| 2026-10-31 | When asked to run updates, the data update, the check and the LaTeX compile run outside the sandbox (local settings file, git-ignored) | user |
 | 2026-10-31 | Current focus: the value-investing tool, starting with S&P 500 data extraction, and the wallet as backtest engine; the BTC strategy moves to the sandbox | user |

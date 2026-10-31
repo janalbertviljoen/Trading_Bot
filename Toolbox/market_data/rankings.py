@@ -30,6 +30,8 @@ sector_scores(topic, companies, tables)
     One score per sector: columns ``gics_sector``, ``sector_fund``, ``score``.
 best_and_worst(scores, topic, n)
     The ``n`` best and ``n`` worst rows.
+window(tables, start)
+    The tables cut to a recent window, for rankings over the same years.
 RankingTables
     The tables the scores are computed from.
 
@@ -54,6 +56,7 @@ import numpy as np
 import pandas as pd
 
 from Toolbox.skatkis.financial_logic import (
+    DAYS_PER_YEAR,
     annualised_growth,
     annualised_relative_return,
 )
@@ -84,6 +87,9 @@ class RankingTables:
         The GICS map (``symbol``, ``cik``, ``gics_sector``, ``sector_fund``).
     market : str
         The market benchmark symbol.
+    min_years_return : float
+        Shortest history for a return score (one year; the window length when ranking a
+        window, so every company is scored over the same years).
     """
 
     annual: pd.DataFrame
@@ -92,6 +98,7 @@ class RankingTables:
     pe: pd.DataFrame
     gics: pd.DataFrame
     market: str
+    min_years_return: float = MIN_YEARS_RETURN
 
 
 def company_scores(topic: str, tables: RankingTables) -> pd.DataFrame:
@@ -110,13 +117,15 @@ def company_scores(topic: str, tables: RankingTables) -> pd.DataFrame:
         scores = {s: by_cik.get(c, np.nan) for s, c in zip(symbols, ciks, strict=True)}
     elif topic == "total_return":
         scores = {
-            s: annualised_growth(wide[s], min_years=MIN_YEARS_RETURN)
+            s: annualised_growth(wide[s], min_years=tables.min_years_return)
             for s in symbols
             if s in wide.columns
         }
     elif topic == "relative_return":
         scores = {
-            s: annualised_relative_return(wide[s], wide[f], min_years=MIN_YEARS_RETURN)
+            s: annualised_relative_return(
+                wide[s], wide[f], min_years=tables.min_years_return
+            )
             for s, f in zip(symbols, funds, strict=True)
             if s in wide.columns and f in wide.columns
         }
@@ -153,11 +162,15 @@ def sector_scores(
             if fund not in wide.columns:
                 values.append(np.nan)
             elif topic == "total_return":
-                values.append(annualised_growth(wide[fund], min_years=MIN_YEARS_RETURN))
+                values.append(
+                    annualised_growth(wide[fund], min_years=tables.min_years_return)
+                )
             else:
                 values.append(
                     annualised_relative_return(
-                        wide[fund], wide[tables.market], min_years=MIN_YEARS_RETURN
+                        wide[fund],
+                        wide[tables.market],
+                        min_years=tables.min_years_return,
                     )
                 )
         result = funds.assign(score=values)
@@ -165,6 +178,29 @@ def sector_scores(
         medians = companies.groupby("gics_sector", as_index=False)["score"].median()
         result = funds.merge(medians, on="gics_sector")
     return result.dropna(subset=["score"]).reset_index(drop=True)
+
+
+def window(
+    tables: RankingTables, start: pd.Timestamp, *, tolerance_days: int = 10
+) -> RankingTables:
+    """Return ``tables`` cut to dates from ``start``, requiring the whole window for returns.
+
+    Prices, P/E and yields keep rows dated from ``start``; annual values keep fiscal years
+    ending from ``start``. Return scores then need a history of the whole window, less
+    ``tolerance_days`` (for holidays at the start), so a company listed during the window
+    is not ranked against those with the full period.
+    """
+    last = pd.Timestamp(tables.prices["date"].max())
+    years = ((last - start).days - tolerance_days) / DAYS_PER_YEAR
+    return RankingTables(
+        annual=pd.DataFrame(tables.annual[tables.annual["period_end"] >= start]),
+        prices=pd.DataFrame(tables.prices[tables.prices["date"] >= start]),
+        yields=pd.DataFrame(tables.yields[tables.yields["date"] >= start]),
+        pe=pd.DataFrame(tables.pe[tables.pe["date"] >= start]),
+        gics=tables.gics,
+        market=tables.market,
+        min_years_return=years,
+    )
 
 
 def best_and_worst(

@@ -22,8 +22,10 @@ Public API
 ----------
 ReportFigure(path, caption)
     A saved image and its caption.
+FigureGroup(panels, caption, columns)
+    Several images in one figure, lettered (a), (b), ..., in columns.
 Table(header, rows, columns)
-    A simple table inside a section.
+    A table inside a section; long tables break across pages.
 Section(title, text, figures, subsections)
     A numbered section.
 Document(title, subtitle, abstract, sections, appendix)
@@ -54,6 +56,8 @@ PREAMBLE = r"""\documentclass[11pt,a4paper]{article}
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{caption}
+\usepackage{subcaption}
+\usepackage{longtable}
 \captionsetup{font=small,labelfont=bf}
 \setlength{\parskip}{0.5em}
 \setlength{\parindent}{0pt}
@@ -83,6 +87,18 @@ class ReportFigure:
 
 
 @dataclass(frozen=True)
+class FigureGroup:
+    """Several images in one figure, in ``columns`` columns, each with a sub-caption.
+
+    The panels are lettered (a), (b), ... and the figure has one ``caption``.
+    """
+
+    panels: Sequence[ReportFigure]
+    caption: str
+    columns: int = 2
+
+
+@dataclass(frozen=True)
 class Table:
     """A simple table: column headings, rows of cells and LaTeX column types."""
 
@@ -100,7 +116,7 @@ class Section:
 
     title: str
     text: str
-    figures: Sequence[ReportFigure] = ()
+    figures: Sequence[ReportFigure | FigureGroup] = ()
     subsections: Sequence["Section"] = field(default_factory=tuple["Section", ...])
     label: str | None = None
     table: Table | None = None
@@ -227,30 +243,50 @@ def _section(section: Section, folder: Path, *, level: str) -> list[str]:
     if section.text:
         lines += [escape(paragraph) + "\n" for paragraph in section.text.split("\n\n")]
     for item in section.figures:
-        image = relpath(item.path, folder)
-        lines += [
-            "\\begin{figure}[H]",
-            "\\centering",
-            f"\\includegraphics[width=\\textwidth]{{{image}}}",
-            f"\\caption{{{escape(item.caption)}}}",
-            "\\end{figure}",
-        ]
+        lines += _figure(item, folder)
     deeper = "subsection" if level == "section" else "subsubsection"
     for sub in section.subsections:
         lines += _section(sub, folder, level=deeper)
     return lines
 
 
+def _figure(item: ReportFigure | FigureGroup, folder: Path) -> list[str]:
+    """Return the LaTeX of one image, or of a group of lettered panels in columns."""
+    if isinstance(item, ReportFigure):
+        return [
+            "\\begin{figure}[H]",
+            "\\centering",
+            f"\\includegraphics[width=\\textwidth]{{{relpath(item.path, folder)}}}",
+            f"\\caption{{{escape(item.caption)}}}",
+            "\\end{figure}",
+        ]
+    width = 0.98 / item.columns - 0.01
+    lines = ["\\begin{figure}[H]", "\\centering"]
+    for index, panel in enumerate(item.panels):
+        if index and index % item.columns == 0:
+            lines.append("\\par\\medskip")
+        lines += [
+            f"\\begin{{subfigure}}[t]{{{width:.3f}\\textwidth}}",
+            "\\centering",
+            f"\\includegraphics[width=\\linewidth]{{{relpath(panel.path, folder)}}}",
+            f"\\caption{{{escape(panel.caption)}}}",
+            "\\end{subfigure}\\hfill",
+        ]
+    lines += [f"\\caption{{{escape(item.caption)}}}", "\\end{figure}"]
+    return lines
+
+
 def _table(table: Table) -> list[str]:
-    """Return the LaTeX of a table with horizontal rules."""
+    """Return the LaTeX of a table with horizontal rules; long tables break across pages."""
+    header = " & ".join(escape(h) for h in table.header) + " \\\\"
     lines = [
-        "\\begin{center}",
-        "\\small",
-        f"\\begin{{tabular}}{{{table.columns}}}",
+        "{\\small",
+        f"\\begin{{longtable}}{{{table.columns}}}",
         "\\hline",
-        " & ".join(escape(h) for h in table.header) + " \\\\",
+        header,
         "\\hline",
+        "\\endhead",
     ]
     lines += [" & ".join(escape(c) for c in row) + " \\\\" for row in table.rows]
-    lines += ["\\hline", "\\end{tabular}", "\\end{center}"]
+    lines += ["\\hline", "\\end{longtable}}"]
     return lines

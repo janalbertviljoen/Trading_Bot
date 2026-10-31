@@ -19,6 +19,12 @@ it. This file holds only what is specific to Claude Code.
   `Toolbox/skatkis/midas/server.py`; it becomes `midas` with change S_202610_002). Edits to its
   code reach the running server only after Claude Code restarts it.
 - **Commands.** Use `.venv/bin/python -m …` for pytest, Black, ruff and pyright.
+- **Data updates and the report run outside the sandbox** (user, 2026-10-31): when the
+  user asks to run an update, `python -m Toolbox.market_data update` and `check` and
+  `tectonic` may run, with their hosts (SEC, Yahoo, FRED, Wikipedia, tectonic's package
+  server) allowed. Configured in the git-ignored `.claude/settings.local.json`
+  (`sandbox.excludedCommands`, `sandbox.network.allowedDomains`); active after Claude
+  Code restarts.
 - **No prompts the user did not need.** Read and search with Read and Grep; keep Bash
   for plain commands; no paths outside the repository except the session scratchpad;
   do not edit `.claude/settings.json` or hooks unless asked. The reasons are in

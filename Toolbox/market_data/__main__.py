@@ -43,7 +43,7 @@ from collections.abc import Sequence
 from datetime import date
 from pathlib import Path
 
-from Toolbox.market_data.checks import run_checks
+from Toolbox.market_data.checks import CheckSettings, run_checks
 from Toolbox.market_data.gics import gics_map
 from Toolbox.market_data.report import ReportContext, build_report
 from Toolbox.market_data.sources.constituents import WikipediaPage, wikipedia_client
@@ -80,20 +80,22 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 def _check(args: argparse.Namespace, storage: Storage) -> int:
     """Write the check plots and the report; compile the report if an engine is found."""
-    benchmarks = load_config(args.config)["benchmarks"]
+    config = load_config(args.config)
+    settings = CheckSettings(
+        market=config["benchmarks"]["market"],
+        sectors=config["benchmarks"]["sectors"],
+        excluded=config["universe"]["excluded_sectors"],
+        **config.get("analysis", {}),
+    )
     report = run_checks(
-        args.as_of,
-        storage=storage,
-        results=args.results_dir,
-        market=benchmarks["market"],
-        sectors=benchmarks["sectors"],
+        args.as_of, storage=storage, results=args.results_dir, settings=settings
     )
     print("\n".join(report.lines))
     tex = build_report(
-        ReportContext(report.plots, report.facts, report.sectors),
+        ReportContext(report.plots, report.facts, report.sectors, report.tickers),
         load_config(args.report_text),
         folder=report.folder,
-        subtitle=f"Data as of {args.as_of.isoformat()}; {len(report.sectors)} GICS sectors",
+        subtitle=f"Data as of {args.as_of.isoformat()}",
     )
     print(f"\n{len(report.plots)} plots and {tex.name} in {report.folder}")
     engine = next((e for e in LATEX_ENGINES if shutil.which(e)), None)
@@ -191,7 +193,7 @@ def _update(args: argparse.Namespace, storage: Storage) -> int:
 
 
 def _parser() -> argparse.ArgumentParser:
-    """Return the argument parser of the ``update`` command."""
+    """Return the argument parser of the ``update`` and ``check`` commands."""
     parser = argparse.ArgumentParser(prog="python -m Toolbox.market_data")
     commands = parser.add_subparsers(dest="command", required=True)
     update = commands.add_parser(

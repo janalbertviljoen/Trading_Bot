@@ -40,6 +40,8 @@ plot_spread(df, *, x, y, group, band, thresholds, ...)
     Median and percentile band of a value across rows over time, per group.
 plot_spread_pair(df, *, x, left, right, band, ...)
     Median and band of two values across rows, each on its own axis.
+plot_pair_series(df, *, x, left, right, group, ...)
+    Two values per group on two axes (left solid, right dashed), one colour per group.
 plot_lag_profile(df, *, lag, value, group, ...)
     A statistic per lag, one line per group, with the zero lag marked.
 lagged_correlation(a, b, lags)
@@ -77,6 +79,7 @@ from matplotlib.figure import Figure
 from matplotlib.ticker import StrMethodFormatter
 
 WIDE = (10.0, 4.5)
+PANEL = (5.0, 3.6)
 MAX_LINES = 30
 MAX_LEGEND = MAX_LINES
 LINE_STYLES = ("-", "--", ":", "-.")
@@ -98,6 +101,7 @@ def plot_series(
     log: bool = False,
     markers: bool = False,
     thresholds: Mapping[str, float] | None = None,
+    panel: bool = False,
 ) -> Figure:
     """Plot ``y`` against ``x``: one colour per ``group``, one line style per ``style``.
 
@@ -124,6 +128,9 @@ def plot_series(
         Mark each point on the line (for sparse data such as annual values).
     thresholds : Mapping[str, float], optional
         Named horizontal lines, such as a rule's cut-off (``{"G6: P/E 15": 15.0}``).
+    panel : bool
+        A small figure (``PANEL``) with the legend inside, for grids of plots placed side
+        by side in a report.
 
     Raises
     ------
@@ -146,7 +153,7 @@ def plot_series(
     )
     _check_lines(drawn)
     colours = _palette(len(groups))
-    figure = Figure(figsize=WIDE)
+    figure = Figure(figsize=PANEL if panel else WIDE)
     axes = figure.add_subplot()
     for (name, part), colour in zip(groups, colours, strict=True):
         thick = highlight is not None and name == highlight
@@ -167,7 +174,9 @@ def plot_series(
     if style:
         _style_key(axes, [str(v) for v in styles])
     _thresholds(axes, thresholds)
-    _finish(axes, title=title, ylabel=ylabel, legend=group is not None, log=log)
+    _finish(
+        axes, title=title, ylabel=ylabel, legend=group is not None, log=log, panel=panel
+    )
     figure.tight_layout()
     return figure
 
@@ -544,6 +553,69 @@ def plot_spread_pair(
     return figure
 
 
+def plot_pair_series(
+    df: pd.DataFrame,
+    *,
+    x: str,
+    left: str,
+    right: str,
+    group: str,
+    title: str = "",
+    left_label: str = "",
+    right_label: str = "",
+    log_left: bool = False,
+    log_right: bool = False,
+    panel: bool = False,
+) -> Figure:
+    """Plot two values per group on two axes: ``left`` solid, ``right`` dashed, one colour each.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Long table with ``x``, ``left``, ``right`` and ``group``; not modified.
+    x : str
+        Horizontal axis.
+    left, right : str
+        Values on the left axis (solid lines) and the right axis (dashed lines).
+    group : str
+        Column whose values get one colour each, the same on both axes.
+    title, left_label, right_label : str
+        Labels; an empty axis label falls back to the column name.
+    log_left, log_right : bool
+        Logarithmic axes.
+    panel : bool
+        A small figure with the legend inside, for figures placed side by side.
+    """
+    groups = list(_groups(df, group))
+    _check_lines(2 * len(groups))
+    figure = Figure(figsize=PANEL if panel else WIDE)
+    axes = figure.add_subplot()
+    twin = axes.twinx()
+    for (name, unsorted), colour in zip(groups, _palette(len(groups)), strict=True):
+        part = unsorted.sort_values(x)
+        axes.plot(part[x], part[left], color=colour, lw=1.2, label=name)
+        twin.plot(part[x], part[right], color=colour, lw=1.0, ls="--")
+    _style_key(axes, [left_label or left, right_label or right])
+    axes.set_ylabel(left_label or left)
+    twin.set_ylabel(right_label or right)
+    if log_left:
+        axes.set_yscale("log")
+    if log_right:
+        twin.set_yscale("log")
+    _finish(axes, title=title, ylabel=left_label or left, legend=not panel)
+    if panel:
+        # Two axes leave no free corner inside the plot: the legend goes below it.
+        axes.legend(
+            fontsize=6,
+            loc="upper center",
+            bbox_to_anchor=(0.5, -0.12),
+            ncols=4,
+            frameon=False,
+        )
+    figure.tight_layout()
+    return figure
+
+
 def plot_lag_profile(
     df: pd.DataFrame,
     *,
@@ -668,19 +740,28 @@ def _groups(
 
 
 def _finish(
-    axes: Axes, *, title: str, ylabel: str, legend: bool, log: bool = False
+    axes: Axes,
+    *,
+    title: str,
+    ylabel: str,
+    legend: bool,
+    log: bool = False,
+    panel: bool = False,
 ) -> None:
     """Apply the title, axis label, scale, legend and grid shared by all plots.
 
-    Large values (from ``THOUSANDS``) get thousands separators instead of an offset.
+    Large values (from ``THOUSANDS``) get thousands separators instead of an offset. A
+    panel keeps its legend inside the plot, in two small columns.
     """
-    axes.set_title(title)
+    axes.set_title(title, fontsize=10 if panel else None)
     axes.set_ylabel(ylabel)
     if log:
         axes.set_yscale("log")
     elif max((abs(v) for v in axes.get_ylim()), default=0.0) >= THOUSANDS:
         axes.yaxis.set_major_formatter(StrMethodFormatter("{x:,.0f}"))
-    if legend:
+    if legend and panel:
+        axes.legend(fontsize=6, loc="best", ncols=2, frameon=False)
+    elif legend:
         axes.legend(
             fontsize=7, loc="upper left", bbox_to_anchor=(1.01, 1.0), frameon=False
         )

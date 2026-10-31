@@ -34,6 +34,18 @@ heat maps, wallet outcomes, normalised series).
 
 ## Decisions
 
+- 2026-10-31 (user): the report is a concise summary of the last five years; the long
+  history goes to the appendix (back-testing and optimisation). Structure: introduction
+  (GICS sectors, a ticker appendix by sector and ticker); per analysis (fundamentals,
+  total return, relative return, P/E, P/E and value, dividend yield) a sector summary, a
+  3 x 3 grid of every sector's five best and five worst companies, and an overview of
+  the two best and the two worst sectors with their five best or worst companies;
+  revenue and net income side by side in USD trillions; total return in three rows (5,
+  10 years, full history); P/E before dividends; the P/E lead-lag and the data checks in
+  the appendix; a P/E and value section showing the lowest-P/E and best-value companies
+  side by side, each plot with both measures, to find companies in both lists. Panels
+  are separate images joined by LaTeX (the formatting tool).
+
 - 2026-10-31 (user): the detailed per-sector plots go to an appendix; the main text shows
   only the best and worst sector of each analysis, by that analysis's measure, then the
   five best against the five worst companies of each of the two, with references to the
@@ -79,6 +91,15 @@ heat maps, wallet outcomes, normalised series).
   and metrics over time, similar to the existing plots.
 
 ## Notes
+
+- 2026-10-31: built: `FigureGroup` (lettered panels in columns) and long tables in
+  `skatkis.report`; panel mode and `plot_pair_series` in `skatkis.analysis`;
+  `rankings.window` (scores over the last five years, only companies with the whole
+  window); `CheckSettings` and `[analysis]` in `config/market_data.toml`; one GICS row
+  per company for fundamentals (warden finding 1) and the excluded sectors applied in
+  `check` (finding 2); the report text rewritten (secretary). 129 plots. First P/E and
+  value result: no company is in both the five lowest-P/E and the five best-value lists
+  (nor in both worst lists). The PDF waits for the local settings to load (restart).
 
 - 2026-10-31: built: `skatkis.financial_logic.annualised_growth`, `market_data.rankings`
   (company and sector scores per analysis, lowest P/E best), `plot_spread_pair` (two

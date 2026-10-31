@@ -57,3 +57,11 @@ market = "^SP500TR"
 "Materials" = "XLB"
 "Real Estate" = "XLRE"
 "Utilities" = "XLU"
+
+[analysis]
+# The report's main text ranks and plots the most recent years; the appendix the full
+# history (for back-testing and optimisation).
+recent_years = 5
+long_years = 10
+main_companies = 5
+appendix_companies = 10

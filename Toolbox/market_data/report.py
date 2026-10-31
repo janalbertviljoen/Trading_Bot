@@ -3,18 +3,18 @@ market_data/report.py
 ---------------------
 Assembles the market analysis report: the plots of a check run with the report's text.
 
-The text (title, abstract, sector descriptions, and per section its description and
-captions) is in ``config/report_market_analysis.toml``, which the secretary writes; this
-module only places it. The report goes from coarse to fine: an introduction with a table
-of the GICS sectors, the overview of sectors against the S&P 500, then one section per
-analysis with its sector summary, its best and worst sector and their best and worst
-companies, referring to the appendix, where every sector's companies are shown.
+The text (title, abstract, sector descriptions, section texts, figure lists and captions)
+is in ``config/report_market_analysis.toml``, which the secretary writes; this module only
+places it. Each section lists its figures by name; the plots of one figure become one
+image, or a group of lettered panels in the given number of columns (a 3 x 3 grid of
+sectors, two sectors side by side, three time views in rows). The appendix holds the
+ticker list, every analysis's full history per sector and the data checks.
 ``skatkis.report`` writes the LaTeX document.
 
 Owns
 ----
-The mapping from a check run's plots, facts and sector table to sections, subsections,
-captions, references and the appendix.
+The mapping from a check run's plots, facts, sector table and ticker list to sections,
+figures, panels, captions, references and the appendix.
 
 Must not
 --------
@@ -24,8 +24,8 @@ render LaTeX (``skatkis.report``).
 Public API
 ----------
 Plot
-    A plot of a check run: section, name, caption kind, file, caption fields, appendix.
-ReportContext(plots, facts, sectors)
+    A plot of a check run: section, name, figure, panel, file, caption fields, appendix.
+ReportContext(plots, facts, sectors, tickers)
     What a check run hands to the report.
 build_report(context, text, *, folder, subtitle)
     Write ``report.tex`` into ``folder`` and return its path.
@@ -39,14 +39,22 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any, NamedTuple
 
-from Toolbox.skatkis.report import Document, ReportFigure, Section, Table, write_latex
+from Toolbox.skatkis.report import (
+    Document,
+    FigureGroup,
+    ReportFigure,
+    Section,
+    Table,
+    write_latex,
+)
 
 
 class Plot(NamedTuple):
     """A plot written by a check run.
 
     ``topic`` is its section, ``kind`` selects its caption in the text file, ``fields``
-    fill the caption's placeholders, and ``appendix`` places it in the appendix.
+    fill the caption's placeholders, ``appendix`` places it in the appendix. Plots with
+    the same ``figure`` are joined into one figure, each with ``panel`` as sub-caption.
     """
 
     topic: str
@@ -55,14 +63,21 @@ class Plot(NamedTuple):
     path: Path
     fields: Mapping[str, str] = {}
     appendix: bool = False
+    figure: str = ""
+    panel: str = ""
 
 
 class ReportContext(NamedTuple):
-    """What a check run hands to the report: plots, facts per analysis, sector table."""
+    """What a check run hands to the report.
+
+    ``facts`` per analysis (best and worst sectors and companies), ``sectors`` for the
+    introduction table and ``tickers`` (sector, symbol, name) for the ticker appendix.
+    """
 
     plots: Sequence[Plot]
     facts: Mapping[str, Mapping[str, str]]
     sectors: Sequence[Mapping[str, str]]
+    tickers: Sequence[Mapping[str, str]]
 
 
 def build_report(
@@ -73,38 +88,32 @@ def build_report(
     Parameters
     ----------
     context : ReportContext
-        The plots of the check run; per analysis the ``best`` and ``worst`` sector and
-        their scores; per GICS sector its ``sector``, ``companies`` and ``fund``.
+        The plots, facts, sector table and ticker list of the check run.
     text : Mapping[str, Any]
         The parsed report text file.
     folder : Path
         Where ``report.tex`` is written, next to the plot folders.
     subtitle : str
-        The line under the title, e.g. the data date and universe size.
+        The line under the title, e.g. the data date.
 
     Notes
     -----
-    Captions and section texts may use the placeholders of the plot's fields or the
-    analysis's facts (``{best}``, ``{worst}``, ``{best_score}``, ``{sector}``, ...), and
-    ``[[app:<analysis>]]`` refers to the analysis's appendix section.
+    Texts and captions may use the placeholders of the analysis's facts (``{best1}``,
+    ``{worst1}``, ``{n}``, ``{years}``, ...) and of the plot's fields; ``[[app:<name>]]``
+    refers to an appendix section.
     """
-    plots, facts = context.plots, context.facts
     sections = [_introduction(text, context.sectors)]
     for topic in text["order"]:
-        own = [p for p in plots if p.topic == topic and not p.appendix]
+        spec = text["sections"][topic]
+        facts = context.facts.get(topic, {})
+        main = [p for p in context.plots if p.topic == topic and not p.appendix]
+        if main:
+            sections.append(_section(spec, main, facts, label=f"sec:{topic}"))
+    appendix = [_tickers(text["appendix"]["tickers"], context.tickers)]
+    for topic in text["appendix_order"]:
+        own = [p for p in context.plots if p.topic == f"appendix/{topic}"]
         if own:
-            sections.append(
-                _analysis(topic, own, facts.get(topic, {}), text["sections"][topic])
-            )
-    appendix = [
-        _appendix(
-            topic,
-            [p for p in plots if p.appendix and p.topic == f"appendix/{topic}"],
-            text,
-        )
-        for topic in text["order"]
-        if any(p.appendix and p.topic == f"appendix/{topic}" for p in plots)
-    ]
+            appendix.append(_appendix(topic, own, text["appendix"][topic]))
     document = Document(
         title=str(text["title"]),
         subtitle=subtitle,
@@ -113,6 +122,53 @@ def build_report(
         appendix=appendix,
     )
     return write_latex(folder / "report.tex", document)
+
+
+def _fill(template: str, values: Mapping[str, str]) -> str:
+    """Return ``template`` with its placeholders filled from ``values``."""
+    return template.format(**values) if values else template
+
+
+def _figures(
+    specs: Sequence[Mapping[str, Any]], plots: Sequence[Plot], facts: Mapping[str, str]
+) -> list[ReportFigure | FigureGroup]:
+    """Build the figures listed in ``specs`` from the plots with those figure names."""
+    figures: list[ReportFigure | FigureGroup] = []
+    for spec in specs:
+        own = [p for p in plots if p.figure == spec["figure"]]
+        if not own:
+            continue
+        caption = _fill(str(spec["caption"]), {**facts, **own[0].fields})
+        if len(own) == 1 and not own[0].panel:
+            figures.append(ReportFigure(own[0].path, caption))
+        else:
+            panels = [ReportFigure(p.path, p.panel) for p in own]
+            figures.append(FigureGroup(panels, caption, int(spec.get("columns", 2))))
+    return figures
+
+
+def _section(
+    spec: Mapping[str, Any],
+    plots: Sequence[Plot],
+    facts: Mapping[str, str],
+    *,
+    label: str,
+) -> Section:
+    """Return one main section with its figures and subsections."""
+    return Section(
+        title=_fill(str(spec["title"]), facts),
+        text=_fill(str(spec["text"]), facts),
+        figures=_figures(spec.get("figures", []), plots, facts),
+        subsections=[
+            Section(
+                title=_fill(str(sub["title"]), facts),
+                text=_fill(str(sub.get("text", "")), facts),
+                figures=_figures(sub.get("figures", []), plots, facts),
+            )
+            for sub in spec.get("subsections", [])
+        ],
+        label=label,
+    )
 
 
 def _introduction(
@@ -137,67 +193,54 @@ def _introduction(
     )
 
 
-def _caption(spec: Mapping[str, Any], plot: Plot, facts: Mapping[str, str]) -> str:
-    """Return the caption of ``plot``: its kind's template with its fields and facts."""
-    captions: Mapping[str, str] = spec.get("captions", {})
-    template = captions.get(plot.kind, plot.name.replace("_", " "))
-    return template.format(**{**facts, **plot.fields})
-
-
-def _analysis(
-    topic: str, own: Sequence[Plot], facts: Mapping[str, str], spec: Mapping[str, Any]
-) -> Section:
-    """Return one analysis: summary figures, then its subsections in the file's order."""
-    used = {
-        p.kind
-        for sub in spec.get("subsections", [])
-        for p in own
-        if p.kind in sub["kinds"]
-    }
-    summary = [
-        ReportFigure(p.path, _caption(spec, p, facts))
-        for p in own
-        if p.kind not in used
-    ]
-    subsections = [
-        Section(
-            title=str(sub["title"]).format(**facts),
-            text=str(sub.get("text", "")).format(**facts),
-            figures=[
-                ReportFigure(p.path, _caption(spec, p, facts))
-                for kind in sub["kinds"]
-                for p in own
-                if p.kind == kind
-            ],
-        )
-        for sub in spec.get("subsections", [])
-        if any(p.kind in sub["kinds"] for p in own)
-    ]
+def _tickers(spec: Mapping[str, Any], tickers: Sequence[Mapping[str, str]]) -> Section:
+    """Return the ticker appendix: per GICS sector, tickers and names in alphabetical order."""
+    sectors = sorted({t["sector"] for t in tickers})
     return Section(
         title=str(spec["title"]),
-        text=str(spec["text"]).format(**facts) if facts else str(spec["text"]),
-        figures=summary,
-        subsections=subsections,
-        label=f"sec:{topic}",
+        text=str(spec["text"]),
+        label="app:tickers",
+        subsections=[
+            Section(
+                title=sector,
+                text="",
+                table=Table(
+                    header=["Ticker", "Company"],
+                    rows=sorted(
+                        (
+                            [t["symbol"], t["name"]]
+                            for t in tickers
+                            if t["sector"] == sector
+                        ),
+                        key=lambda row: row[0],
+                    ),
+                    columns=r"lp{11cm}",
+                ),
+            )
+            for sector in sectors
+        ],
     )
 
 
-def _appendix(topic: str, own: Sequence[Plot], text: Mapping[str, Any]) -> Section:
-    """Return the appendix section of an analysis: one subsection per GICS sector."""
-    spec = text["sections"][topic]
-    appendix = text["appendix"]
+def _appendix(topic: str, plots: Sequence[Plot], spec: Mapping[str, Any]) -> Section:
+    """Return an appendix section: per GICS sector its full-history plot, plus extras."""
+    per_sector = [p for p in plots if p.kind == "appendix"]
+    others = [p for p in plots if p.kind != "appendix"]
+    captions: Mapping[str, str] = spec.get("captions", {})
     return Section(
-        title=f"{spec['title']}: {appendix['title']}",
-        text=str(appendix["text"]),
+        title=str(spec["title"]),
+        text=str(spec["text"]),
         label=f"app:{topic}",
+        figures=[
+            ReportFigure(p.path, _fill(captions.get(p.kind, p.name), p.fields))
+            for p in others
+        ],
         subsections=[
             Section(
                 title=p.fields.get("sector", p.name),
                 text="",
-                figures=[
-                    ReportFigure(p.path, str(appendix["caption"]).format(**p.fields))
-                ],
+                figures=[ReportFigure(p.path, _fill(str(spec["caption"]), p.fields))],
             )
-            for p in sorted(own, key=lambda p: p.fields.get("sector", p.name))
+            for p in sorted(per_sector, key=lambda p: p.fields.get("sector", p.name))
         ],
     )

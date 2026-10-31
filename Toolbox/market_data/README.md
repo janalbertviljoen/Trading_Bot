@@ -165,37 +165,36 @@ export FRED_API_KEY=...                       # optional
 .venv/bin/python -m Toolbox.market_data check --as-of 2026-10-31
 ```
 
-reads the tables written for that as-of date, prints numeric checks (missing values,
-duplicates, implausible values, filing delays, coverage) and writes the plots and the
-report under `results/market_analysis/<as_of>/`, going from coarse to fine:
+reads the tables written for that as-of date, prints numeric checks and writes the plots
+and the report under `results/market_analysis/<as_of>/`. The main text is a concise view
+of the last five years (`[analysis] recent_years` in `config/market_data.toml`):
 
-1. **Introduction**: the GICS sectors analysed (a table with a description, the number
-   of companies and the sector fund).
-2. **Overview** (`overview/`): the sector funds against the S&P 500.
-3. **One section per analysis**, in the order fundamentals, total return, relative return,
-   P/E, dividend yield (`<analysis>/`): the all-sector summary, the best and the worst
-   sector by the analysis's measure, and the five best and five worst companies of each
-   of those two sectors. The P/E section shows each sector's median P/E with its median
-   price growth (bands from the 25th to the 75th percentile), for the sectors with the
-   best and worst P/E and for those with the best and worst return.
-4. **Data checks** (`data_checks/`): coverage per field and year, EPS cross-check, filing
-   delays, trading days (youngest first), USD/ZAR.
-5. **Appendix** (`appendix/<analysis>/`): every sector's ten best and ten worst companies.
+1. **Introduction**: the GICS sectors (description, companies, fund); company names are
+   in the ticker appendix.
+2. **Per analysis** (fundamentals, total return, relative return, P/E, dividend yield):
+   the sector summary (revenue and net income side by side in USD trillions; total
+   return over 5 years, 10 years and the full history in three rows), a 3 x 3 grid with
+   every sector's five best (solid) and five worst (dashed) companies, and an overview of
+   the two best and the two worst sectors with their five best or worst companies.
+3. **P/E and value**: the five lowest-P/E companies beside the five with the best total
+   return (and the highest P/E beside the worst return), each plot showing both P/E and
+   price growth per company, and the companies found in both lists.
+4. **Appendix**: tickers and names by sector; every sector's ten best and ten worst
+   companies over the full history per analysis; the P/E lead-lag; the data checks.
 
-"Best" follows the analysis (`rankings.py`):
+"Best" follows the analysis (`rankings.py`); main-text rankings use the last five years
+and only companies with prices for the whole window (`rankings.window`).
 
 | Analysis | Company score | Sector score | Best |
 |---|---|---|---|
 | Fundamentals | annualised revenue growth (at least 3 years) | median of its companies | highest |
-| Total return | annualised total return (at least 1 year) | its fund's | highest |
+| Total return | annualised total return | its fund's | highest |
 | Relative return | annualised return relative to the sector fund | its fund's against the S&P 500 | highest |
 | P/E | median P/E | median of its companies | lowest |
 | Dividend yield | mean trailing yield | median of its companies | highest |
 
-Growth and returns are annualised as $g = (V_T / V_0)^{1/Y} - 1$ over $Y$ years
-(`skatkis.financial_logic`). A line plot holds at most 30 lines and has its legend
-outside the plot; colour marks the company or sector, line style the group or metric
-(best solid, worst dashed).
+Each panel is a separate image; the LaTeX report joins them into grids and side-by-side
+figures with lettered sub-captions. A line plot holds at most 30 lines.
 
 The fiscal year of the as-of date is left out of the fundamentals totals, as it is not
 over. The P/E, lead-lag and dividend-yield tables are stored under

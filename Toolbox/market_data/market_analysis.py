@@ -36,6 +36,8 @@ ranked_series(prices, symbols, *, relative_to)
     Growth of 1 USD per company, optionally over a benchmark, for ``companies_ranked``.
 companies_ranked(table, *, value, best, worst, ...)
     The best companies (solid) against the worst (dashed), one colour per company.
+pe_and_value(pe, symbols, *, title)
+    Per company its P/E (solid, left axis) and price growth (dashed, right axis).
 edgar_coverage, edgar_eps_check, edgar_filing_lag, yahoo_trading_days, fred_series,
 fred_coverage
     Data checks.
@@ -72,6 +74,7 @@ from Toolbox.skatkis.analysis import (
     plot_dual_axis,
     plot_lag_profile,
     plot_normalised,
+    plot_pair_series,
     plot_relative,
     plot_scatter,
     plot_series,
@@ -81,13 +84,14 @@ from Toolbox.skatkis.analysis import (
 
 BENCHMARK = "^SP500TR"
 MILLION = 1e6
+TRILLION = 1e12
 
 
 # ---------------------------------------------------------------- sector summaries
 
 
 def sector_benchmarks(
-    prices: pd.DataFrame, sectors: Mapping[str, str], market: str
+    prices: pd.DataFrame, sectors: Mapping[str, str], market: str, *, title: str = ""
 ) -> Figure:
     """Plot each sector fund's total return relative to the S&P 500's.
 
@@ -101,13 +105,13 @@ def sector_benchmarks(
         group="symbol",
         benchmark=market,
         labels={fund: f"{name} ({fund})" for name, fund in sectors.items()},
-        title="GICS sector funds relative to the S&P 500",
+        title=title or "GICS sector funds relative to the S&P 500",
         ylabel="fund growth / S&P 500 growth (log)",
     )
 
 
 def total_return_summary(
-    prices: pd.DataFrame, sectors: Mapping[str, str], market: str
+    prices: pd.DataFrame, sectors: Mapping[str, str], market: str, *, title: str = ""
 ) -> Figure:
     """Plot growth of 1 USD, dividends reinvested, for each sector fund and the S&P 500."""
     part = prices[prices["symbol"].isin([*sectors.values(), market])]
@@ -118,13 +122,13 @@ def total_return_summary(
         group="symbol",
         highlight=market,
         labels={fund: f"{name} ({fund})" for name, fund in sectors.items()},
-        title="GICS sector funds and the S&P 500 (black): growth of 1 USD",
+        title=title or "GICS sector funds and the S&P 500 (black): growth of 1 USD",
         ylabel="growth of 1 USD (log)",
     )
 
 
 def fundamentals_sector_totals(annual: pd.DataFrame, field: str) -> Figure:
-    """Plot the sum of ``field`` over each GICS sector's companies per fiscal year.
+    """Plot the sum of ``field`` over each GICS sector's companies per fiscal year (USD trillions).
 
     ``annual`` has columns ``gics_sector``, ``field``, ``period_end``, ``value`` (USD).
     The number of companies reporting can change between years, which moves the totals.
@@ -135,7 +139,7 @@ def fundamentals_sector_totals(annual: pd.DataFrame, field: str) -> Figure:
         .groupby(["gics_sector", "year"], as_index=False)["value"]
         .sum()
     )
-    totals["value"] = totals["value"] / MILLION
+    totals["value"] = totals["value"] / TRILLION
     totals["year"] = pd.to_datetime(totals["year"].astype(str), format="%Y")
     return plot_series(
         totals,
@@ -143,12 +147,12 @@ def fundamentals_sector_totals(annual: pd.DataFrame, field: str) -> Figure:
         y="value",
         group="gics_sector",
         markers=True,
-        title=f"{field.replace('_', ' ')}: sector totals (USD millions)",
-        ylabel="USD millions",
+        title=f"{field.replace('_', ' ').capitalize()} per GICS sector",
+        ylabel="USD trillions",
     )
 
 
-def dividend_yield_summary(yields: pd.DataFrame) -> Figure:
+def dividend_yield_summary(yields: pd.DataFrame, *, title: str = "") -> Figure:
     """Plot the median trailing dividend yield of each GICS sector (percent)."""
     return plot_spread(
         yields.assign(dividend_yield=yields["dividend_yield"] * 100),
@@ -156,12 +160,12 @@ def dividend_yield_summary(yields: pd.DataFrame) -> Figure:
         y="dividend_yield",
         group="gics_sector",
         band=(0.5, 0.5),
-        title="Median trailing 12-month dividend yield per GICS sector",
+        title=title or "Median trailing 12-month dividend yield per GICS sector",
         ylabel="dividend yield (%)",
     )
 
 
-def pe_sector_medians(pe: pd.DataFrame) -> Figure:
+def pe_sector_medians(pe: pd.DataFrame, *, title: str = "") -> Figure:
     """Plot the median P/E of each GICS sector over time (``pe`` has ``gics_sector``)."""
     return plot_spread(
         pe,
@@ -169,7 +173,7 @@ def pe_sector_medians(pe: pd.DataFrame) -> Figure:
         y="pe",
         group="gics_sector",
         band=(0.5, 0.5),
-        title="Median P/E per GICS sector",
+        title=title or "Median P/E per GICS sector",
         ylabel="median P/E",
     )
 
@@ -307,6 +311,7 @@ def companies_ranked(
     ylabel: str,
     log: bool = False,
     thresholds: Mapping[str, float] | None = None,
+    panel: bool = False,
 ) -> Figure:
     """Plot the best companies (solid) against the worst (dashed), one colour per company.
 
@@ -330,6 +335,34 @@ def companies_ranked(
         thresholds=thresholds,
         title=title,
         ylabel=ylabel,
+        panel=panel,
+    )
+
+
+def pe_and_value(
+    pe: pd.DataFrame, symbols: Sequence[str], *, title: str, panel: bool = True
+) -> Figure:
+    """Plot each company's P/E (solid, left) and price growth (dashed, right), one colour each.
+
+    ``pe`` has ``symbol``, ``date``, ``pe`` and ``close``; price growth is the close divided
+    by the company's first close in the table, so it starts at 1.
+    """
+    part = (
+        pe[pe["symbol"].isin(list(symbols))].dropna(subset=["pe"]).sort_values("date")
+    )
+    first = part.groupby("symbol")["close"].transform("first")
+    return plot_pair_series(
+        part.assign(growth=part["close"] / first),
+        x="date",
+        left="pe",
+        right="growth",
+        group="symbol",
+        title=title,
+        left_label="P/E (log)",
+        right_label="price growth (log)",
+        log_left=True,
+        log_right=True,
+        panel=panel,
     )
 
 

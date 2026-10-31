@@ -1,31 +1,38 @@
 # Text of the market analysis report (python -m Toolbox.market_data check).
-# Owned by the secretary: wording, structure and captions. The code places the plots and
-# fills the placeholders: {best} and {worst} (sectors), {best_score} and {worst_score},
-# {direction} ("highest" or "lowest"), {value_best} and {value_worst} (P/E section),
-# {sector}, {n} and {fund} (company plots). [[app:<section>]] refers to the appendix.
-# Inline maths between $...$; in section and subsection texts write { and } as {{ and }}.
+# Owned by the secretary: wording, structure, figure lists and captions. The code places
+# the plots and fills the placeholders: {best1}, {best2}, {worst1}, {worst2} (sectors),
+# {best1_score}, {worst1_score}, {n} (companies per group), {years} (recent window),
+# {long_years}; in the P/E and value section {low_pe}, {high_pe}, {best_value},
+# {worst_value}, {overlap_best}, {overlap_worst}; in the appendix {sector}, {n}, {fund}.
+# [[app:<name>]] refers to an appendix section. Inline maths between $...$; write { and }
+# inside texts and captions as {{ and }}.
 
 title = "S&P 500 market analysis"
-abstract = """This report describes the market data behind the value-investing and machine-learning \
-tools: company fundamentals from SEC EDGAR filings, prices and dividends from Yahoo Finance, and the \
-USD/ZAR exchange rate from FRED. It moves from coarse to fine: the GICS sectors against the S&P 500, \
-then for each analysis all sectors side by side, its best and worst sector, and the best and worst \
-companies of those two sectors; every sector's companies are in the appendix. Companies are the \
-current S&P 500 members outside the Financials and Real Estate sectors; those that left the index are \
-not included, so the results carry survivorship bias. All returns include reinvested dividends and \
-all amounts are in US dollars."""
+abstract = """A concise view of the S&P 500 over the last five years: company fundamentals from SEC \
+EDGAR filings and prices and dividends from Yahoo Finance, for the current members outside the \
+Financials and Real Estate sectors. For each measure, the sectors are compared, then every sector's \
+best and worst companies, then the two best and two worst sectors in more detail; a final section \
+puts P/E and value side by side to find companies that are both cheap and rewarding. The full \
+history since 2006, used for back-testing, and the data checks are in the appendix. Companies that \
+left the index are not included, so the results carry survivorship bias; all returns include \
+reinvested dividends and all amounts are in US dollars."""
 
-order = ["overview", "fundamentals", "total_return", "relative_return", "pe", "dividend_yield", "data_checks", "companies"]
+order = ["fundamentals", "total_return", "relative_return", "pe", "pe_value", "dividend_yield"]
+appendix_order = ["fundamentals", "total_return", "relative_return", "pe", "dividend_yield", "data_checks"]
 
 [introduction]
 title = "Introduction"
 text = """Companies are grouped by the Global Industry Classification Standard (GICS), which S&P and \
-MSCI use to classify every listed company by its principal business. The analysis uses the eleven \
-GICS sectors, the top level of the classification; Financials and Real Estate are left out of the \
-stock universe because the balance-sheet rules of value investing do not fit banks, insurers and \
-real-estate trusts. Each sector is compared with its SPDR sector fund, which tracks the S&P 500 sector \
-index and includes dividends, and with the S&P 500 total-return index. The table lists the sectors \
-analysed, the number of their companies with prices, and their fund."""
+MSCI use to classify listed companies by their principal business. The report uses the GICS sectors, \
+the top level of the classification; Financials and Real Estate are left out because the \
+balance-sheet rules of value investing do not fit banks, insurers and real-estate trusts. Each sector \
+is compared with its SPDR sector fund, which tracks the S&P 500 sector index and includes dividends, \
+and with the S&P 500 total-return index.
+
+Plots name companies by their ticker; Appendix [[app:tickers]] gives each company's full name, \
+grouped by sector and sorted by ticker. In plots of companies, solid lines are the best and dashed \
+lines the worst by the measure of the section, and each colour is one company. Rankings in the main \
+text use the last five years, and only companies with prices for the whole five years are ranked."""
 
 [introduction.sectors]
 "Communication Services" = "Telecommunication carriers, media, entertainment and interactive online platforms."
@@ -37,97 +44,152 @@ analysed, the number of their companies with prices, and their fund."""
 "Information Technology" = "Software, IT services, hardware, semiconductors and electronic equipment."
 "Materials" = "Chemicals, construction materials, containers and packaging, metals and mining."
 "Utilities" = "Electric, gas and water utilities and independent power producers."
-"Financials" = "Banks, insurers, asset managers and other financial services (not analysed)."
-"Real Estate" = "Real-estate investment trusts and real-estate management (not analysed)."
-
-[sections.overview]
-title = "Overview: sectors against the S&P 500"
-text = """Each GICS sector is represented by its sector fund, the market by the S&P 500 total-return \
-index; both include reinvested dividends. Relative return divides a fund's growth by the S&P 500's \
-growth over the same period, so a value above one means the sector beat the market since the start."""
-captions = { relative = "GICS sector funds relative to the S&P 500 total-return index, log scale; above 1 the sector outperformed the market since 2006 (or since the fund's first date).", total = "Growth of 1 USD with dividends reinvested for each GICS sector fund and the S&P 500 (black), log scale." }
 
 [sections.fundamentals]
 title = "Fundamentals: revenue and net income"
-text = """Revenue and net income are the values first reported in each company's annual report (10-K), \
-in millions of US dollars, as filed with the SEC; later restatements are not used. Sector totals sum \
-the companies of a sector per fiscal year and move when the number of reporting companies changes, \
-especially before 2009. The fiscal year of the data date is left out, as it is not complete. A \
-company's score is its annualised revenue growth, $g = (V_T / V_0)^{{1/Y}} - 1$ over at least three \
-years; a sector's score is the median of its companies' scores, and the highest is best."""
-captions = { revenue = "Sum of first-reported annual revenue per GICS sector, USD millions.", net_income = "Sum of first-reported annual net income per GICS sector, USD millions; negative values are sector-wide losses.", sectors = "Total revenue (solid) and net income (dashed) of {best}, the sector with the highest median revenue growth ({best_score}), and {worst}, the lowest ({worst_score}); USD millions.", companies = "{sector}: revenue of the {n} companies with the highest (solid) and lowest (dashed) annualised revenue growth, USD millions." }
+text = """Revenue and net income are the values first reported in each company's annual report (10-K) \
+to the SEC, in US dollars; later restatements are not used. Sector totals sum the companies of a \
+sector per fiscal year; they move when the number of reporting companies changes, especially before \
+2009, and the fiscal year of the data date is left out because it is not complete. Companies are \
+ranked by annualised revenue growth over the last {years} years, $g = (V_T / V_0)^{{1/Y}} - 1$, with \
+$V_0$ and $V_T$ the first and last annual revenue and $Y$ the years between them; a sector by the \
+median of its companies."""
+figures = [
+  { figure = "summary", columns = 2, caption = "Sum of first-reported annual (a) revenue and (b) net income over the companies of each GICS sector, USD trillions." },
+  { figure = "grid", columns = 3, caption = "Annual revenue, per GICS sector, of the {n} companies with the highest (solid) and lowest (dashed) revenue growth over the last {years} years; USD millions." },
+]
 subsections = [
-  { title = "Best and worst sector", text = "By median annualised revenue growth, {best} ranks first ({best_score}) and {worst} last ({worst_score}). Every sector is shown in Appendix [[app:fundamentals]].", kinds = ["sectors"] },
-  { title = "Companies in {best} and {worst}", text = "Within each of the two sectors, the five companies with the highest revenue growth against the five with the lowest.", kinds = ["companies"] },
+  { title = "Overview", text = "Over the last {years} years, {best1} ({best1_score} median growth) and {best2} grew revenue fastest, {worst1} ({worst1_score}) and {worst2} slowest. The full history of every sector is in Appendix [[app:fundamentals]].", figures = [
+    { figure = "best", columns = 2, caption = "The two sectors with the highest median revenue growth over the last {years} years, (a) {best1} and (b) {best2}, with the revenue of their {n} fastest-growing companies; USD millions." },
+    { figure = "worst", columns = 2, caption = "The two sectors with the lowest median revenue growth, (a) {worst1} and (b) {worst2}, with the revenue of their {n} slowest-growing companies; USD millions." },
+  ] },
 ]
 
 [sections.total_return]
 title = "Total return"
-text = """Growth of one US dollar invested with dividends reinvested, from each series' first trading \
-day in the data (2006 at the earliest). A company's score is its annualised total return \
-$r = (P_T / P_0)^{{1/Y}} - 1$, with $P$ the dividend-adjusted price and $Y$ the years in the data \
-(at least one); a sector's score is that of its fund, and the highest is best. All sectors are \
-shown in the overview."""
-captions = { sectors = "Growth of 1 USD for the funds of {best}, the sector with the highest annualised return ({best_score}), and {worst}, the lowest ({worst_score}), with the S&P 500 in black; log scale.", companies = "{sector}: growth of 1 USD for the {n} companies with the highest (solid) and lowest (dashed) annualised total return, log scale." }
+text = """Growth of one US dollar invested with dividends reinvested. Companies are ranked by \
+annualised total return over the last {years} years, $r = (P_T / P_0)^{{1/Y}} - 1$, with $P$ the \
+dividend-adjusted price; a sector by the return of its fund."""
+figures = [
+  { figure = "summary", columns = 1, caption = "Growth of 1 USD with dividends reinvested for each GICS sector fund and the S&P 500 (black), over (a) the last {years} years, (b) the last {long_years} years and (c) the full history since 2006; each view starts at 1, log scale." },
+  { figure = "grid", columns = 3, caption = "Growth of 1 USD over the last {years} years, per GICS sector, for the {n} companies with the highest (solid) and lowest (dashed) total return; log scale." },
+]
 subsections = [
-  { title = "Best and worst sector", text = "{best} returned the most ({best_score}) and {worst} the least ({worst_score}). Every sector's companies are in Appendix [[app:total_return]].", kinds = ["sectors"] },
-  { title = "Companies in {best} and {worst}", text = "Within each of the two sectors, the five companies with the highest total return against the five with the lowest.", kinds = ["companies"] },
+  { title = "Overview", text = "Over the last {years} years the funds of {best1} ({best1_score}) and {best2} returned the most, those of {worst1} ({worst1_score}) and {worst2} the least. The full history of every sector is in Appendix [[app:total_return]].", figures = [
+    { figure = "best", columns = 2, caption = "The two sectors whose funds returned the most over the last {years} years, (a) {best1} and (b) {best2}, with growth of 1 USD for their {n} best companies; log scale." },
+    { figure = "worst", columns = 2, caption = "The two sectors whose funds returned the least, (a) {worst1} and (b) {worst2}, with growth of 1 USD for their {n} worst companies; log scale." },
+  ] },
 ]
 
 [sections.relative_return]
 title = "Relative return"
-text = """A series' growth divided by a benchmark's growth over the same period. Sectors are compared \
-with the S&P 500 and companies with their sector fund, separating performance within the sector from \
-performance of the sector. Scores are annualised relative returns, $r = G^{{1/Y}} - 1$, where $G$ is \
-the relative growth and $Y$ the years (at least one); the highest is best."""
-captions = { sectors = "Funds of {best} (best, {best_score} against the S&P 500) and {worst} (worst, {worst_score}), relative to the S&P 500; log scale, above 1 the sector outperformed.", companies = "{sector}: the {n} companies with the highest (solid) and lowest (dashed) annualised return relative to {fund}, shown as growth relative to {fund}; log scale." }
+text = """A series' growth divided by a benchmark's growth over the same period: above one it beat the \
+benchmark. Sectors are compared with the S&P 500 and companies with their sector fund, so a company's \
+result is its performance within its sector. Ranking uses the annualised relative growth over the \
+last {years} years."""
+figures = [
+  { figure = "summary", columns = 1, caption = "GICS sector funds relative to the S&P 500 over the last {years} years, each starting at 1; above 1 the sector outperformed the market. Log scale." },
+  { figure = "grid", columns = 3, caption = "Growth relative to the sector fund over the last {years} years, per GICS sector, for the {n} companies that beat it most (solid) and trailed it most (dashed); log scale." },
+]
 subsections = [
-  { title = "Best and worst sector", text = "Against the S&P 500, {best} did best ({best_score}) and {worst} worst ({worst_score}). Every sector's companies are in Appendix [[app:relative_return]].", kinds = ["sectors"] },
-  { title = "Companies in {best} and {worst}", text = "Within each of the two sectors, the five companies that beat their sector fund by the most against the five that trailed it by the most.", kinds = ["companies"] },
+  { title = "Overview", text = "Against the S&P 500, {best1} ({best1_score}) and {best2} did best over the last {years} years, {worst1} ({worst1_score}) and {worst2} worst. The full history of every sector is in Appendix [[app:relative_return]].", figures = [
+    { figure = "best", columns = 2, caption = "The two sectors that beat the S&P 500 most over the last {years} years, (a) {best1} and (b) {best2}, with their {n} companies that beat their sector fund most; growth relative to the fund, log scale." },
+    { figure = "worst", columns = 2, caption = "The two sectors that trailed the S&P 500 most, (a) {worst1} and (b) {worst2}, with their {n} companies that trailed their sector fund most; growth relative to the fund, log scale." },
+  ] },
 ]
 
 [sections.pe]
 title = "Price-to-earnings ratio"
 text = """The P/E divides the share price by the latest first-reported annual diluted earnings per \
-share filed before the day, with EPS put on the price's split basis. It changes in steps once a year, \
-when a new annual report is filed; a ratio on trailing twelve-month earnings will replace it. \
-Companies with zero or negative earnings have no P/E. A company's score is its median P/E over the \
-data; a sector's score is the median of its companies', and the lowest is best, as value investing \
-looks for cheap earnings. The P/E of a sector is shown with the price growth of its companies, each \
-with the band from the 25th to the 75th percentile, to show how the two move together."""
-captions = { summary = "Median P/E of the companies in each GICS sector.", lead_lag = "Mean correlation, over each sector's companies, of monthly P/E changes with price changes k months later; positive k: the P/E changes first.", sector_best = "{best}, the sector with the lowest median P/E ({best_score}): median P/E (left) and median price growth since each company's first close (right, log), each with its 25th to 75th percentile band.", sector_worst = "{worst}, the sector with the highest median P/E ({worst_score}): median P/E (left) and median price growth (right, log), with bands.", value_best = "{value_best}, the sector with the best return against the S&P 500: median P/E (left) and median price growth (right, log), with bands.", value_worst = "{value_worst}, the sector with the worst return against the S&P 500: median P/E (left) and median price growth (right, log), with bands.", companies = "{sector}: P/E of the {n} companies with the lowest (solid) and highest (dashed) median P/E." }
+share filed before the day, with earnings per share on the price's split basis; it changes in steps \
+when a new annual report is filed, and companies with zero or negative earnings have none. A company \
+is ranked by its median P/E over the last {years} years and a sector by the median of its companies; \
+the lowest is best, as value investing looks for cheap earnings. The correlation of P/E and price \
+changes is in Appendix [[app:pe]]."""
+figures = [
+  { figure = "summary", columns = 1, caption = "Median P/E of the companies in each GICS sector over the last {years} years." },
+  { figure = "grid", columns = 3, caption = "P/E over the last {years} years, per GICS sector, of the {n} companies with the lowest (solid) and highest (dashed) median P/E." },
+]
 subsections = [
-  { title = "P/E against value: best and worst P/E", text = "{best} has the lowest median P/E ({best_score}) and {worst} the highest ({worst_score}). Every sector's companies are in Appendix [[app:pe]].", kinds = ["sector_best", "sector_worst"] },
-  { title = "Value against P/E: best and worst return", text = "The P/E of the sectors with the best and worst return against the S&P 500, {value_best} and {value_worst}.", kinds = ["value_best", "value_worst"] },
-  { title = "Companies in {best} and {worst}", text = "Within the sectors with the lowest and highest P/E, the five companies with the lowest P/E against the five with the highest.", kinds = ["companies"] },
+  { title = "Overview", text = "Over the last {years} years {best1} ({best1_score}) and {best2} had the lowest median P/E, {worst1} ({worst1_score}) and {worst2} the highest. The full history of every sector is in Appendix [[app:pe]].", figures = [
+    { figure = "best", columns = 2, caption = "The two sectors with the lowest median P/E over the last {years} years, (a) {best1} and (b) {best2}, with the P/E of their {n} cheapest companies." },
+    { figure = "worst", columns = 2, caption = "The two sectors with the highest median P/E, (a) {worst1} and (b) {worst2}, with the P/E of their {n} most expensive companies." },
+  ] },
+]
+
+[sections.pe_value]
+title = "P/E and value"
+text = """Value investing looks for companies that are cheap on earnings and still reward their \
+holders. Across all companies, those with the lowest median P/E over the last {years} years are set \
+beside those with the highest total return over the same years, and likewise for the highest P/E \
+and the lowest return; every plot shows both measures for each company. Companies in both best \
+lists: {overlap_best}. Companies in both worst lists: {overlap_worst}. Finding such overlap is what \
+the models aim for."""
+figures = [
+  { figure = "best", columns = 2, caption = "(a) The {n} companies with the lowest median P/E over the last {years} years ({low_pe}) and (b) the {n} with the highest total return ({best_value}); for each company its P/E (solid, left axis) and price growth since the start of the window (dashed, right axis), log scales." },
+  { figure = "worst", columns = 2, caption = "(a) The {n} companies with the highest median P/E over the last {years} years ({high_pe}) and (b) the {n} with the lowest total return ({worst_value}); P/E (solid, left axis) and price growth (dashed, right axis), log scales." },
 ]
 
 [sections.dividend_yield]
 title = "Dividend yield"
 text = """The trailing dividend yield is the sum of a company's dividends with an ex-date in the past \
-twelve months divided by its share price, with both on the same split basis, in percent; a company \
-that paid no dividend in the window yields zero. A company's score is its mean yield over the data; \
-a sector's score is the median of its companies', and the highest is best."""
-captions = { summary = "Median trailing 12-month dividend yield of the companies in each GICS sector, percent.", sectors = "Median trailing dividend yield of {best} (highest, {best_score}) and {worst} (lowest, {worst_score}), with their 25th to 75th percentile bands; percent.", companies = "{sector}: trailing dividend yield of the {n} companies with the highest (solid) and lowest (dashed) mean yield, percent." }
+twelve months divided by its share price, both on the same split basis, in percent; a company that \
+paid no dividend in the window yields zero. A company is ranked by its mean yield over the last \
+{years} years and a sector by the median of its companies; the highest is best."""
+figures = [
+  { figure = "summary", columns = 1, caption = "Median trailing 12-month dividend yield of the companies in each GICS sector over the last {years} years, percent." },
+  { figure = "grid", columns = 3, caption = "Trailing dividend yield over the last {years} years, per GICS sector, of the {n} companies with the highest (solid) and lowest (dashed) mean yield; percent." },
+]
 subsections = [
-  { title = "Best and worst sector", text = "{best} pays the highest median yield ({best_score}) and {worst} the lowest ({worst_score}). Every sector's companies are in Appendix [[app:dividend_yield]].", kinds = ["sectors"] },
-  { title = "Companies in {best} and {worst}", text = "Within each of the two sectors, the five companies with the highest mean yield against the five with the lowest.", kinds = ["companies"] },
+  { title = "Overview", text = "Over the last {years} years {best1} ({best1_score}) and {best2} paid the highest median yield, {worst1} ({worst1_score}) and {worst2} the lowest. The full history of every sector is in Appendix [[app:dividend_yield]].", figures = [
+    { figure = "best", columns = 2, caption = "The two sectors with the highest median yield over the last {years} years, (a) {best1} and (b) {best2}, with their {n} highest-yielding companies; percent." },
+    { figure = "worst", columns = 2, caption = "The two sectors with the lowest median yield, (a) {worst1} and (b) {worst2}, with their {n} lowest-yielding companies; percent." },
+  ] },
 ]
 
-[sections.data_checks]
+[appendix.tickers]
+title = "Tickers and company names"
+text = """The companies analysed, by GICS sector, sorted by ticker. Tickers follow Yahoo Finance (a dash \
+for a share class, as in BF-B)."""
+
+[appendix.fundamentals]
+title = "Fundamentals: full history per sector"
+text = """For every GICS sector, the revenue of its companies with the highest (solid) and lowest \
+(dashed) annualised revenue growth over all years in the data."""
+caption = "{sector}: annual revenue of the {n} companies with the highest (solid) and lowest (dashed) revenue growth over the full history; USD millions."
+
+[appendix.total_return]
+title = "Total return: full history per sector"
+text = """For every GICS sector, growth of 1 USD for its companies with the highest (solid) and lowest \
+(dashed) annualised total return since each company's first date in the data (at least one year)."""
+caption = "{sector}: growth of 1 USD for the {n} companies with the highest (solid) and lowest (dashed) total return over the full history; log scale."
+
+[appendix.relative_return]
+title = "Relative return: full history per sector"
+text = """For every GICS sector, growth relative to the sector fund for its companies that beat it most \
+(solid) and trailed it most (dashed) over the full history."""
+caption = "{sector}: growth relative to {fund} for the {n} companies with the highest (solid) and lowest (dashed) annualised relative return over the full history; log scale."
+
+[appendix.pe]
+title = "P/E: full history per sector"
+text = """For every GICS sector, the P/E of its companies with the lowest (solid) and highest (dashed) \
+median P/E over the full history, and the lead-lag correlation of monthly P/E and price changes. P/E \
+is price divided by earnings per share, so at lag 0 the two move together by construction; the other \
+lags show whether P/E changes come before or after price changes."""
+caption = "{sector}: P/E of the {n} companies with the lowest (solid) and highest (dashed) median P/E over the full history."
+captions = { lead_lag = "Mean correlation, over each sector's companies, of monthly P/E changes with price changes k months later; positive k: the P/E changes first." }
+
+[appendix.dividend_yield]
+title = "Dividend yield: full history per sector"
+text = """For every GICS sector, the trailing dividend yield of its companies with the highest (solid) and \
+lowest (dashed) mean yield over the full history."""
+caption = "{sector}: trailing dividend yield of the {n} companies with the highest (solid) and lowest (dashed) mean yield over the full history; percent."
+
+[appendix.data_checks]
 title = "Data checks"
-text = """Checks of the data behind the sections above: how many companies report each field per year, \
-whether reported EPS agrees with net income divided by diluted shares, how long after the period end \
-filings arrive (the point-in-time delay), whether every symbol has a full trading calendar (youngest \
-first, which shows each company's age in the data), and the exchange rate used for ZAR figures."""
+text = """Checks of the data behind the report: how many companies report each field per year, whether \
+reported EPS agrees with net income divided by diluted shares, how long after the period end filings \
+arrive (the point-in-time delay), whether every symbol has a full trading calendar (youngest first, \
+which shows each company's age in the data), and the exchange rate for ZAR figures."""
+caption = "{sector}"
 captions = { coverage = "Number of companies with a first-reported annual value, per field and fiscal year.", eps_check = "Reported diluted EPS against net income divided by weighted diluted shares, USD per share; points off the diagonal differ.", filing_lag = "Days from period end to filing for each 10-K and 10-Q.", trading_days = "Trading days per symbol and year, youngest symbols at the top; a row starts in the year the symbol first traded.", fx = "USD/ZAR exchange rate (FRED DEXSFUS), rand per US dollar.", fx_coverage = "Exchange-rate observations per year." }
-
-[sections.companies]
-title = "Single companies"
-text = """For a small universe, the series of each company are shown individually."""
-
-[appendix]
-title = "all GICS sectors"
-text = """For every GICS sector, its best companies (solid) against its worst (dashed) by the measure of \
-the analysis."""
-caption = "{sector}: the {n} best (solid) and worst (dashed) companies by the measure of this analysis; fund {fund}."

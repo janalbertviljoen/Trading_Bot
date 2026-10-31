@@ -118,10 +118,32 @@ Package caption Info: Standard document class detected.
 \c@caption@flags=\count193
 \c@continuedfloat=\count194
 Package caption Info: float package is loaded.
+) (subcaption.sty
+Package: subcaption 2022/01/07 v1.5 Sub-captions (AR)
+\c@subfigure=\count195
+\c@subtable=\count196
+)
+(longtable.sty
+Package: longtable 2021-09-01 v4.17 Multi-page Table package (DPC)
+\LTleft=\skip49
+\LTright=\skip50
+\LTpre=\skip51
+\LTpost=\skip52
+\LTchunksize=\count197
+\LTcapwidth=\dimen157
+\LT@head=\box52
+\LT@firsthead=\box53
+\LT@foot=\box54
+\LT@lastfoot=\box55
+\LT@gbox=\box56
+\LT@cols=\count198
+\LT@rows=\count199
+\c@LT@tables=\count266
+\c@LT@chunks=\count267
+\LT@p@ftn=\toks20
 ) (hyperref.sty
 Package: hyperref 2022-02-21 v7.00n Hypertext links for LaTeX
-
-(ltxcmds.sty
+ (ltxcmds.sty
 Package: ltxcmds 2020-05-10 v1.25 LaTeX kernel commands for general use (HO)
 ) (pdftexcmds.sty
 Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO
@@ -132,33 +154,35 @@ Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
 Package pdftexcmds Info: \pdf@primitive is available.
 Package pdftexcmds Info: \pdf@ifprimitive is available.
 Package pdftexcmds Info: \pdfdraftmode not found.
-) (kvsetkeys.sty
-Package: kvsetkeys 2019/12/15 v1.18 Key value parser (HO)
 )
-(kvdefinekeys.sty
+(kvsetkeys.sty
+Package: kvsetkeys 2019/12/15 v1.18 Key value parser (HO)
+) (kvdefinekeys.sty
 Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
 ) (pdfescape.sty
 Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
 ) (hycolor.sty
 Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
-) (letltxmacro.sty
+)
+(letltxmacro.sty
 Package: letltxmacro 2019/12/03 v1.6 Let assignment for LaTeX macros (HO)
 ) (auxhook.sty
 Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
 ) (kvoptions.sty
 Package: kvoptions 2020-10-07 v3.14 Key value format for package options (HO)
 )
-\@linkdim=\dimen157
-\Hy@linkcounter=\count195
-\Hy@pagecounter=\count196
+\@linkdim=\dimen158
+\Hy@linkcounter=\count268
+\Hy@pagecounter=\count269
  (pd1enc.def
 File: pd1enc.def 2022-02-21 v7.00n Hyperref: PDFDocEncoding definition (HO)
 ) (intcalc.sty
 Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
-) (etexcmds.sty
+)
+(etexcmds.sty
 Package: etexcmds 2019/12/15 v1.7 Avoid name clashes with e-TeX commands (HO)
 )
-\Hy@SavedSpaceFactor=\count197
+\Hy@SavedSpaceFactor=\count270
  (puenc.def
 File: puenc.def 2022-02-21 v7.00n Hyperref: PDF Unicode definition (HO)
 )
@@ -171,23 +195,22 @@ Package hyperref Info: Plain pages OFF on input line 4152.
 Package hyperref Info: Backreferencing OFF on input line 4157.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4390.
-\c@Hy@tempcnt=\count198
-
-(url.sty
+\c@Hy@tempcnt=\count271
+ (url.sty
 \Urlmuskip=\muskip16
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 4749.
-\XeTeXLinkMargin=\dimen158
+\XeTeXLinkMargin=\dimen159
  (bitset.sty
 Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
  (bigintcalc.sty
 Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
 )
 ))
-\Fld@menulength=\count199
-\Field@Width=\dimen159
-\Fld@charsize=\dimen160
+\Fld@menulength=\count272
+\Field@Width=\dimen160
+\Fld@charsize=\dimen161
 Package hyperref Info: Hyper figures OFF on input line 6027.
 Package hyperref Info: Link nesting OFF on input line 6032.
 Package hyperref Info: Hyper index ON on input line 6035.
@@ -197,30 +220,31 @@ Package hyperref Info: Link coloring with OCG OFF on input line 6052.
 Package hyperref Info: PDF/A mode OFF on input line 6057.
 LaTeX Info: Redefining \ref on input line 6097.
 LaTeX Info: Redefining \pageref on input line 6101.
- (atbegshi-ltx.sty
+
+(atbegshi-ltx.sty
 Package: atbegshi-ltx 2021/01/10 v1.0c Emulation of the original atbegshi
 package with kernel methods
 )
-\Hy@abspage=\count266
-\c@Item=\count267
-\c@Hfootnote=\count268
+\Hy@abspage=\count273
+\c@Item=\count274
+\c@Hfootnote=\count275
 )
 Package hyperref Info: Driver (autodetected): hxetex.
  (hxetex.def
 File: hxetex.def 2022-02-21 v7.00n Hyperref driver for XeTeX
-
-(stringenc.sty
+ (stringenc.sty
 Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO
 )
 )
-\pdfm@box=\box52
-\c@Hy@AnnotLevel=\count269
-\HyField@AnnotCount=\count270
-\Fld@listcount=\count271
-\c@bookmark@seq@number=\count272
+\pdfm@box=\box57
+\c@Hy@AnnotLevel=\count276
+\HyField@AnnotCount=\count277
+\Fld@listcount=\count278
+\c@bookmark@seq@number=\count279
  (rerunfilecheck.sty
 Package: rerunfilecheck 2019/12/05 v1.9 Rerun checks for auxiliary files (HO)
- (atveryend-ltx.sty
+
+(atveryend-ltx.sty
 Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atveryend pac
 kage
 with kernel methods
@@ -230,46 +254,46 @@ Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 86.
 )
-\Hy@SectionHShift=\skip49
-)
-(l3backend-xetex.def
+\Hy@SectionHShift=\skip53
+) (l3backend-xetex.def
 File: l3backend-xetex.def 2022-02-07 L3 backend support: XeTeX
-\c__kernel_sys_dvipdfmx_version_int=\count273
-\l__color_backend_stack_int=\count274
-\g__color_backend_stack_int=\count275
-\g__graphics_track_int=\count276
-\l__pdf_internal_box=\box53
-\g__pdf_backend_object_int=\count277
-\g__pdf_backend_annotation_int=\count278
-\g__pdf_backend_link_int=\count279
+\c__kernel_sys_dvipdfmx_version_int=\count280
+\l__color_backend_stack_int=\count281
+\g__color_backend_stack_int=\count282
+\g__graphics_track_int=\count283
+\l__pdf_internal_box=\box58
+\g__pdf_backend_object_int=\count284
+\g__pdf_backend_annotation_int=\count285
+\g__pdf_backend_link_int=\count286
 ) (report.aux)
 \openout1 = `report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 16.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 18.
 LaTeX Font Info:    Trying to load font information for TS1+cmr on input line 1
-6.
- (ts1cmr.fd
+8.
+
+(ts1cmr.fd
 File: ts1cmr.fd 2019/12/16 v2.5j Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 16.
-LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: xetex
@@ -307,285 +331,395 @@ LaTeX Font Info:    ... okay on input line 16.
 
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: hyperref package is loaded.
+Package caption Info: longtable package is loaded.
+(ltcaption.sty
+Package: ltcaption 2021/01/08 v1.4c longtable captions (AR)
+)
 Package caption Info: End \AtBeginDocument code.
-Package hyperref Info: Link coloring OFF on input line 16.
-(nameref.sty
+Package hyperref Info: Link coloring OFF on input line 18.
+ (nameref.sty
 Package: nameref 2021-04-02 v2.47 Cross-referencing by name of section
  (refcount.sty
 Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
 ) (gettitlestring.sty
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
-\c@section@level=\count280
+\c@section@level=\count287
 )
-LaTeX Info: Redefining \ref on input line 16.
-LaTeX Info: Redefining \pageref on input line 16.
-LaTeX Info: Redefining \nameref on input line 16.
- (report.out) (report.out)
+LaTeX Info: Redefining \ref on input line 18.
+LaTeX Info: Redefining \pageref on input line 18.
+LaTeX Info: Redefining \nameref on input line 18.
+ (report.out)
+(report.out)
 \@outlinefile=\write3
 \openout3 = `report.out'.
 
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 1
-8.
-
-(ot1lmr.fd
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 2
+0.
+ (ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 1
-8.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 2
+0.
  (omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-18.
+20.
  (omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-18.
+20.
  (omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 18.
+(Font)              <12> on input line 20.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 18.
+(Font)              <8> on input line 20.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 18.
+(Font)              <6> on input line 20.
  (report.toc
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 4.
- [1
+(Font)              <10.95> on input line 3.
+
+[1
 
 ] [2])
 \tf@toc=\write4
 \openout4 = `report.toc'.
 
  [3]
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 27.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 27.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 27.
-
-Underfull \hbox (badness 7362) in paragraph at lines 31--31
-[]\T1/lmr/m/n/10 Communication Ser-
+Underfull \hbox (badness 7362) in paragraph at lines 33--33
+[]|\T1/lmr/m/n/10 Communication Ser-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 32--32
-[]\T1/lmr/m/n/10 Consumer Dis-cre-
+Underfull \hbox (badness 10000) in paragraph at lines 34--34
+[]|\T1/lmr/m/n/10 Consumer Dis-cre-
  []
 
 
-Underfull \hbox (badness 1953) in paragraph at lines 37--37
-[]\T1/lmr/m/n/10 Information Tech-nol-
+Underfull \hbox (badness 1953) in paragraph at lines 39--39
+[]|\T1/lmr/m/n/10 Information Tech-nol-
  []
 
-File: overview/relative.png Graphic file (type bmp)
-<overview/relative.png>
-File: overview/total.png Graphic file (type bmp)
-<overview/total.png>
-[4]
 File: fundamentals/revenue.png Graphic file (type bmp)
 <fundamentals/revenue.png>
 File: fundamentals/net_income.png Graphic file (type bmp)
 <fundamentals/net_income.png>
+File: fundamentals/grid_communication_services.png Graphic file (type bmp)
+<fundamentals/grid_communication_services.png>
+File: fundamentals/grid_consumer_discretionary.png Graphic file (type bmp)
+<fundamentals/grid_consumer_discretionary.png>
+File: fundamentals/grid_consumer_staples.png Graphic file (type bmp)
+<fundamentals/grid_consumer_staples.png>
+File: fundamentals/grid_energy.png Graphic file (type bmp)
+<fundamentals/grid_energy.png>
+File: fundamentals/grid_health_care.png Graphic file (type bmp)
+<fundamentals/grid_health_care.png>
+File: fundamentals/grid_industrials.png Graphic file (type bmp)
+<fundamentals/grid_industrials.png>
+File: fundamentals/grid_information_technology.png Graphic file (type bmp)
+<fundamentals/grid_information_technology.png>
+File: fundamentals/grid_materials.png Graphic file (type bmp)
+<fundamentals/grid_materials.png>
+File: fundamentals/grid_utilities.png Graphic file (type bmp)
+<fundamentals/grid_utilities.png>
+[4]
+File: fundamentals/best_communication_services.png Graphic file (type bmp)
+<fundamentals/best_communication_services.png>
+File: fundamentals/best_information_technology.png Graphic file (type bmp)
+<fundamentals/best_information_technology.png>
+File: fundamentals/worst_materials.png Graphic file (type bmp)
+<fundamentals/worst_materials.png>
+File: fundamentals/worst_consumer_staples.png Graphic file (type bmp)
+<fundamentals/worst_consumer_staples.png>
  [5]
-File: fundamentals/sectors.png Graphic file (type bmp)
-<fundamentals/sectors.png>
-File: fundamentals/companies_best.png Graphic file (type bmp)
-<fundamentals/companies_best.png>
-File: fundamentals/companies_worst.png Graphic file (type bmp)
-<fundamentals/companies_worst.png>
+File: total_return/summary_recent.png Graphic file (type bmp)
+<total_return/summary_recent.png>
+File: total_return/summary_long.png Graphic file (type bmp)
+<total_return/summary_long.png>
+File: total_return/summary_full.png Graphic file (type bmp)
+<total_return/summary_full.png>
+File: total_return/grid_communication_services.png Graphic file (type bmp)
+<total_return/grid_communication_services.png>
+File: total_return/grid_consumer_discretionary.png Graphic file (type bmp)
+<total_return/grid_consumer_discretionary.png>
+File: total_return/grid_consumer_staples.png Graphic file (type bmp)
+<total_return/grid_consumer_staples.png>
+File: total_return/grid_energy.png Graphic file (type bmp)
+<total_return/grid_energy.png>
+File: total_return/grid_health_care.png Graphic file (type bmp)
+<total_return/grid_health_care.png>
+File: total_return/grid_industrials.png Graphic file (type bmp)
+<total_return/grid_industrials.png>
+File: total_return/grid_information_technology.png Graphic file (type bmp)
+<total_return/grid_information_technology.png>
+File: total_return/grid_materials.png Graphic file (type bmp)
+<total_return/grid_materials.png>
+File: total_return/grid_utilities.png Graphic file (type bmp)
+<total_return/grid_utilities.png>
  [6]
-File: total_return/sectors.png Graphic file (type bmp)
-<total_return/sectors.png>
- [7]
-File: total_return/companies_best.png Graphic file (type bmp)
-<total_return/companies_best.png>
-File: total_return/companies_worst.png Graphic file (type bmp)
-<total_return/companies_worst.png>
+Overfull \vbox (1.30716pt too high) has occurred while \output is active []
+
+
+[7]
+File: total_return/best_energy.png Graphic file (type bmp)
+<total_return/best_energy.png>
+File: total_return/best_information_technology.png Graphic file (type bmp)
+<total_return/best_information_technology.png>
+File: total_return/worst_consumer_discretionary.png Graphic file (type bmp)
+<total_return/worst_consumer_discretionary.png>
+File: total_return/worst_communication_services.png Graphic file (type bmp)
+<total_return/worst_communication_services.png>
  [8]
-File: relative_return/sectors.png Graphic file (type bmp)
-<relative_return/sectors.png>
-File: relative_return/companies_best.png Graphic file (type bmp)
-<relative_return/companies_best.png>
- [9]
-File: relative_return/companies_worst.png Graphic file (type bmp)
-<relative_return/companies_worst.png>
+File: relative_return/summary.png Graphic file (type bmp)
+<relative_return/summary.png>
+File: relative_return/grid_communication_services.png Graphic file (type bmp)
+<relative_return/grid_communication_services.png>
+File: relative_return/grid_consumer_discretionary.png Graphic file (type bmp)
+<relative_return/grid_consumer_discretionary.png>
+File: relative_return/grid_consumer_staples.png Graphic file (type bmp)
+<relative_return/grid_consumer_staples.png>
+File: relative_return/grid_energy.png Graphic file (type bmp)
+<relative_return/grid_energy.png>
+File: relative_return/grid_health_care.png Graphic file (type bmp)
+<relative_return/grid_health_care.png>
+File: relative_return/grid_industrials.png Graphic file (type bmp)
+<relative_return/grid_industrials.png>
+File: relative_return/grid_information_technology.png Graphic file (type bmp)
+<relative_return/grid_information_technology.png>
+File: relative_return/grid_materials.png Graphic file (type bmp)
+<relative_return/grid_materials.png>
+File: relative_return/grid_utilities.png Graphic file (type bmp)
+<relative_return/grid_utilities.png>
+ [9] [10]
+File: relative_return/best_energy.png Graphic file (type bmp)
+<relative_return/best_energy.png>
+File: relative_return/best_information_technology.png Graphic file (type bmp)
+<relative_return/best_information_technology.png>
+File: relative_return/worst_consumer_discretionary.png Graphic file (type bmp)
+<relative_return/worst_consumer_discretionary.png>
+File: relative_return/worst_communication_services.png Graphic file (type bmp)
+<relative_return/worst_communication_services.png>
 File: pe/summary.png Graphic file (type bmp)
 <pe/summary.png>
- [10]
-File: pe/lead_lag.png Graphic file (type bmp)
-<pe/lead_lag.png>
-File: pe/sector_best.png Graphic file (type bmp)
-<pe/sector_best.png>
-File: pe/sector_worst.png Graphic file (type bmp)
-<pe/sector_worst.png>
- [11]
-File: pe/value_best.png Graphic file (type bmp)
-<pe/value_best.png>
-File: pe/value_worst.png Graphic file (type bmp)
-<pe/value_worst.png>
- [12]
-File: pe/companies_best.png Graphic file (type bmp)
-<pe/companies_best.png>
-File: pe/companies_worst.png Graphic file (type bmp)
-<pe/companies_worst.png>
+File: pe/grid_communication_services.png Graphic file (type bmp)
+<pe/grid_communication_services.png>
+File: pe/grid_consumer_discretionary.png Graphic file (type bmp)
+<pe/grid_consumer_discretionary.png>
+File: pe/grid_consumer_staples.png Graphic file (type bmp)
+<pe/grid_consumer_staples.png>
+File: pe/grid_energy.png Graphic file (type bmp)
+<pe/grid_energy.png>
+File: pe/grid_health_care.png Graphic file (type bmp)
+<pe/grid_health_care.png>
+File: pe/grid_industrials.png Graphic file (type bmp)
+<pe/grid_industrials.png>
+File: pe/grid_information_technology.png Graphic file (type bmp)
+<pe/grid_information_technology.png>
+File: pe/grid_materials.png Graphic file (type bmp)
+<pe/grid_materials.png>
+File: pe/grid_utilities.png Graphic file (type bmp)
+<pe/grid_utilities.png>
+ [11] [12]
+File: pe/best_energy.png Graphic file (type bmp)
+<pe/best_energy.png>
+File: pe/best_materials.png Graphic file (type bmp)
+<pe/best_materials.png>
+File: pe/worst_information_technology.png Graphic file (type bmp)
+<pe/worst_information_technology.png>
+File: pe/worst_communication_services.png Graphic file (type bmp)
+<pe/worst_communication_services.png>
+File: pe_value/low_pe.png Graphic file (type bmp)
+<pe_value/low_pe.png>
+File: pe_value/best_value.png Graphic file (type bmp)
+<pe_value/best_value.png>
+File: pe_value/high_pe.png Graphic file (type bmp)
+<pe_value/high_pe.png>
+File: pe_value/worst_value.png Graphic file (type bmp)
+<pe_value/worst_value.png>
  [13]
 File: dividend_yield/summary.png Graphic file (type bmp)
 <dividend_yield/summary.png>
+File: dividend_yield/grid_communication_services.png Graphic file (type bmp)
+<dividend_yield/grid_communication_services.png>
+File: dividend_yield/grid_consumer_discretionary.png Graphic file (type bmp)
+<dividend_yield/grid_consumer_discretionary.png>
+File: dividend_yield/grid_consumer_staples.png Graphic file (type bmp)
+<dividend_yield/grid_consumer_staples.png>
+File: dividend_yield/grid_energy.png Graphic file (type bmp)
+<dividend_yield/grid_energy.png>
+File: dividend_yield/grid_health_care.png Graphic file (type bmp)
+<dividend_yield/grid_health_care.png>
+File: dividend_yield/grid_industrials.png Graphic file (type bmp)
+<dividend_yield/grid_industrials.png>
+File: dividend_yield/grid_information_technology.png Graphic file (type bmp)
+<dividend_yield/grid_information_technology.png>
+File: dividend_yield/grid_materials.png Graphic file (type bmp)
+<dividend_yield/grid_materials.png>
+File: dividend_yield/grid_utilities.png Graphic file (type bmp)
+<dividend_yield/grid_utilities.png>
  [14]
-File: dividend_yield/sectors.png Graphic file (type bmp)
-<dividend_yield/sectors.png>
-File: dividend_yield/companies_best.png Graphic file (type bmp)
-<dividend_yield/companies_best.png>
-File: dividend_yield/companies_worst.png Graphic file (type bmp)
-<dividend_yield/companies_worst.png>
+File: dividend_yield/best_energy.png Graphic file (type bmp)
+<dividend_yield/best_energy.png>
+File: dividend_yield/best_utilities.png Graphic file (type bmp)
+<dividend_yield/best_utilities.png>
  [15]
-File: data_checks/coverage.png Graphic file (type bmp)
-<data_checks/coverage.png>
-File: data_checks/eps_check.png Graphic file (type bmp)
-<data_checks/eps_check.png>
- [16]
-File: data_checks/filing_lag.png Graphic file (type bmp)
-<data_checks/filing_lag.png>
- [17]
-File: data_checks/trading_days.png Graphic file (type bmp)
-<data_checks/trading_days.png>
- [18]
-File: data_checks/DEXSFUS.png Graphic file (type bmp)
-<data_checks/DEXSFUS.png>
- [19]
-Overfull \vbox (329.34961pt too high) has occurred while \output is active []
-
-
-[20]
-File: data_checks/DEXSFUS_coverage.png Graphic file (type bmp)
-<data_checks/DEXSFUS_coverage.png>
- [21]
+File: dividend_yield/worst_information_technology.png Graphic file (type bmp)
+<dividend_yield/worst_information_technology.png>
+File: dividend_yield/worst_health_care.png Graphic file (type bmp)
+<dividend_yield/worst_health_care.png>
+ [16] [17]
+Missing character: There is no – ("2013) in font ec-lmr10!
+[18] [19] [20] [21] [22] [23]
 File: appendix/fundamentals/communication_services.png Graphic file (type bmp)
 <appendix/fundamentals/communication_services.png>
+ [24]
 File: appendix/fundamentals/consumer_discretionary.png Graphic file (type bmp)
 <appendix/fundamentals/consumer_discretionary.png>
 File: appendix/fundamentals/consumer_staples.png Graphic file (type bmp)
 <appendix/fundamentals/consumer_staples.png>
- [22]
+ [25]
 File: appendix/fundamentals/energy.png Graphic file (type bmp)
 <appendix/fundamentals/energy.png>
 File: appendix/fundamentals/health_care.png Graphic file (type bmp)
 <appendix/fundamentals/health_care.png>
- [23]
+ [26]
 File: appendix/fundamentals/industrials.png Graphic file (type bmp)
 <appendix/fundamentals/industrials.png>
 File: appendix/fundamentals/information_technology.png Graphic file (type bmp)
 <appendix/fundamentals/information_technology.png>
- [24]
+ [27]
 File: appendix/fundamentals/materials.png Graphic file (type bmp)
 <appendix/fundamentals/materials.png>
 File: appendix/fundamentals/utilities.png Graphic file (type bmp)
 <appendix/fundamentals/utilities.png>
- [25]
+ [28]
 File: appendix/total_return/communication_services.png Graphic file (type bmp)
 <appendix/total_return/communication_services.png>
 File: appendix/total_return/consumer_discretionary.png Graphic file (type bmp)
 <appendix/total_return/consumer_discretionary.png>
- [26]
+ [29]
 File: appendix/total_return/consumer_staples.png Graphic file (type bmp)
 <appendix/total_return/consumer_staples.png>
 File: appendix/total_return/energy.png Graphic file (type bmp)
 <appendix/total_return/energy.png>
- [27]
+ [30]
 File: appendix/total_return/health_care.png Graphic file (type bmp)
 <appendix/total_return/health_care.png>
 File: appendix/total_return/industrials.png Graphic file (type bmp)
 <appendix/total_return/industrials.png>
- [28]
+ [31]
 File: appendix/total_return/information_technology.png Graphic file (type bmp)
 <appendix/total_return/information_technology.png>
 File: appendix/total_return/materials.png Graphic file (type bmp)
 <appendix/total_return/materials.png>
- [29]
+ [32]
 File: appendix/total_return/utilities.png Graphic file (type bmp)
 <appendix/total_return/utilities.png>
 File: appendix/relative_return/communication_services.png Graphic file (type bm
 p)
 <appendix/relative_return/communication_services.png>
- [30]
+
+[33]
 File: appendix/relative_return/consumer_discretionary.png Graphic file (type bm
 p)
 <appendix/relative_return/consumer_discretionary.png>
 File: appendix/relative_return/consumer_staples.png Graphic file (type bmp)
 <appendix/relative_return/consumer_staples.png>
- [31]
+ [34]
 File: appendix/relative_return/energy.png Graphic file (type bmp)
 <appendix/relative_return/energy.png>
 File: appendix/relative_return/health_care.png Graphic file (type bmp)
 <appendix/relative_return/health_care.png>
- [32]
+ [35]
 File: appendix/relative_return/industrials.png Graphic file (type bmp)
 <appendix/relative_return/industrials.png>
 File: appendix/relative_return/information_technology.png Graphic file (type bm
 p)
 <appendix/relative_return/information_technology.png>
- [33]
+ [36]
 File: appendix/relative_return/materials.png Graphic file (type bmp)
 <appendix/relative_return/materials.png>
 File: appendix/relative_return/utilities.png Graphic file (type bmp)
 <appendix/relative_return/utilities.png>
- [34]
+ [37]
+File: appendix/pe/lead_lag.png Graphic file (type bmp)
+<appendix/pe/lead_lag.png>
 File: appendix/pe/communication_services.png Graphic file (type bmp)
 <appendix/pe/communication_services.png>
+ [38]
 File: appendix/pe/consumer_discretionary.png Graphic file (type bmp)
 <appendix/pe/consumer_discretionary.png>
-
-[35]
 File: appendix/pe/consumer_staples.png Graphic file (type bmp)
 <appendix/pe/consumer_staples.png>
+ [39]
 File: appendix/pe/energy.png Graphic file (type bmp)
 <appendix/pe/energy.png>
- [36]
 File: appendix/pe/health_care.png Graphic file (type bmp)
 <appendix/pe/health_care.png>
+ [40]
 File: appendix/pe/industrials.png Graphic file (type bmp)
 <appendix/pe/industrials.png>
- [37]
 File: appendix/pe/information_technology.png Graphic file (type bmp)
 <appendix/pe/information_technology.png>
+ [41]
 File: appendix/pe/materials.png Graphic file (type bmp)
 <appendix/pe/materials.png>
- [38]
 File: appendix/pe/utilities.png Graphic file (type bmp)
 <appendix/pe/utilities.png>
+ [42]
 File: appendix/dividend_yield/communication_services.png Graphic file (type bmp
 )
 <appendix/dividend_yield/communication_services.png>
- [39]
 File: appendix/dividend_yield/consumer_discretionary.png Graphic file (type bmp
 )
 <appendix/dividend_yield/consumer_discretionary.png>
+ [43]
 File: appendix/dividend_yield/consumer_staples.png Graphic file (type bmp)
 <appendix/dividend_yield/consumer_staples.png>
- [40]
 File: appendix/dividend_yield/energy.png Graphic file (type bmp)
 <appendix/dividend_yield/energy.png>
+ [44]
 File: appendix/dividend_yield/health_care.png Graphic file (type bmp)
 <appendix/dividend_yield/health_care.png>
- [41]
 File: appendix/dividend_yield/industrials.png Graphic file (type bmp)
 <appendix/dividend_yield/industrials.png>
+ [45]
 File: appendix/dividend_yield/information_technology.png Graphic file (type bmp
 )
 <appendix/dividend_yield/information_technology.png>
- [42]
 File: appendix/dividend_yield/materials.png Graphic file (type bmp)
 <appendix/dividend_yield/materials.png>
+ [46]
 File: appendix/dividend_yield/utilities.png Graphic file (type bmp)
 <appendix/dividend_yield/utilities.png>
- [43] [44] (report.aux)
+File: appendix/data_checks/coverage.png Graphic file (type bmp)
+<appendix/data_checks/coverage.png>
+File: appendix/data_checks/eps_check.png Graphic file (type bmp)
+<appendix/data_checks/eps_check.png>
+ [47]
+File: appendix/data_checks/filing_lag.png Graphic file (type bmp)
+<appendix/data_checks/filing_lag.png>
+
+[48]
+File: appendix/data_checks/trading_days.png Graphic file (type bmp)
+<appendix/data_checks/trading_days.png>
+ [49]
+File: appendix/data_checks/DEXSFUS.png Graphic file (type bmp)
+<appendix/data_checks/DEXSFUS.png>
+ [50]
+Overfull \vbox (329.34961pt too high) has occurred while \output is active []
+
+
+[51]
+File: appendix/data_checks/DEXSFUS_coverage.png Graphic file (type bmp)
+<appendix/data_checks/DEXSFUS_coverage.png>
+ [52] (report.aux)
 Package rerunfilecheck Info: File `report.out' has not changed.
-(rerunfilecheck)             Checksum: C35C49D6CD1969413DBC34966472AFE0;12672.
+(rerunfilecheck)             Checksum: 354A13B04E0A07D3B5D2EC62713EAB27;11580.
  )
-Output written on report.xdv (44 pages, 100652 bytes).
+Output written on report.xdv (52 pages, 136408 bytes).
