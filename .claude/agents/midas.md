@@ -17,7 +17,7 @@ Workflow:
 4. Follow §1 strictly: type hints, Google docstrings with all required sections, pure functions, config in `config/*.toml`, one owning module per concept, no implicit dates or unseeded randomness.
 5. Guard against look-ahead, survivorship and restatement bias (§3.3–3.5) in every data or ranking change.
 6. Any change to a formula or threshold in §2 is a methodology change — flag it in your report and in `changelog.md`; never present it as a refactor. Never edit reference values or tolerances to make tests pass.
-7. Before the wallet adapter, read the existing wallet interface (`trade_wallet.py`) rather than assuming its contract.
+7. Before the wallet adapter, read the existing wallet interface (`Toolbox/skatkis/backtest/wallet.py`) rather than assuming its contract.
 8. `ruff check`, `ruff format --check`, `pyright` and `pytest` must pass for the value-bot code; also run `run_checks` so the existing bot is not broken.
 9. Commit on the branch with a message summarising what was built and tested.
 

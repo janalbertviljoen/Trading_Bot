@@ -33,8 +33,10 @@ Every index answer carries its `provenance` (`code` or `docs`) and the git `comm
 `dirty` flag it was built from. Where code and documentation disagree, the code is
 trusted and `health` reports the contradiction.
 
-Status: the `lab` tools exist today as the `trading-bot` server (`mcp_server/`). The
-index and the merge into one `midas` server are change
+Status: the `lab` tools are served today as the `trading-bot` server
+(`Toolbox/skatkis/midas/server.py`), running the BTC harness in `Toolbox/SandBox/btc_vwap/`
+until the portfolio engine (S_202610_006) replaces it. The index and the rename to
+`midas` are change
 [S_202610_002](toolbox/skatkis/changes/S_202610_002-midas-index-server.md).
 
 ## 4. Controls
@@ -58,4 +60,11 @@ index and the merge into one `midas` server are change
 | 2026-10-31 | Docstrings follow the example's numpydoc structure (Owns, Must not, Public API, Computes) so the index can parse them; this replaces Google style in spec §1.3 | user |
 | 2026-10-31 | One MCP server with two profiles: `index` (read-only) and `lab` (backtests and data) | user |
 | 2026-10-31 | Lifecycle order: build until the framework produces plots → warden's report → documentation (docstrings for agents, README for people) → unit tests last, which may be committed directly | user |
+| 2026-10-31 | The MCP server lives in `Toolbox/skatkis/midas/`; its lab tools run the BTC harness in `Toolbox/SandBox/btc_vwap/`, a temporary dependency of `skatkis` on the sandbox until S_202610_006 (S_202610_001; awaits the user's explicit confirmation) | developer |
+| 2026-10-31 | `midas/instructions/quant.md` holds what the developer and the researcher share about data: the sources, their traps and the working rules; the detailed source reference is official documentation, in the tool README | user |
+| 2026-10-31 | A second tool, `hand_o_midas` (machine learning, prefix `HOM`), beside `value_investing`; both read one shared data package (sources, cleaned tables, shared metrics) between `skatkis` and the tools, so `skatkis` stays free of domain knowledge | user |
+| 2026-10-31 | No scripts in `notebooks/`: repeatable work runs as terminal commands or MCP tools; plots and reports go to a `results/` folder tracked in git (so changed plots show in review), per source under `market_analysis/` and per tool | user |
+| 2026-10-31 | Changes to Midas's records (`midas/`) are staged directly after writing; commits still wait for the user | user |
+| 2026-10-31 | Reports are LaTeX documents compiled to PDF; the secretary owns their writing and formatting (text in `config/report_*.toml`), the developer the rendering code | user |
+| 2026-10-31 | When asked to run updates, the data update, the check and the LaTeX compile run outside the sandbox (local settings file, git-ignored) | user |
 | 2026-10-31 | Current focus: the value-investing tool, starting with S&P 500 data extraction, and the wallet as backtest engine; the BTC strategy moves to the sandbox | user |

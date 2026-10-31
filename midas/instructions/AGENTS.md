@@ -18,6 +18,9 @@ the role a task needs before starting it:
   under `midas/`.
 - [researcher.md](researcher.md): improving strategy performance and proving it
   out-of-sample.
+- [quant.md](quant.md): the data sources, their traps and the rules that keep results
+  honest; shared by the developer and the researcher. Read it before working with data,
+  metrics, rankings, strategies or the wallet.
 - [warden.md](warden.md): the pre-commit review, its checklist and its report.
 - [writing.md](writing.md): the rules for writing any file, shared by every role that
   writes. Read it with your role's file.
@@ -35,22 +38,32 @@ on out-of-sample excess return over the S&P 500 total-return index.
 - `Toolbox/skatkis/`: shared infrastructure with no tool-specific domain knowledge:
   pipeline contracts, registry and validation, IO, general financial mathematics
   (`skatkis.financial_logic`), the backtest wallet engine, and Midas's index server.
-- `Toolbox/value_investing/`: the value-investing tool: schema, contracts, sources
-  (EDGAR, prices, constituents), layers (metrics, ranking), validation, strategy
-  registry, pipeline.
+- `Toolbox/market_data/`: shared market data read by every tool: sources (EDGAR,
+  prices and dividends, FX, constituents), cleaned standard tables and the shared
+  metrics (each ratio owned once). Depends on `skatkis` only.
+- `Toolbox/value_investing/`: the rule-based tool: Graham, Buffett and Munger rule
+  thresholds, gates, ranking and strategies, on `market_data`.
+- `Toolbox/hand_o_midas/`: the machine-learning tool: sub-models trained on
+  `market_data` with walk-forward splits, turned into strategies.
 - `Toolbox/SandBox/`: exploratory code outside the standard and excluded from lint,
   including the original BTC VWAP bot.
-- `notebooks/`: run scripts and notebooks: paths, configuration and display only; no
-  reusable logic.
+- `notebooks/`: interactive notebooks only (display and exploration); no scripts and no
+  reusable logic. Repeatable work runs as terminal commands (`python -m Toolbox.<package>
+  <command>`) or through the MCP server.
+- `results/`: plots and reports written by the commands, tracked in git so changes show
+  for review (raw vendor data stays in the git-ignored `data/`):
+  `market_analysis/<source>/<as_of>/` per source, and one folder per tool
+  (`value_investing/`, `hand_o_midas/`) for how its strategies perform.
 - `tests/`: mirrors `Toolbox/`.
 - `docs/`: the value-investing specification (`value_investing_bot_spec.md`), its rule
   extract (`trading_rules.md`) and stored source documents.
 - `midas/`: Midas's workspace: these instructions, change logs, notes and designs. No
   code.
 
-The layout above is the target agreed on 2026-10-31; until change
-[S_202610_001](../toolbox/skatkis/changes/S_202610_001-repository-layout.md) is done,
-the code still sits at the repository root and in `mcp_server/`.
+The layout was agreed on 2026-10-31 and put in place by
+[S_202610_001](../toolbox/skatkis/changes/done/S_202610_001-repository-layout.md). Code is
+imported from the repository root as `Toolbox.<package>` (pytest sets `pythonpath`;
+notebooks add the root to `sys.path`).
 
 ## Authority order
 
@@ -185,7 +198,7 @@ hats are separated by what they may write; each record has one owner.
 | Hat | Does | Writes | Rules |
 |---|---|---|---|
 | **Index** | The MCP server: answers questions about code, rules and documents | nothing | `developer.md`, "Working on Midas's code" |
-| **Secretary** | Keeps the notes, change logs, change files, designs, decisions and outcome minutes, and the agent instructions | `midas/`, the only hat that writes there | [secretary.md](secretary.md) |
+| **Secretary** | Keeps the notes, change logs, change files, designs, decisions and outcome minutes, and the agent instructions; writes and formats the PDF reports | `midas/`, the only hat that writes there; the report text in `config/report_*.toml` | [secretary.md](secretary.md) |
 | **Developer** | Designs the change with the user, builds code and tests, updates the official documentation after the warden's report | code, official documentation, `.claude/` rules and agents, the root pointers; nothing in `midas/` | [developer.md](developer.md) |
 | **Researcher** | Improves strategy performance with hypothesis-driven, out-of-sample backtests | strategy code, config and tests on its branch | [researcher.md](researcher.md) |
 | **Warden** | Applies the rules strictly to a finished change and gives the user a pre-commit report | nothing | [warden.md](warden.md) |

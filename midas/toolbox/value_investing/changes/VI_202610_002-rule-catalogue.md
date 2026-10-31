@@ -5,7 +5,7 @@
 | Status | ready |
 | Priority | medium |
 | Kind | new capability |
-| Depends on | S_202610_001, S_202610_005, VI_202610_001; spec §9.3 (financials and REITs) |
+| Depends on | S_202610_001, S_202610_005, MD_202610_002 |
 | Raised | 2026-10-31 |
 
 ## Description
@@ -54,18 +54,39 @@ Fitted to the SOP layout (§3.3) and the spec's stage and node split (§5, §6.2
 - **Registry or plain functions.** With a fixed rule set, the rules could be plain
   functions in the layers. The registry pays off if gates and the composite rank choose
   rules from config. Recommendation: registry.
-- **Spec §9.3, financials and REITs:** exclude, or score separately (e.g. P/B and ROE).
-  Decides whether G2, E1, E2 and NN apply to every company or through a sector-specific
-  rule set.
-- **Dependency gap:** stage 2 (`fundamentals.point_in_time`, TTM and 10–20 year
-  history) has no change yet. Raise it separately, or fold it into VI_202610_001.
 - **Hard-gate subset:** which of G2, G3 and E1–E3 are hard gates by default (spec §3,
   item 1); belongs to the ranking change but fixes which pass flags this change must
   emit.
 
+## Decisions
+
+- 2026-10-31 (user): plots of a rule's metric show the rule's cut-off as a labelled
+  horizontal line (for example P/E 15 for G6). Supported by `thresholds` in
+  `skatkis.analysis` (`plot_series`, `plot_spread`) and the P/E plots of
+  `market_data.market_analysis`; the values come from this tool's rule config.
+
+- 2026-10-31 (user): REITs and financial companies are excluded from the universe (spec
+  §9.3), so one rule set applies to every company scored; no sector-specific rules.
+- 2026-10-31 (user): a missing input gives NaN for the rule; no filling or
+  interpolation until the data has been looked at.
+- 2026-10-31 (user): product first; validation stays minimal (declared columns only)
+  until the framework runs end to end.
+- 2026-10-31: the point-in-time panel this change consumes is MD_202610_002.
+- 2026-10-31 (user, on the short EDGAR history; tool notes): three measures, all to be
+  built.
+  1. G4 (and E4) take the dividend history from the price source (Yahoo dividends,
+     back to 1970), not from EDGAR. Built in MD_202610_001 (`sources/prices.py`).
+  2. The look-back windows of G3, G5, G4, E3, E5 and B1 are explicit parameters in
+     `config/*.toml`, defaulting to Graham's and Buffett's values (10, 13, 20, 5, 4
+     and 10 years). A shorter window is a methodology change: run as a recorded
+     experiment, never as the default.
+  3. Rules are phased in: a rule gives NaN until its window is full at the rebalance
+     date, and gates and the composite rank treat NaN as "not yet available", so the
+     backtest can start before every rule applies.
+
 ## Kickoff prompt
 
-Pick up VI_202610_002. Confirm S_202610_001, S_202610_005 and VI_202610_001 are done and
+Pick up VI_202610_002. Confirm S_202610_001, S_202610_005 and MD_202610_001 are done and
 the decisions above are made. Read spec §2, §3, §5 and §6, the SOP sections cited in
 the approach, and the tool's notes. Propose the registry interface, the context object
 and the output columns, then build `layers/valuation.py` and `layers/graham.py` first.

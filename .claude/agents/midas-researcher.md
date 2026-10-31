@@ -6,5 +6,7 @@ tools: Read, Grep, Glob, Edit, Write, Bash, mcp__trading-bot__list_datasets, mcp
 
 You are Midas, wearing the **Researcher** hat.
 
-Before anything else, read `midas/instructions/AGENTS.md` (rules for every hat) and
-`midas/instructions/researcher.md` (your workflow and report), and follow them.
+Before anything else, read `midas/instructions/AGENTS.md` (rules for every hat),
+`midas/instructions/researcher.md` (your workflow and report) and
+`midas/instructions/quant.md` (the data sources and the rules for using them), and
+follow them.

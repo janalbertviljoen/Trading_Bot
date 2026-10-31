@@ -2,7 +2,8 @@
 
 How Midas improves strategy performance. It adds to the rules for every hat in
 [AGENTS.md](AGENTS.md); where they differ, `AGENTS.md` wins. In Claude Code the
-`midas-researcher` subagent loads this file.
+`midas-researcher` subagent loads this file, with [quant.md](quant.md), which holds the
+data sources and the rules for using them.
 
 The researcher is a quantitative researcher. It works on its own branch
 (`feature/<area>/<topic>`), changes strategy code, config and tests, and proves every

@@ -4,3 +4,6 @@ __pycache__/
 **/*.ipynb_checkpoints
 data/
 .venv/
+.claude/settings.local.json
+.DS_Store
+results/**/*.log

@@ -20,6 +20,17 @@ them down.
 - **Warden's report.** Write each report the warden returns into the change file,
   unchanged, under `## Warden report`, headed with its date and the commit reviewed. It
   is removed on closing, when the `## Outcome` records the date and commit of the run.
+- **Report writer.** The secretary owns the PDF reports' writing and formatting (user,
+  2026-10-31): the title, abstract, section descriptions and captions, and the academic
+  layout (numbered sections and sub-sections per GICS sector, numbered figure captions,
+  short factual descriptions, no persona). The text lives in `config/report_*.toml` (for
+  the market analysis: `config/report_market_analysis.toml`), which the secretary edits;
+  the developer builds the code that renders it to LaTeX and PDF
+  (`skatkis.report`, `market_data.report`).
+- **Stage records directly.** After writing in `midas/` (change logs, change files,
+  notes, designs, instructions), stage the changes with `git add midas/`; the user rarely
+  reviews these small edits (user, 2026-10-31). Staging is not committing: commits still
+  wait for the user's request.
 - **Session close.** At the end of a piece of work, list what changed, what is still
   open and which rules were decided, and confirm where each was recorded.
 
@@ -55,7 +66,9 @@ user steer. Do not run checks or tests when picking up or discussing a change.
 | Prefix | Registry | Scope |
 |---|---|---|
 | `S` | [toolbox/skatkis/CHANGELOG.md](../toolbox/skatkis/CHANGELOG.md) | `skatkis` (shared infrastructure, backtest engine, Midas's index) and repository setup |
+| `MD` | [toolbox/market_data/CHANGELOG.md](../toolbox/market_data/CHANGELOG.md) | the shared `market_data` package (sources, cleaned tables, shared metrics) |
 | `VI` | [toolbox/value_investing/CHANGELOG.md](../toolbox/value_investing/CHANGELOG.md) | the `value_investing` tool |
+| `HOM` | [toolbox/hand_o_midas/CHANGELOG.md](../toolbox/hand_o_midas/CHANGELOG.md) | the `hand_o_midas` machine-learning tool |
 
 ## Working on a change
 
