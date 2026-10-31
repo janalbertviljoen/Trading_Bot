@@ -49,7 +49,7 @@ on out-of-sample excess return over the S&P 500 total-return index.
   code.
 
 The layout was agreed on 2026-10-31 and put in place by
-[S_202610_001](../toolbox/skatkis/changes/S_202610_001-repository-layout.md). Code is
+[S_202610_001](../toolbox/skatkis/changes/done/S_202610_001-repository-layout.md). Code is
 imported from the repository root as `Toolbox.<package>` (pytest sets `pythonpath`;
 notebooks add the root to `sys.path`).
 

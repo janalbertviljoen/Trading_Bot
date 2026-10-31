@@ -1,7 +1,6 @@
 """Midas MCP server: the lab tools (backtests and market data) for this repository.
 
-The read-only index profile is added by S_202610_002. Until the portfolio engine
-(S_202610_006) exists, the lab tools run the BTC harness in ``Toolbox/SandBox``.
+The lab tools run the BTC VWAP harness in ``Toolbox/SandBox/btc_vwap/``.
 """
 
 import subprocess

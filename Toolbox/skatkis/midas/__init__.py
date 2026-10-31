@@ -1,1 +1,1 @@
-"""Midas: the MCP server (lab tools now, read-only index in S_202610_002)."""
+"""Midas: the MCP server with the lab tools (backtests and market data)."""

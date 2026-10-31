@@ -49,6 +49,9 @@ A new engine in `Toolbox/skatkis/backtest/`, alongside the existing single-asset
 - Spec §9.2: bottom ten as avoid/sell only, or shorted?
 - Cost model: fixed basis points per trade (proposed), or per-share commission plus
   spread?
+- Confirm the temporary dependency of `skatkis.midas.server` on the sandbox harness
+  (from S_202610_001), which this change removes when the lab tools move to the
+  portfolio engine.
 
 ## Done when
 
