@@ -1,10 +1,34 @@
+"""Post-processing of a ``PromisedLandTrader`` grid search: parameter robustness statistics."""
+
 import numpy as np
 from promised_land import PromisedLandTrader
 
 
 class PromisedLandExplorer:
+    """Analyse which parameter values perform well consistently across a grid search.
+
+    Attributes set after ``pre_process``:
+        df_sp (pandas.DataFrame): Strategic points sorted by the metric, merged with
+            the detect / trade statistics and ``final_weighted`` (float64).
+        df_stat_d (pandas.DataFrame): Metric mean / std / weighted score per
+            detection-parameter combination.
+        df_stat_t (pandas.DataFrame): Same per wallet-parameter combination.
+        df_ts_norm (pandas.DataFrame): Each run's ``normalised_wallet_value_<c>``
+            and ``normalised_price_<c>`` divided by the buy-and-hold
+            ``normalised_price``, plus ``timestamp``.
+        highest_coor (pandas.Series): Coordinates whose time series were extracted.
+    """
 
     def __init__(self, trader: PromisedLandTrader):
+        """Take the results of a finished grid search.
+
+        Args:
+            trader (PromisedLandTrader): Trader after ``optimise_strategy`` has run
+                (``df_strategic_points`` and ``df_timeseries`` must exist).
+
+        Raises:
+            AttributeError: ``optimise_strategy`` has not been run on ``trader``.
+        """
         self.trader = trader
         self.df_sp = trader.df_strategic_points
         self.df_ts = trader.df_timeseries
@@ -12,6 +36,35 @@ class PromisedLandExplorer:
         self.params_trade = list(trader.trade_config_range.keys())
 
     def pre_process(self, metric="mean_normalised_wallet"):
+        """Score parameter robustness and extract the top runs' time series.
+
+        Computes:
+            For detection and wallet parameters separately, grouped by parameter
+            values:
+                <type>_mean, <type>_std = mean, std of ``metric``
+                <type>_weighted = <type>_mean / (<type>_std + 1)
+            final_weighted = sqrt(detect_weighted**2 + trade_weighted**2)
+            df_ts_norm = normalised wallet columns / normalised_price
+                (> 1 means the run beat buy-and-hold at that time step).
+
+        Args:
+            metric (str): Column of ``df_strategic_points`` to score (float64).
+                Default "mean_normalised_wallet".
+
+        Returns:
+            None. Sets ``df_sp``, ``df_stat_d``, ``df_stat_t``, ``df_ts_norm`` and
+            ``highest_coor``.
+
+        Edge cases:
+            ``highest_coor`` is taken from ``self.df_sp`` before it is replaced by
+            the sorted frame, so on the first call it is the first five
+            coordinates in run order, not the five best by ``metric``.
+            A parameter group with a single run has std NaN, so its weighted
+            score is NaN.
+
+        Raises:
+            KeyError: ``metric`` or a parameter column is missing.
+        """
 
         ## Strategic Points
         df_sp = self.df_sp.sort_values(metric, ascending=False).copy()
@@ -50,6 +103,22 @@ class PromisedLandExplorer:
         self.highest_coor = highest_comb
 
     def calc_stat(self, df, params, metric):
+        """Compute the mean and standard deviation of a metric per parameter group.
+
+        Args:
+            df (pandas.DataFrame): Strategic points with ``metric`` and ``params``
+                columns.
+            params (list[str]): Parameter columns to group by.
+            metric (str): Numeric column to aggregate.
+
+        Returns:
+            pandas.DataFrame: One row per unique parameter combination with the
+            ``params`` columns plus ``mean`` and ``std`` (float64, sample std,
+            ddof=1).
+
+        Raises:
+            ValueError: ``params`` is empty (``groupby([])``).
+        """
         df_grp = (
             df[[metric] + params]
             .groupby(params)[metric]
@@ -59,12 +128,44 @@ class PromisedLandExplorer:
         return df_grp
 
     def calc_weighted_metric(self, df, type):
+        """Add a stability-weighted score and prefix the statistic columns.
+
+        Formula:
+            <type>_weighted = mean / (std + 1)
+
+        Args:
+            df (pandas.DataFrame): Output of ``calc_stat`` (``mean``, ``std``).
+            type (str): Prefix, e.g. "detect" or "trade".
+
+        Returns:
+            pandas.DataFrame: ``df`` with ``mean`` / ``std`` renamed to
+            ``<type>_mean`` / ``<type>_std`` and an added ``<type>_weighted``
+            column (float64). Higher means a good and consistent metric.
+
+        Edge cases:
+            Adds the ``<type>_weighted`` column to the input ``df`` in place before
+            renaming into a new frame.
+        """
         rename = {"mean": f"{type}_mean", "std": f"{type}_std"}
         df[f"{type}_weighted"] = df["mean"] / (df["std"] + 1)
         df = df.rename(columns=rename)
         return df
 
     def extract_ts_cols(self, df, coordinates: list):
+        """List the time-series columns belonging to the given run coordinates.
+
+        Args:
+            df (pandas.DataFrame): ``df_timeseries`` with ``<col>_<coordinate>``
+                columns.
+            coordinates (list[str]): Run coordinates, e.g. ``["3", "12"]``.
+
+        Returns:
+            list[str]: Column names ending in ``_<coordinate>``, grouped by
+            coordinate in the given order.
+
+        Edge cases:
+            Coordinates are used in a regex unescaped; numeric strings are safe.
+        """
         col_name = []
         for c in coordinates:
             col_name += list(df.columns[df.columns.str.contains(f"_{c}$")])

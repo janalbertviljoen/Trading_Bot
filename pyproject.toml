@@ -1,0 +1,77 @@
+[project]
+name = "trading-bot"
+version = "0.1.0"
+description = "Value-investing trading bot: S&P 500 fundamentals, quarterly ranking and backtest wallet"
+requires-python = ">=3.11"
+
+# Dependencies are installed by group (pip >= 25.1), pinned by package_versions.txt:
+#   .venv/bin/python -m pip install -c package_versions.txt --group dev
+# setup_env.sh does this for a fresh environment.
+[dependency-groups]
+core = [
+    "numpy>=2.0",
+    "pandas>=2.2",
+    "matplotlib>=3.8",
+    "requests>=2.31",
+]
+mcp = ["fastmcp>=2.0"]
+notebooks = ["ipykernel>=6.29"]
+sandbox = [
+    "ccxt>=4.0",
+    "plotly>=5.20",
+    "dash>=2.16",
+    "dash-bootstrap-components>=1.5",
+    "pytz>=2024.1",
+]
+lint = [
+    "black>=24.0",
+    "ruff>=0.6",
+    "pyright[nodejs]>=1.1.380",
+    "pandas-stubs>=2.2",
+]
+test = ["pytest>=8.0"]
+dev = [
+    { include-group = "core" },
+    { include-group = "mcp" },
+    { include-group = "notebooks" },
+    { include-group = "sandbox" },
+    { include-group = "lint" },
+    { include-group = "test" },
+]
+
+[tool.black]
+extend-exclude = '''
+(
+  ^/data
+  | ^/notebooks
+)
+'''
+
+# Spec §1.4. Scoped to the target layout (S_202610_001); the root modules and
+# Toolbox/SandBox are outside the standard until they move.
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+include = ["Toolbox/**/*.py", "tests/**/*.py"]
+extend-exclude = ["Toolbox/SandBox", "notebooks", "data"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP", "N", "D", "ANN", "SIM", "RUF", "PL", "PD", "NPY"]
+ignore = ["D203", "D213"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D", "ANN", "PLR2004"]
+
+[tool.pyright]
+typeCheckingMode = "strict"
+pythonVersion = "3.11"
+include = ["Toolbox"]
+exclude = ["Toolbox/SandBox", "**/__pycache__"]
+venvPath = "."
+venv = ".venv"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

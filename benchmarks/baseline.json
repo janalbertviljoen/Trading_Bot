@@ -1,0 +1,15 @@
+{
+  "BTCUSDT_1h_2025-06-01_2025-10-01": {
+    "start": "2025-06-01 00:59:59",
+    "end": "2025-09-30 23:59:59",
+    "rows": 2928,
+    "final_normalised_wallet": 1.045968,
+    "buy_and_hold": 1.091936,
+    "excess_vs_buy_and_hold": -0.045968,
+    "mean_normalised_wallet": 1.037254,
+    "max_drawdown": -0.072007,
+    "sharpe_unannualised": 0.5318,
+    "n_buys": 0,
+    "n_sells": 0
+  }
+}

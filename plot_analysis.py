@@ -1,3 +1,5 @@
+"""Matplotlib plots of wallet runs and parameter-grid statistics."""
+
 import pylab as plt
 import matplotlib.ticker as mtick
 import numpy as np
@@ -5,6 +7,15 @@ from matplotlib.patches import Rectangle
 
 
 def plot_trade_events(df):
+    """Plot price, VWAP and deviation with BUY / SELL markers.
+
+    Args:
+        df (pandas.DataFrame): Wallet run with ``timestamp``, ``price``, ``vwap``,
+            ``deviation`` and ``direction`` (1 BUY, -1 SELL).
+
+    Returns:
+        None. Draws one figure.
+    """
     fig, ax = plt.subplots(figsize=(10, 8))
     df.plot(ax=ax, x="timestamp", y="price")
     df.plot(ax=ax, x="timestamp", y="deviation", secondary_y=True, alpha=0.2, ls="-.")
@@ -19,6 +30,15 @@ def plot_trade_events(df):
 
 
 def plot_wallet_outcomes(df):
+    """Plot total wallet value against price, and held volume, over time.
+
+    Args:
+        df (pandas.DataFrame): Wallet run with ``timestamp``, ``total_wallet_value``,
+            ``price`` and ``wallet_volume_available``.
+
+    Returns:
+        None. Draws one figure with two panels (axis labels assume USD / BTC).
+    """
     fig, ax = plt.subplots(ncols=2, figsize=(18, 6))
 
     # Left panel
@@ -50,6 +70,15 @@ def plot_wallet_outcomes(df):
 
 
 def plot_normalised_wallet(df):
+    """Plot the normalised wallet value against the buy-and-hold normalised price.
+
+    Args:
+        df (pandas.DataFrame): Wallet run with ``timestamp``,
+            ``normalised_wallet_value`` and ``normalised_price``.
+
+    Returns:
+        None. Draws one figure.
+    """
     fig, ax = plt.subplots(figsize=(8, 6))
     df.plot(
         ax=ax,
@@ -62,6 +91,18 @@ def plot_normalised_wallet(df):
 
 
 def plot_imshow(df_stat):
+    """Plot a 2-D parameter grid as a heatmap and outline its maximum cell.
+
+    Args:
+        df_stat (pandas.DataFrame): Numeric pivot table (index = one parameter,
+            columns = another, values = metric).
+
+    Returns:
+        None. Draws and shows one figure.
+
+    Raises:
+        ValueError: All values are NaN (``nanargmax``).
+    """
     fig, ax = plt.subplots()
 
     # Plot heatmap

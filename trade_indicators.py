@@ -1,7 +1,24 @@
+"""Price indicators and deviation signals that feed ``trade_wallet``."""
+
 ALL_METRICS = ["vwap"]
 
 
 def detect_all(df, threshold, rolling_window):
+    """Compute every indicator in ``ALL_METRICS`` and flag deviations from it.
+
+    Args:
+        df (pandas.DataFrame): Columns ``price`` and ``volume`` (float64).
+        threshold (float): Relative deviation that triggers a signal (e.g. 0.03).
+        rolling_window (int): Window length in rows for the indicators.
+
+    Returns:
+        pandas.DataFrame: New frame with ``vwap``, ``deviation`` (float64) and
+        ``signal`` (bool) added.
+
+    Edge cases:
+        ``rolling_vwap`` adds ``vwap`` to the input ``df`` in place.
+        With several metrics, ``deviation`` / ``signal`` hold the last one only.
+    """
     df = rolling_vwap(df, rolling_window)
     for metric in ALL_METRICS:
         df = detect_deviation(df, metric_name=metric, threshold=threshold)
@@ -9,15 +26,23 @@ def detect_all(df, threshold, rolling_window):
 
 
 def rolling_vwap(df, rolling_window, price_col="price", volume_col="volume"):
-    """
-    Computes the volume-weighted average price (VWAP) over a rolling window.
+    """Compute the volume-weighted average price over a trailing rolling window.
 
-    :param df (pandas.DataFrame): DataFrame containing price and volume data
-    :param price_col (str): Column name for price data
-    :param volume_col (str): Column name for volume data
-    :param window (int): Rolling window size for VWAP calculation
+    Formula:
+        vwap_t = sum(price * volume over last w rows) / sum(volume over last w rows)
 
-    :return (pandas.Series): Series with rolling VWAP values
+    Args:
+        df (pandas.DataFrame): Contains ``price_col`` and ``volume_col`` (float64).
+        rolling_window (int): Window length w in rows (> 0).
+        price_col (str): Price column name. Default "price".
+        volume_col (str): Volume column name. Default "volume".
+
+    Returns:
+        pandas.DataFrame: The same object as ``df`` (mutated in place) with a
+        ``vwap`` column (float64, price units).
+
+    Edge cases:
+        First w - 1 rows -> NaN. Zero volume over a window -> NaN (0 / 0).
     """
     pv = df[price_col] * df[volume_col]
     vwap = (
@@ -31,15 +56,25 @@ def rolling_vwap(df, rolling_window, price_col="price", volume_col="volume"):
 
 
 def detect_deviation(df, metric_name: str, threshold: float, unit_price="price"):
-    """
-    Detects significant price deviations from metric, uses volume-weighted average price as default.
+    """Flag rows where price deviates from a reference metric by more than a threshold.
 
-    :param df (pandas.DataFrame): DataFrame containing reference metric to compare against
-    :param unit_price (str): Name of the price column to compare against (default is "price")
-    :param metric_name (str): Name of the metric to compare against (default is "vwap")
-    :param threshold (float): Threshold for detecting large moves (default is 0.03)
+    Formula:
+        deviation = (price - metric) / metric
+        signal    = |deviation| > threshold
 
-    :return (pandas.DataFrame): DataFrame with added value of 'deviation' and 'signal' if deviation exceeds threshold
+    Args:
+        df (pandas.DataFrame): Contains ``unit_price`` and ``metric_name`` columns
+            (float64).
+        metric_name (str): Reference column, e.g. "vwap".
+        threshold (float): Relative deviation threshold (>= 0); strict inequality.
+        unit_price (str): Price column. Default "price".
+
+    Returns:
+        pandas.DataFrame: Copy of ``df`` with ``deviation`` (float64,
+        dimensionless) and ``signal`` (bool).
+
+    Edge cases:
+        NaN metric -> deviation NaN, signal False.
     """
     df = df.copy()
     df["deviation"] = (df[unit_price] - df[metric_name]) / df[metric_name]

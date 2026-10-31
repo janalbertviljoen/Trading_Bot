@@ -1,19 +1,53 @@
+"""Performance and cycle-analysis helpers for price series (not used by the wallet run)."""
+
 import numpy as np
 
 
 # TODO: Split to seperate file: "performance.py"
 def best_bot(df):
-    """Copmutes the theoretical maximum profit possible given high and low prices in time interval selected.
+    """Compute the theoretical maximum profit per time step from the high-low range.
 
-    :param df (pandas.DataFrame): DataFrame containing 'high' and 'low' price columns
+    Formula:
+        max_profit = high - low
 
-    :return (pandas.DataFrame): DataFrame with added 'max_profit' column
+    Args:
+        df (pandas.DataFrame): Must contain ``high`` and ``low`` (float64, base
+            currency per unit).
+
+    Returns:
+        pandas.DataFrame: The same object as ``df`` (mutated in place) with an added
+        ``max_profit`` column (float64, base currency per unit, >= 0 for valid
+        bars).
+
+    Assumptions:
+        A perfect trader buys at every bar's low and sells at its high, with no
+        fees.
+
+    Raises:
+        KeyError: ``high`` or ``low`` is missing.
     """
     df["max_profit"] = df["high"] - df["low"]
     return df
 
 
 def detrend_series(series, method="log_return"):
+    """Remove the trend from a price series.
+
+    Formula:
+        log_return: r_t = ln(p_t) - ln(p_{t-1})
+        demean:     d_t = p_t - mean(p_{t-49..t})   (50-step rolling mean)
+
+    Args:
+        series (pandas.Series): Prices (float64, > 0 for ``log_return``).
+        method (str): "log_return" (default) or "demean".
+
+    Returns:
+        pandas.Series: float64. ``log_return`` drops the first row (n - 1 values);
+        ``demean`` keeps the length with NaN for the first 49 rows.
+
+    Raises:
+        ValueError: Unknown ``method``.
+    """
     if method == "log_return":
         return np.log(series).diff().dropna()
     elif method == "demean":
@@ -23,6 +57,25 @@ def detrend_series(series, method="log_return"):
 
 
 def rolling_fft(series, window):
+    """Compute the FFT magnitude spectrum over a trailing rolling window.
+
+    Formula:
+        For i in [window, n): |FFT(series[i - window : i])|
+
+    Args:
+        series (pandas.Series): Detrended values (float64), length n.
+        window (int): Number of samples per FFT (> 0).
+
+    Returns:
+        tuple[numpy.ndarray, list]: Magnitudes of shape (n - window, window),
+        float64; and the index labels ``series.index[i]`` each row belongs to.
+
+    Assumptions:
+        Each window ends at i - 1, so row i uses no data at or after i.
+
+    Edge cases:
+        n <= window -> empty array of shape (0,) and an empty list.
+    """
     fft_results = []
     index = []
 
@@ -38,10 +91,38 @@ def rolling_fft(series, window):
 
 
 def fft_frequencies(window, sampling_interval=1.0):
+    """Return the FFT sample frequencies for a window length.
+
+    Args:
+        window (int): Number of samples per FFT.
+        sampling_interval (float): Time between samples, in the time unit of the
+            series (e.g. 1.0 = one bar). Default 1.0.
+
+    Returns:
+        numpy.ndarray: float64 frequencies of shape (window,), in cycles per
+        ``sampling_interval`` unit (``numpy.fft.fftfreq`` order).
+    """
     return np.fft.fftfreq(window, d=sampling_interval)
 
 
 def dominant_cycle(series, window, sampling_interval=1.0):
+    """Find the dominant cycle length in each rolling window.
+
+    Formula:
+        period_i = 1 / argmax_{f > 0} |FFT_i(f)|
+
+    Args:
+        series (pandas.Series): Detrended values (float64).
+        window (int): Samples per FFT (> 1).
+        sampling_interval (float): Time between samples. Default 1.0.
+
+    Returns:
+        numpy.ndarray: float64 periods of shape (n - window,), in the time unit of
+        ``sampling_interval``; bounds (2, window] samples.
+
+    Raises:
+        IndexError: n <= window (empty spectrum).
+    """
     fft_mag, _ = rolling_fft(series, window)
     freqs = fft_frequencies(window, sampling_interval)
 

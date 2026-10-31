@@ -1,3 +1,5 @@
+"""Price-data ingestion from the Binance public klines API."""
+
 import requests
 import pandas as pd
 
@@ -5,14 +7,34 @@ BINANCE_URL = "https://api.binance.com/api/v3/klines"
 
 
 def fetch_btc_history(interval="1h", start_date="2024-01-01", symbol="BTCUSDT"):
-    """
-    Fetch historical BTC price data from Binance.
+    """Fetch historical OHLCV bars from Binance, paging 1000 bars per request.
 
-    :param interval (str): Frequency of data (e.g., '1h' for 1 hour)
-    :param start_date (str): Start date for fetching data
-    :param symbol (str): Trading pair symbol (default is BTCUSDT)
+    Args:
+        interval (str): Bar size accepted by Binance, e.g. "1m", "1h", "1d".
+            Default "1h".
+        start_date (str): First date to fetch, parsed as UTC (e.g. "2024-01-01").
+            Default "2024-01-01".
+        symbol (str): Trading pair. Default "BTCUSDT".
 
-    :return (pandas.DataFrame): DataFrame with historical price data
+    Returns:
+        pandas.DataFrame: One row per bar with a ``RangeIndex`` and columns:
+            timestamp (datetime64[ns], bar close time in UTC, timezone-naive,
+                floored to the second),
+            high, low (float64, quote currency per unit),
+            price (float64, bar close, quote currency per unit),
+            volume (float64, base-asset units traded in the bar).
+
+    Assumptions:
+        Data runs up to the moment of the call, so results are not reproducible
+        between calls; use ``mcp_server/backtest.fetch_dataset`` with a pinned
+        ``end_date`` for backtests.
+
+    Edge cases:
+        The last bar may still be open (partial). No retry, rate-limit handling
+        or HTTP status check; an API error payload is not detected.
+
+    Raises:
+        requests.RequestException: Network failure.
     """
     start_ts = int(pd.Timestamp(start_date, tz="UTC").timestamp() * 1000)
     end_ts = int(pd.Timestamp.utcnow().timestamp() * 1000)
