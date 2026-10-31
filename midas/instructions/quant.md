@@ -27,7 +27,8 @@ table. In one line each:
    result that used a later filing, SEC's `frame`, or today's figures is invalid, not
    just less accurate.
 2. **A value's period is `period_start` to `period_end`.** EDGAR's `fiscal_year` and
-   `fiscal_period` belong to the filing that reported it.
+   `fiscal_period` belong to the filing that reported it. A field follows the company's
+   most recently used tag (`market_data.clean.select_tags`).
 3. **Never divide an adjusted price by an as-reported figure.** Yahoo prices and
    dividends are split-adjusted as of the fetch date; EDGAR per-share figures are not.
    Undo the split adjustment with the splits table, or compare company totals with
@@ -40,9 +41,11 @@ table. In one line each:
 6. **State the known biases with every result.** Delisted companies are missing from
    Yahoo (survivorship bias), and EDGAR starts in 2009, so long-window rules phase in
    late. A result that hides either overstates what the strategy would have done.
-7. **Pin the snapshots.** Every result names the as-of date of each source snapshot it
+7. **Commands, not scripts.** Data is updated and checked with
+   `python -m Toolbox.market_data update` and `check`; plots go to `results/`.
+8. **Pin the snapshots.** Every result names the as-of date of each source snapshot it
    used; a new pull is a new as-of date, never an overwrite.
-8. **Out-of-sample or it did not happen.** Every strategy claim is judged on
+9. **Out-of-sample or it did not happen.** Every strategy claim is judged on
    out-of-sample excess return over `^SP500TR` (`researcher.md`); in-sample results are
    diagnostics only.
 

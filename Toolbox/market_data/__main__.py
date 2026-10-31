@@ -1,7 +1,7 @@
 r"""
 market_data/__main__.py
 -----------------------
-The terminal command that updates the stored market data.
+The terminal commands that update and check the stored market data.
 
 Run from the repository root::
 
@@ -9,6 +9,7 @@ Run from the repository root::
     export FRED_API_KEY=...                       # optional
     .venv/bin/python -m Toolbox.market_data update --as-of 2026-10-31 \
         --cik 320193 789019 21344 --ticker AAPL MSFT KO
+    .venv/bin/python -m Toolbox.market_data check --as-of 2026-10-31
 
 This is the command-line boundary: it reads the environment, the config file and the
 arguments, and passes them explicitly to ``market_data.update``. The as-of date is
@@ -25,7 +26,7 @@ Fetch, parse or write data itself (``market_data.update``).
 Public API
 ----------
 main(argv)
-    Run the command; returns the exit code.
+    Run ``update`` or ``check``; returns the exit code.
 
 Dependency rule
 ---------------
@@ -39,6 +40,7 @@ from collections.abc import Sequence
 from datetime import date
 from pathlib import Path
 
+from Toolbox.market_data.checks import run_checks
 from Toolbox.market_data.sources.edgar import edgar_client
 from Toolbox.market_data.sources.fred import FredSeries, fred_client
 from Toolbox.market_data.sources.prices import YahooChart, yahoo_client
@@ -58,10 +60,22 @@ FX_SERIES = ("DEXSFUS",)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """Parse the arguments, run the requested updates and print a summary."""
+    """Parse the arguments and run the ``update`` or ``check`` command."""
     args = _parser().parse_args(argv)
-    config = load_config(args.config)["sources"]
     storage = Storage(SnapshotStore(args.data_dir / "raw"), args.data_dir / "interim")
+    if args.command == "check":
+        report = run_checks(args.as_of, storage=storage, results=args.results_dir)
+        print("\n".join(report.lines))
+        print(
+            f"\n{len(report.figures)} plots under {args.results_dir / 'market_analysis'}"
+        )
+        return 0
+    return _update(args, storage)
+
+
+def _update(args: argparse.Namespace, storage: Storage) -> int:
+    """Run the requested updates and print a summary."""
+    config = load_config(args.config)["sources"]
     results: list[UpdateResult] = []
 
     if "edgar" in args.source and args.cik:
@@ -134,6 +148,14 @@ def _parser() -> argparse.ArgumentParser:
     )
     update.add_argument("--data-dir", type=Path, default=Path("data"))
     update.add_argument("--config", type=Path, default=Path("config/market_data.toml"))
+    check = commands.add_parser(
+        "check", help="plot and check the data stored for an as-of date"
+    )
+    check.add_argument(
+        "--as-of", required=True, type=date.fromisoformat, help="YYYY-MM-DD"
+    )
+    check.add_argument("--data-dir", type=Path, default=Path("data"))
+    check.add_argument("--results-dir", type=Path, default=Path("results"))
     return parser
 
 

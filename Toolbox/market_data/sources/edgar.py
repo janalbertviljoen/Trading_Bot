@@ -29,6 +29,8 @@ EdgarSubmissions(client)
     The ``DataProvider`` for ``submissions``, a company's filing index.
 latest_periodic_filing(content)
     The date of the latest 10-K or 10-Q in a ``submissions`` payload.
+parse_tickers(content)
+    The company's current ticker symbols from a ``submissions`` payload.
 parse_companyfacts(content, tag_map)
     Raw JSON to one row per reported value of a mapped tag.
 load_companyfacts(ciks, *, provider, store, as_of, tag_map)
@@ -211,6 +213,20 @@ def latest_periodic_filing(content: bytes) -> date | None:
         if f in PERIODIC_FORMS
     ]
     return max(periodic, default=None)
+
+
+def parse_tickers(content: bytes) -> list[str]:
+    """Return the ticker symbols listed in a ``submissions`` payload (current, not historical).
+
+    Raises
+    ------
+    EdgarParseError
+        If the payload is not ``submissions`` JSON.
+    """
+    try:
+        return [str(t) for t in cast(list[object], json.loads(content)["tickers"])]
+    except (json.JSONDecodeError, KeyError, TypeError) as error:
+        raise EdgarParseError(f"submissions payload lacks tickers ({error})") from error
 
 
 def parse_companyfacts(

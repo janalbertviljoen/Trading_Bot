@@ -20,3 +20,23 @@ Yahoo's `close` and dividend amounts are adjusted for every split up to the fetc
 as reported, so price ratios (P/E, P/B, Graham number) need the split adjustment undone
 first, from the splits table, or must be computed from market capitalisation and
 company totals instead.
+
+### Companies switch tags over time: choose the tag per period (2026-10-31, resolved)
+
+Found in the first data checks. Choosing one tag per company for all years loses most
+of the history: Apple reported revenue as `SalesRevenueNet`, then `Revenues`, then the
+ASC 606 tag. The best available tag (lowest `tag_priority`) must be chosen per company,
+field and period; with that, revenue is complete for all three companies from 2007.
+Resolved 2026-10-31 (user): the company's most recently used tag is canonical
+(`market_data.clean.select_tags`).
+
+### Per-share comparatives are restated for splits (2026-10-31, open → MD_202610_002)
+
+Apple's diluted EPS for 2011–2013 is 27, 44 and 40 as first reported, before the 7:1
+split of 2014; later 10-Ks repeat those years split-adjusted (about 6.3 and 5.6), and
+the 4:1 split of 2020 does the same for 2018–2019 (11.9 and 2.97). So the first-reported
+value of a per-share figure is on its own pre-split basis, while comparatives move to
+the later basis. Rules comparing per-share values across years (G3, G5, E5) need them on
+one basis, from the Yahoo splits table, applied point-in-time (only splits before the
+rebalance date).
+

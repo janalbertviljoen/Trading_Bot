@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | in discussion |
+| Status | in progress |
 | Priority | high |
 | Kind | new capability |
 | Depends on | MD_202610_001 (cleaned tables to plot) |
@@ -17,7 +17,7 @@ heat maps, wallet outcomes, normalised series).
 
 ## Approach
 
-- `skatkis.market_analysis`: plot functions that take a DataFrame and column names
+- `skatkis.analysis`: plot functions that take a DataFrame and column names
   (date, entity, value) and know nothing about any metric: a metric over time per
   entity, its cross-sectional spread over time (median and percentile bands), a
   coverage heat map (entity × date, showing gaps), a distribution per period, and a
@@ -34,8 +34,33 @@ heat maps, wallet outcomes, normalised series).
 
 ## Decisions
 
-- 2026-10-31 (user): a `skatkis.market_analysis` module of callable plots for the data
+- 2026-10-31 (user): generic plots in `skatkis.analysis`, with no market information;
+  the named market plots per source in `market_data.market_analysis`, also used by the
+  models. P/E is compared with price on a second axis, with the lead or lag between
+  them.
+
+- 2026-10-31 (user): a `skatkis.analysis` module of callable plots for the data
   and metrics over time, similar to the existing plots.
+
+## Notes
+
+- 2026-10-31: split in two (user): generic layouts and statistics in `skatkis.analysis`
+  (with `plot_dual_axis`,
+  `plot_lag_profile`, `lagged_correlation`), and the named market plots with their
+  titles and formatting per source in `market_data/market_analysis.py`, called by the
+  checks and later by the modelling tools. P/E against price on two axes per company and
+  a lead-lag profile of monthly P/E and price changes (12 months either side). For
+  Apple, Coca-Cola and Microsoft only lag 0 stands out (0.22–0.59, mechanical: P/E is
+  price over EPS); every other lag is within about 0.15, the range of chance for about
+  200 months. A real test needs the trailing-twelve-month P/E, the full universe and
+  P/E level against forward returns.
+
+- 2026-10-31: first set built (user asked to look at the data):
+  `skatkis/analysis.py` with `plot_series`, `plot_coverage`, `plot_normalised`
+  and `plot_scatter`, each returning a `Figure` without pyplot state; used by
+  `notebooks/check_data.py` for 13 data-check plots. The spread plot (percentile bands
+  over time) follows with the shared metrics. A file-level pyright directive covers
+  matplotlib's untyped `**kwargs`.
 
 ## Done when
 

@@ -118,6 +118,26 @@ Per source:
 
 ### Progress
 
+- 2026-10-31: the data checks are a terminal command (`python -m Toolbox.market_data
+  check`, `market_data/checks.py`) writing plots to `results/market_analysis/<source>/
+  <as_of>/` (user: no scripts in `notebooks/`; `notebooks/check_data.py` removed,
+  `results/` git-ignored). Added `market_data/clean.py` (`select_tags` with the user's
+  most-recent-tag rule, `annual_first_reported`), `market_data/metrics.py` (`split_factor`,
+  `price_earnings` on the latest annual EPS, filed the day before), `parse_tickers` for
+  the CIK-to-ticker link (current tickers, until the constituents source exists) and
+  `skatkis/io/figures.py`. The P/E behaves as expected: Coca-Cola's 2017 tax charge
+  (EPS 0.29) gives a P/E of 150–175 in 2018–2019, Apple's first-reported FY2009 EPS
+  (before its restatement) a P/E of 30–45, and no jumps at splits.
+- 2026-10-31: first data checks (`notebooks/check_data.py`, plots from
+  `skatkis.analysis`, saved under `data/interim/checks/<as_of>/`). All three
+  APIs work: EDGAR has no missing values and no filing before its period end; reported
+  diluted EPS equals net income / diluted shares within 5% for all 153 annual values;
+  10-Q filed 18–34 days and 10-K 26–59 days after period end. Yahoo has 250–253 trading
+  days a year for every symbol, no duplicates, no non-positive prices, and dividends
+  and splits that match the companies' history (Apple's pause 1996–2011, Microsoft's
+  first dividend 2003). FRED shows the known rand episodes (2008, end-2015, 2020). Two
+  findings for MD_202610_002 are in the market_data notes: tags must be chosen per
+  period, and per-share comparatives are restated for splits.
 - 2026-10-31: update pipeline built (`update.py`, `__main__.py`,
   `EdgarSubmissions` and `latest_periodic_filing` in `sources/edgar.py`,
   `SnapshotStore.latest_as_of` in `skatkis.io.snapshots`). Live run: EDGAR reused all

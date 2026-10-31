@@ -158,3 +158,51 @@ export FRED_API_KEY=...                       # optional
   (`--ticker`) are given on the command line; `^SP500TR` is always added.
 - The command can be scheduled (macOS `launchd` or `cron`), for example weekly or after
   each earnings season.
+
+## Checking the data
+
+```
+.venv/bin/python -m Toolbox.market_data check --as-of 2026-10-31
+```
+
+reads the tables written for that as-of date, prints numeric checks per source (missing
+values, duplicates, implausible values, filing delays, coverage) and writes plots to
+`results/market_analysis/<source>/<as_of>/`:
+
+| Folder | Plots |
+|---|---|
+| `edgar/` | Coverage per company (field × fiscal year), first-reported revenue, net income and diluted EPS, reported EPS against net income / diluted shares, days from period end to filing |
+| `yahoo/` | Growth of 1 USD with dividends reinvested against `^SP500TR`, trading days per year, dividends per year |
+| `fred/` | The exchange rate and its observations per year |
+| `metrics/` | P/E per company and the EPS behind it; P/E and price on two axes per company; the lead-lag profile of monthly P/E changes against price changes 12 months either side |
+
+The P/E and lead-lag tables are also stored under `data/interim/metrics/<as_of>/`.
+`results/` is git-ignored like `data/`.
+
+The plots are named functions in `market_analysis.py` (`edgar_coverage`, `pe_vs_price`,
+`pe_lead_lag`, ...), one per thing shown, with its titles and units, so a plot looks the
+same wherever it is used; the modelling tools call them too. They are built on the
+generic layouts of `skatkis.analysis`, which know no source or metric.
+
+The lead-lag profile correlates the monthly log change of the P/E at month $t$ with the
+monthly log change of the price at month $t + k$, for $k$ from $-12$ to $12$; a positive
+$k$ means the P/E changes first. P/E is price divided by EPS, so the two move together at
+$k = 0$ by construction; the other lags carry the information. With $n$ months, a
+correlation within about $\pm 2 / \sqrt{n}$ is indistinguishable from chance.
+
+## Cleaning and metrics
+
+- **One tag per value** (`clean.select_tags`). A field (`TAG_MAP`) can be reported under
+  several XBRL tags, even in one filing. Per company, the tag used most recently ranks
+  first, so each field follows the company's current tag; ties go to the lower
+  `tag_priority`.
+- **First-reported annual values** (`clean.annual_first_reported`): per company and
+  fiscal year, the value as first filed in a 10-K; flows count as annual when they span
+  350 to 380 days.
+- **P/E** (`metrics.price_earnings`): the close divided by the latest first-reported
+  annual diluted EPS filed before the day. The EPS is put on the price's split basis
+  first: with $F(d)$ the product of the split ratios after day $d$,
+  $$\text{P/E}_t = \frac{P^{\text{close}}_t}{\text{EPS} / F(d_{\text{filed}})},$$
+  where $d_{\text{filed}}$ is the EPS's filing date. The P/E is missing where the EPS is
+  zero or negative. It uses annual EPS, so it steps once a year; a P/E on trailing
+  twelve-month EPS follows once quarterly values are cleaned.

@@ -32,6 +32,10 @@ Indexed: `Toolbox/` (excluding `SandBox/`), `.claude/rules/`, `midas/`, `docs/*.
 patterns in `.claude/settings.json`. Configured in `pyproject.toml`
 (`[tool.skatkis.midas]`) so the code never names a tool.
 
+The `lab` profile should also expose the data commands (`market_data update` and
+`check`) as tools, so an agent can refresh and check the data (user, 2026-10-31: work runs
+in the terminal or through an agent and the MCP server, not in notebook scripts).
+
 First tools: `search`, `list_components`, `describe_module`, `describe_symbol`,
 `find_calculation`, `rules_for`, `spec_section`, `document`, `list_documents`, `health`,
 `rebuild_index`. Pipeline-aware tools (`describe_layer`, `find_owner`,

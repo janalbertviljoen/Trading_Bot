@@ -47,8 +47,12 @@ on out-of-sample excess return over the S&P 500 total-return index.
   `market_data` with walk-forward splits, turned into strategies.
 - `Toolbox/SandBox/`: exploratory code outside the standard and excluded from lint,
   including the original BTC VWAP bot.
-- `notebooks/`: run scripts and notebooks: paths, configuration and display only; no
-  reusable logic.
+- `notebooks/`: interactive notebooks only (display and exploration); no scripts and no
+  reusable logic. Repeatable work runs as terminal commands (`python -m Toolbox.<package>
+  <command>`) or through the MCP server.
+- `results/`: plots and reports written by the commands, git-ignored like `data/`:
+  `market_analysis/<source>/<as_of>/` per source, and one folder per tool
+  (`value_investing/`, `hand_o_midas/`) for how its strategies perform.
 - `tests/`: mirrors `Toolbox/`.
 - `docs/`: the value-investing specification (`value_investing_bot_spec.md`), its rule
   extract (`trading_rules.md`) and stored source documents.

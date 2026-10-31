@@ -42,6 +42,10 @@ rules either look ahead or use restated values.
 
 ## Decisions
 
+- 2026-10-31 (user): where a company reports a field under several XBRL tags, its most
+  recently used tag is canonical (built as `market_data.clean.select_tags` during
+  MD_202610_001); the static `tag_priority` only breaks ties.
+
 - 2026-10-31 (user): rebalance on the S&P quarterly rebalance dates (third Friday of
   March, June, September and December), each using the most recent filings accepted on
   or before that date. Reading to confirm: no extra trades between rebalance dates

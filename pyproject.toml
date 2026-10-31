@@ -71,6 +71,8 @@ convention = "numpy"
 # The wallet and server still carry Google-style docstrings; the numpydoc conversion
 # is S_202610_003, after which the D exemptions are removed.
 "Toolbox/skatkis/backtest/wallet.py" = ["D"]
+# Plot functions take many keyword-only labelling options.
+"Toolbox/skatkis/analysis.py" = ["PLR0913"]
 # MCP tool signatures are the tools' input schemas, so they take many arguments.
 "Toolbox/skatkis/midas/**" = ["D", "PLR0913", "PLR0917"]
 
