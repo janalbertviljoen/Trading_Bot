@@ -31,8 +31,11 @@ plot_scatter(df, *, x, y, group, diagonal, ...)
     One value against another, optionally with the line y = x.
 plot_dual_axis(df, *, x, left, right, ...)
     Two series over the same horizontal axis, each on its own vertical axis.
-plot_relative(df, *, x, y, group, benchmark, ...)
-    Each group's growth divided by the benchmark's, from their first common date.
+plot_relative(df, *, x, y, group, benchmark, second_benchmark, ...)
+    Each group's growth divided by a benchmark's (solid) and optionally a second one's
+    (dashed, same colour), each from its own first common date.
+plot_spread(df, *, x, y, group, band, thresholds, ...)
+    Median and percentile band of a value across rows over time, per group.
 plot_lag_profile(df, *, lag, value, group, ...)
     A statistic per lag, one line per group, with the zero lag marked.
 lagged_correlation(a, b, lags)
@@ -44,7 +47,9 @@ growth of one unit, normalised series : plot_normalised
     Each group's value divided by its value on the first date all groups have a value.
 relative growth, relative performance : plot_relative
     Growth of one unit of each group divided by growth of one unit of the benchmark, both
-    from the first date all have a value; above 1 the group did better.
+    from the first date the two have a value; above 1 the group did better.
+median and percentile band, cross-sectional spread : plot_spread
+    Per date (and group), the median and the chosen quantiles of the value across rows.
 lagged correlation, cross-correlation, lead-lag : lagged_correlation
     For each lag k, the Pearson correlation of a(t) with b(t + k) over the positions where
     both exist; k > 0 means ``a`` leads ``b`` by k steps.
@@ -58,7 +63,7 @@ matplotlib, numpy, pandas and the standard library.
 # reports on every call; the arguments passed here are all typed.
 # pyright: reportUnknownMemberType=false
 
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 
 import numpy as np
 import pandas as pd
@@ -66,6 +71,7 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
 WIDE = (10.0, 4.5)
+MAX_LEGEND = 15
 
 
 def plot_series(
@@ -78,6 +84,7 @@ def plot_series(
     ylabel: str = "",
     log: bool = False,
     markers: bool = False,
+    thresholds: Mapping[str, float] | None = None,
 ) -> Figure:
     """Plot ``y`` against ``x``, one line per value of ``group``.
 
@@ -95,6 +102,8 @@ def plot_series(
         Logarithmic vertical axis.
     markers : bool
         Mark each point on the line (for sparse data such as annual values).
+    thresholds : Mapping[str, float], optional
+        Named horizontal lines, such as a rule's cut-off (``{"G6: P/E 15": 15.0}``).
     """
     figure = Figure(figsize=WIDE)
     axes = figure.add_subplot()
@@ -104,6 +113,7 @@ def plot_series(
             axes.plot(part[x], part[y], label=name, lw=1, marker="o", ms=3)
         else:
             axes.plot(part[x], part[y], label=name, lw=1.2)
+    _thresholds(axes, thresholds)
     _finish(axes, title=title, ylabel=ylabel, legend=group is not None, log=log)
     figure.tight_layout()
     return figure
@@ -296,6 +306,8 @@ def plot_relative(
     y: str,
     group: str,
     benchmark: str,
+    second_benchmark: str | None = None,
+    labels: Mapping[str, str] | None = None,
     title: str = "",
     ylabel: str = "Relative to the benchmark",
 ) -> Figure:
@@ -304,37 +316,84 @@ def plot_relative(
     Parameters
     ----------
     df : pd.DataFrame
-        Long table including the benchmark's rows; not modified.
+        Long table including the benchmarks' rows; not modified.
     x, y, group : str
         Date, value and group columns.
     benchmark : str
-        The group every other group is divided by.
+        The group every other group is divided by (solid lines).
+    second_benchmark : str, optional
+        A second group to divide by, drawn dashed in the same colour as the solid line.
+    labels : Mapping[str, str], optional
+        Display names per group value.
     title, ylabel : str
         Labels.
 
     Notes
     -----
-    Only dates on which every group has a value are kept, so all lines start at 1 on
-    the same date. Above 1, the group grew more than the benchmark since that date.
+    Each group starts at 1 on its own first date on which it and the benchmark have a
+    value, so a series that begins later (a company listed after the start) still
+    shows. Above 1, the group grew more than the benchmark since its start. The legend
+    is left out above ``MAX_LEGEND`` groups.
     """
-    wide = df.pivot_table(index=x, columns=group, values=y).dropna()
-    growth = wide / wide.iloc[0]
+    wide = df.pivot_table(index=x, columns=group, values=y).sort_index()
+    names = [n for n in wide.columns if n not in (benchmark, second_benchmark)]
     figure = Figure(figsize=WIDE)
     axes = figure.add_subplot()
-    for name in growth.columns:
-        if name != benchmark:
-            axes.plot(
-                growth.index, growth[name] / growth[benchmark], label=str(name), lw=1.2
-            )
+    for name in names:
+        solid = _relative_growth(wide[name], wide[benchmark])
+        label = (labels or {}).get(str(name), str(name))
+        (line,) = axes.plot(solid.index, solid, label=label, lw=1.2)
+        if second_benchmark is not None:
+            dashed = _relative_growth(wide[name], wide[second_benchmark])
+            axes.plot(dashed.index, dashed, color=line.get_color(), lw=1, ls="--")
     axes.axhline(1, color="black", lw=1)
-    start = pd.Timestamp(growth.index[0]).date() if len(growth) else "-"
-    _finish(
-        axes,
-        title=title or f"Relative to {benchmark} since {start}",
-        ylabel=ylabel,
-        legend=True,
-        log=True,
-    )
+    if not title:
+        title = f"Relative to {benchmark}" + (
+            f" (solid) and {second_benchmark} (dashed)" if second_benchmark else ""
+        )
+    _finish(axes, title=title, ylabel=ylabel, legend=len(names) <= MAX_LEGEND, log=True)
+    figure.tight_layout()
+    return figure
+
+
+def plot_spread(
+    df: pd.DataFrame,
+    *,
+    x: str,
+    y: str,
+    group: str | None = None,
+    band: tuple[float, float] = (0.25, 0.75),
+    thresholds: Mapping[str, float] | None = None,
+    title: str = "",
+    ylabel: str = "",
+) -> Figure:
+    """Plot the median of ``y`` across rows per ``x``, with a percentile band, per group.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Long table, many rows per ``x`` (e.g. one per company and date); not modified.
+    x, y : str
+        Horizontal axis and the value summarised.
+    group : str, optional
+        One median line and band per group value.
+    band : tuple[float, float]
+        Lower and upper quantile of the shaded band; ``(0.25, 0.75)`` by default.
+    thresholds : Mapping[str, float], optional
+        Named horizontal lines, such as a rule's cut-off.
+    title, ylabel : str
+        Labels.
+    """
+    figure = Figure(figsize=WIDE)
+    axes = figure.add_subplot()
+    for name, part in _groups(df, group):
+        values = part.groupby(x)[y]
+        low, high = values.quantile(band[0]), values.quantile(band[1])
+        median = values.median()
+        (line,) = axes.plot(median.index, median, lw=1.4, label=name)
+        axes.fill_between(median.index, low, high, color=line.get_color(), alpha=0.15)
+    _thresholds(axes, thresholds)
+    _finish(axes, title=title, ylabel=ylabel, legend=group is not None)
     figure.tight_layout()
     return figure
 
@@ -389,6 +448,30 @@ def lagged_correlation(a: pd.Series, b: pd.Series, lags: range) -> pd.Series:
     """
     values = {k: a.corr(b.shift(-k), min_periods=3) for k in lags}
     return pd.Series(values, name="correlation", dtype="float64").rename_axis("lag")
+
+
+def _relative_growth(series: pd.Series, benchmark: pd.Series) -> pd.Series:
+    """Return the growth of ``series`` over the benchmark's, both 1 on their first common date."""
+    both = pd.concat([series, benchmark], axis=1).dropna()
+    if both.empty:
+        return pd.Series(dtype="float64")
+    growth = both / both.iloc[0]
+    return growth.iloc[:, 0] / growth.iloc[:, 1]
+
+
+def _thresholds(axes: Axes, thresholds: Mapping[str, float] | None) -> None:
+    """Draw each named threshold as a dashed horizontal line, labelled at the right."""
+    for label, value in (thresholds or {}).items():
+        axes.axhline(value, color="red", lw=1, ls="--")
+        axes.annotate(
+            label,
+            xy=(1.0, value),
+            xycoords=("axes fraction", "data"),
+            ha="right",
+            va="bottom",
+            fontsize=8,
+            color="red",
+        )
 
 
 def _groups(

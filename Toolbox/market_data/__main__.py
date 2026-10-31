@@ -9,6 +9,7 @@ Run from the repository root::
     export FRED_API_KEY=...                       # optional
     .venv/bin/python -m Toolbox.market_data update --as-of 2026-10-31 \
         --cik 320193 789019 21344 --ticker AAPL MSFT KO
+    .venv/bin/python -m Toolbox.market_data update --as-of 2026-10-31 --universe sp500
     .venv/bin/python -m Toolbox.market_data check --as-of 2026-10-31
 
 This is the command-line boundary: it reads the environment, the config file and the
@@ -41,21 +42,25 @@ from datetime import date
 from pathlib import Path
 
 from Toolbox.market_data.checks import run_checks
+from Toolbox.market_data.gics import gics_map
+from Toolbox.market_data.sources.constituents import WikipediaPage, wikipedia_client
 from Toolbox.market_data.sources.edgar import edgar_client
 from Toolbox.market_data.sources.fred import FredSeries, fred_client
 from Toolbox.market_data.sources.prices import YahooChart, yahoo_client
 from Toolbox.market_data.update import (
     Storage,
     UpdateResult,
+    update_constituents,
     update_edgar,
     update_fx,
     update_prices,
 )
 from Toolbox.skatkis.io.config import load_config
 from Toolbox.skatkis.io.snapshots import SnapshotStore
+from Toolbox.skatkis.io.tables import read_table
 
 SOURCES = ("edgar", "prices", "fx")
-BENCHMARK = "^SP500TR"
+UNIVERSES = ("sp500",)
 FX_SERIES = ("DEXSFUS",)
 
 
@@ -64,7 +69,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     storage = Storage(SnapshotStore(args.data_dir / "raw"), args.data_dir / "interim")
     if args.command == "check":
-        report = run_checks(args.as_of, storage=storage, results=args.results_dir)
+        benchmarks = load_config(args.config)["benchmarks"]
+        report = run_checks(
+            args.as_of,
+            storage=storage,
+            results=args.results_dir,
+            market=benchmarks["market"],
+            sectors=benchmarks["sectors"],
+        )
         print("\n".join(report.lines))
         print(
             f"\n{len(report.figures)} plots under {args.results_dir / 'market_analysis'}"
@@ -75,27 +87,46 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 def _update(args: argparse.Namespace, storage: Storage) -> int:
     """Run the requested updates and print a summary."""
-    config = load_config(args.config)["sources"]
+    config = load_config(args.config)
+    sources = config["sources"]
+    benchmarks = [
+        config["benchmarks"]["market"],
+        *config["benchmarks"]["sectors"].values(),
+    ]
     results: list[UpdateResult] = []
+    ciks: list[int | str] = list(args.cik)
+    tickers: list[str] = list(args.ticker)
 
-    if "edgar" in args.source and args.cik:
+    if args.universe == "sp500":
+        wiki = WikipediaPage(wikipedia_client(**sources["wikipedia"]))
+        members = update_constituents(args.as_of, storage=storage, provider=wiki)
+        results.append(members)
+        gics = gics_map(
+            read_table(members.folder / "constituents.parquet"),
+            funds=config["benchmarks"]["sectors"],
+            excluded=config["universe"]["excluded_sectors"],
+        )
+        ciks += [int(cik) for cik in gics["cik"]]
+        tickers += [str(symbol) for symbol in gics["symbol"]]
+
+    if "edgar" in args.source and ciks:
         user_agent = os.environ.get("SEC_USER_AGENT", "")
         if not user_agent:
             print(
                 'EDGAR needs SEC_USER_AGENT, e.g. export SEC_USER_AGENT="Name you@email"'
             )
             return 2
-        client = edgar_client(user_agent, **config["edgar"])
+        client = edgar_client(user_agent, **sources["edgar"])
         results.append(
-            update_edgar(args.cik, as_of=args.as_of, storage=storage, client=client)
+            update_edgar(ciks, as_of=args.as_of, storage=storage, client=client)
         )
     if "prices" in args.source:
-        yahoo = dict(config["yahoo"])
+        yahoo = dict(sources["yahoo"])
         start, events_start = yahoo.pop("start"), yahoo.pop("events_start")
         client = yahoo_client(**yahoo)
         results.append(
             update_prices(
-                [*args.ticker, BENCHMARK],
+                list(dict.fromkeys([*tickers, *benchmarks])),
                 as_of=args.as_of,
                 storage=storage,
                 daily=YahooChart(client, start),
@@ -103,18 +134,13 @@ def _update(args: argparse.Namespace, storage: Storage) -> int:
             )
         )
     if "fx" in args.source:
-        fred = dict(config["fred"])
+        fred = dict(sources["fred"])
         start = fred.pop("start")
         provider = FredSeries(
             fred_client(**fred), start, api_key=os.environ.get("FRED_API_KEY") or None
         )
         results.append(
-            update_fx(
-                FX_SERIES,
-                as_of=args.as_of,
-                storage=storage,
-                provider=provider,
-            )
+            update_fx(FX_SERIES, as_of=args.as_of, storage=storage, provider=provider)
         )
 
     for result in results:
@@ -122,9 +148,11 @@ def _update(args: argparse.Namespace, storage: Storage) -> int:
             f"{name} {rows:,} rows" for name, rows in result.tables.items()
         )
         print(
-            f"{result.source}: fetched {len(result.fetched)}, reused {len(result.reused)}; "
-            f"{tables} -> {result.folder}"
+            f"{result.source}: fetched {len(result.fetched)}, reused {len(result.reused)}, "
+            f"failed {len(result.failed)}; {tables} -> {result.folder}"
         )
+        for query, reason in list(result.failed.items())[:10]:
+            print(f"  failed {query}: {reason[:160]}")
     return 0
 
 
@@ -144,7 +172,12 @@ def _parser() -> argparse.ArgumentParser:
         "--ticker",
         nargs="*",
         default=[],
-        help=f"price symbols ({BENCHMARK} is always added)",
+        help="price symbols (the market and sector benchmarks are always added)",
+    )
+    update.add_argument(
+        "--universe",
+        choices=UNIVERSES,
+        help="add the index members (outside the excluded sectors) to --cik and --ticker",
     )
     update.add_argument("--data-dir", type=Path, default=Path("data"))
     update.add_argument("--config", type=Path, default=Path("config/market_data.toml"))
@@ -156,6 +189,7 @@ def _parser() -> argparse.ArgumentParser:
     )
     check.add_argument("--data-dir", type=Path, default=Path("data"))
     check.add_argument("--results-dir", type=Path, default=Path("results"))
+    check.add_argument("--config", type=Path, default=Path("config/market_data.toml"))
     return parser
 
 

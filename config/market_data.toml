@@ -27,3 +27,33 @@ max_requests_per_second = 1.0
 timeout_seconds = 60.0
 max_retries = 5
 backoff_seconds = 2.0
+
+[sources.wikipedia]
+# MediaWiki API: S&P 500 members (GICS, CIK) and the history of index changes.
+max_requests_per_second = 1.0
+timeout_seconds = 60.0
+max_retries = 5
+backoff_seconds = 2.0
+
+[universe]
+# Sectors left out of the stock universe (decided 2026-10-31: financial companies and
+# REITs, whose balance sheets the value rules do not fit).
+excluded_sectors = ["Financials", "Real Estate"]
+
+[benchmarks]
+# Total-return benchmarks: the market, and per GICS sector the SPDR sector fund, whose
+# adjusted close includes dividends (the S&P sector indices on Yahoo are price-only).
+market = "^SP500TR"
+
+[benchmarks.sectors]
+"Communication Services" = "XLC"
+"Consumer Discretionary" = "XLY"
+"Consumer Staples" = "XLP"
+"Energy" = "XLE"
+"Financials" = "XLF"
+"Health Care" = "XLV"
+"Industrials" = "XLI"
+"Information Technology" = "XLK"
+"Materials" = "XLB"
+"Real Estate" = "XLRE"
+"Utilities" = "XLU"

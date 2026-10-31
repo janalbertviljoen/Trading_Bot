@@ -34,6 +34,19 @@ heat maps, wallet outcomes, normalised series).
 
 ## Decisions
 
+- 2026-10-31 (user): per sector, members relative to the sector benchmark (solid) and
+  to the S&P 500 (dashed, same colour), or side by side with a shared y-axis; plus all
+  sector benchmarks against the S&P 500. Built as one axis with solid and dashed lines.
+
+- 2026-10-31 (user): the current plots are fine; a seaborn style may become the standard
+  later.
+- 2026-10-31 (user): with the full universe, plots cannot show every company, nor all in
+  one figure. Companies are grouped by the standard classification (GICS sector, from
+  the constituents source) and compared only within their group: per sector, the median
+  of a metric with a percentile band over time; sector medians against each other;
+  single companies only within a sector. Value and growth style is a separate dimension,
+  to be added later.
+
 - 2026-10-31 (user): generic plots in `skatkis.analysis`, with no market information;
   the named market plots per source in `market_data.market_analysis`, also used by the
   models. P/E is compared with price on a second axis, with the lead or lag between
@@ -43,6 +56,14 @@ heat maps, wallet outcomes, normalised series).
   and metrics over time, similar to the existing plots.
 
 ## Notes
+
+- 2026-10-31: grouping built. Generic: `plot_relative` with a second benchmark (solid
+  against the first, dashed in the same colour against the second; each series from its
+  own first date, so late listings and late funds still show), `plot_spread` (median
+  and percentile band) and named `thresholds` lines. Named: `sector_relative` (members
+  against their sector fund and the S&P 500), `sector_benchmarks` (sector funds against
+  the S&P 500), `pe_sector_medians`, `pe_sector_spread`. Per-company plots only for a
+  universe of up to 10 companies; sector plots under `results/market_analysis/sectors/`.
 
 - 2026-10-31 (user feedback): per-company coverage plots always showed 1 (one first-reported
   value per year), so coverage is one plot of the number of companies with a value per

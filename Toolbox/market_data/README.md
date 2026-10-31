@@ -174,6 +174,7 @@ values, duplicates, implausible values, filing delays, coverage) and writes plot
 | `edgar/` | Coverage: companies with a value per field and fiscal year, first-reported revenue, net income and diluted EPS, reported EPS against net income / diluted shares, days from period end to filing |
 | `yahoo/` | Growth of 1 USD with dividends reinvested against `^SP500TR`, each company's total return divided by the S&P 500's (above 1: it beat an index fund), trading days per year, dividends per year |
 | `fred/` | The exchange rate and its observations per year |
+| `sectors/` | Each GICS sector fund relative to the S&P 500; per sector, every member relative to its sector fund (solid) and to the S&P 500 (dashed, same colour) |
 | `metrics/` | P/E per company and the EPS behind it; P/E and price on two axes per company; the lead-lag profile of monthly P/E changes against price changes 12 months either side |
 
 The P/E and lead-lag tables are also stored under `data/interim/metrics/<as_of>/`.
@@ -190,6 +191,26 @@ monthly log change of the price at month $t + k$, for $k$ from $-12$ to $12$; a 
 $k$ means the P/E changes first. P/E is price divided by EPS, so the two move together at
 $k = 0$ by construction; the other lags carry the information. With $n$ months, a
 correlation within about $\pm 2 / \sqrt{n}$ is indistinguishable from chance.
+
+## Universe and benchmarks
+
+- **Members** come from Wikipedia's "List of S&P 500 companies" (symbol, GICS sector and
+  sub-industry, date added, CIK); index changes from "Historical components of the S&P
+  500" (complete from about 2007). Both are fetched through the MediaWiki API and stored
+  like every other source (`sources/constituents.py`).
+- **GICS map** (`gics.gics_map`): one row per company with its price symbol, CIK, GICS
+  sector and sector fund, like the tag map for XBRL tags. Analysis merges it onto a
+  table and groups by `gics_sector`; each group is normalised the same way against its
+  own `sector_fund`. The universe is the current members outside the excluded sectors
+  (Financials, Real Estate; `[universe]` in `config/market_data.toml`). `update --universe sp500` pulls
+  their filings and prices. Only current members are included, so companies that left
+  the index are missing (survivorship bias); the membership at past dates follows.
+- **Benchmarks** (`[benchmarks]`): the market is `^SP500TR`; each GICS sector is
+  compared with its SPDR sector fund (`XLK` for Information Technology, `XLP` for
+  Consumer Staples, ...). The funds track the S&P 500 sector indices and their adjusted
+  close includes dividends, so companies, sectors and market are all compared on total
+  return; the sector indices on Yahoo (`^SP500-45`, ...) are price-only.
+- With more than 10 companies, the checks draw sector plots instead of per-company plots.
 
 ## Cleaning and metrics
 

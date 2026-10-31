@@ -56,8 +56,6 @@ Per source:
 
 ## Open decisions (user)
 
-- Source of the imported S&P 500 P/E (benchmark): Robert Shiller's monthly data (Yale,
-  Excel, needs an Excel reader) or S&P Dow Jones Indices' quarterly EPS sheet.
 
 ## Decisions
 
@@ -121,11 +119,33 @@ Per source:
 - 2026-10-31 (user): the S&P 500 P/E used for comparison is imported from an index
   source, not computed from the members. Model portfolios get their own aggregate P/E
   (and other aggregate metrics), compared against that benchmark.
+- 2026-10-31 (user): the constituents source carries each member's GICS sector and
+  sub-industry, the grouping for analysis and plots (S_202610_007).
+- 2026-10-31 (user): each GICS sector is compared with its own sector benchmark as well
+  as the S&P 500 (like with like). Built with the SPDR sector funds (`XLK`, `XLP`, ...)
+  rather than the S&P sector indices on Yahoo (`^SP500-45`, ...), because the indices
+  are price-only and the companies and `^SP500TR` are total return (developer's choice,
+  stated to the user; the price indices remain an option).
+- 2026-10-31 (user): the imported S&P 500 P/E comes from S&P Dow Jones Indices (their
+  index earnings sheet; needs `openpyxl`, to be installed by the user).
 
 ## Notes
 
 ### Progress
 
+- 2026-10-31 (user: keep it simple): the sector grouping is one mapping table, like the
+  tag map: `gics_map` gives each company its GICS sector and sector fund; the checks
+  merge it onto prices and P/E and `groupby` sector, normalising every group the same
+  way against its own fund and the market. The separate universe module and the
+  per-sector rebuilding in the checks were removed.
+- 2026-10-31: constituents source built (`sources/constituents.py`): the Wikipedia
+  pages "List of S&P 500 companies" (503 members, all with CIK, GICS sector and
+  sub-industry, date added) and "Historical components of the S&P 500" (414 changes
+  back to 1976; thin before 2007), parsed from wikitext through the MediaWiki API (no
+  HTML library). The GICS map (`market_data/gics.py`, `gics_map`) tags each member with
+  its sector and sector fund and leaves out Financials and Real Estate; `update --universe sp500` pulls them with the market and sector funds
+  (`[benchmarks]` in `config/market_data.toml`). Failures per company or symbol are
+  recorded and reported instead of stopping the run.
 - 2026-10-31: the data checks are a terminal command (`python -m Toolbox.market_data
   check`, `market_data/checks.py`) writing plots to `results/market_analysis/<source>/
   <as_of>/` (user: no scripts in `notebooks/`; `notebooks/check_data.py` removed,

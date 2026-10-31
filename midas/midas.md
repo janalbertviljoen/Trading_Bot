@@ -64,4 +64,5 @@ until the portfolio engine (S_202610_006) replaces it. The index and the rename 
 | 2026-10-31 | `midas/instructions/quant.md` holds what the developer and the researcher share about data: the sources, their traps and the working rules; the detailed source reference is official documentation, in the tool README | user |
 | 2026-10-31 | A second tool, `hand_o_midas` (machine learning, prefix `HOM`), beside `value_investing`; both read one shared data package (sources, cleaned tables, shared metrics) between `skatkis` and the tools, so `skatkis` stays free of domain knowledge | user |
 | 2026-10-31 | No scripts in `notebooks/`: repeatable work runs as terminal commands or MCP tools; plots and reports go to a `results/` folder tracked in git (so changed plots show in review), per source under `market_analysis/` and per tool | user |
+| 2026-10-31 | Changes to Midas's records (`midas/`) are staged directly after writing; commits still wait for the user | user |
 | 2026-10-31 | Current focus: the value-investing tool, starting with S&P 500 data extraction, and the wallet as backtest engine; the BTC strategy moves to the sandbox | user |

@@ -20,6 +20,10 @@ them down.
 - **Warden's report.** Write each report the warden returns into the change file,
   unchanged, under `## Warden report`, headed with its date and the commit reviewed. It
   is removed on closing, when the `## Outcome` records the date and commit of the run.
+- **Stage records directly.** After writing in `midas/` (change logs, change files,
+  notes, designs, instructions), stage the changes with `git add midas/`; the user rarely
+  reviews these small edits (user, 2026-10-31). Staging is not committing: commits still
+  wait for the user's request.
 - **Session close.** At the end of a piece of work, list what changed, what is still
   open and which rules were decided, and confirm where each was recorded.
 

@@ -60,6 +60,11 @@ Fitted to the SOP layout (§3.3) and the spec's stage and node split (§5, §6.2
 
 ## Decisions
 
+- 2026-10-31 (user): plots of a rule's metric show the rule's cut-off as a labelled
+  horizontal line (for example P/E 15 for G6). Supported by `thresholds` in
+  `skatkis.analysis` (`plot_series`, `plot_spread`) and the P/E plots of
+  `market_data.market_analysis`; the values come from this tool's rule config.
+
 - 2026-10-31 (user): REITs and financial companies are excluded from the universe (spec
   §9.3), so one rule set applies to every company scored; no sector-specific rules.
 - 2026-10-31 (user): a missing input gives NaN for the rule; no filling or

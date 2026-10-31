@@ -38,8 +38,14 @@ yahoo_dividends(dividends)
     Dividends per symbol and year.
 fred_series(rates, series_id) / fred_coverage(rates, series_id)
     A FRED series over time, and its observations per year.
-pe_over_time(pe) / pe_eps(pe)
-    P/E per symbol, and the EPS behind it.
+pe_over_time(pe, thresholds) / pe_eps(pe)
+    P/E per symbol (with optional rule cut-offs), and the EPS behind it.
+pe_sector_medians(pe) / pe_sector_spread(pe, sector, thresholds)
+    Median P/E per GICS sector; one sector's median with its percentile band.
+sector_relative(prices, members, *, sector, fund, market)
+    A sector's members relative to the sector fund (solid) and the market (dashed).
+sector_benchmarks(prices, sectors, market)
+    Each sector fund relative to the S&P 500.
 pe_vs_price(pe, symbol)
     One symbol's P/E and close on two axes.
 pe_price_lead_lag(pe, max_lag)
@@ -59,6 +65,8 @@ Dependency rule
 matplotlib, numpy, pandas and ``skatkis.analysis``.
 """
 
+from collections.abc import Mapping, Sequence
+
 import numpy as np
 import pandas as pd
 from matplotlib.figure import Figure
@@ -72,6 +80,7 @@ from Toolbox.skatkis.analysis import (
     plot_relative,
     plot_scatter,
     plot_series,
+    plot_spread,
 )
 
 BENCHMARK = "^SP500TR"
@@ -204,10 +213,90 @@ def fred_coverage(rates: pd.DataFrame, series_id: str) -> Figure:
     return plot_coverage(part, row="series_id", column="year", title=title)
 
 
-def pe_over_time(pe: pd.DataFrame) -> Figure:
-    """Plot the P/E per symbol over time."""
+def pe_over_time(
+    pe: pd.DataFrame, thresholds: Mapping[str, float] | None = None
+) -> Figure:
+    """Plot the P/E per symbol over time, with optional rule cut-offs as lines."""
     title = "P/E on the latest annual diluted EPS (filed before the day)"
-    return plot_series(pe, x="date", y="pe", group="symbol", title=title, ylabel="P/E")
+    return plot_series(
+        pe,
+        x="date",
+        y="pe",
+        group="symbol",
+        title=title,
+        ylabel="P/E",
+        thresholds=thresholds,
+    )
+
+
+def pe_sector_medians(pe: pd.DataFrame) -> Figure:
+    """Plot the median P/E of each GICS sector over time (``pe`` has ``gics_sector``)."""
+    return plot_spread(
+        pe,
+        x="date",
+        y="pe",
+        group="gics_sector",
+        band=(0.5, 0.5),
+        title="Median P/E per GICS sector",
+        ylabel="median P/E",
+    )
+
+
+def pe_sector_spread(
+    pe: pd.DataFrame, sector: str, thresholds: Mapping[str, float] | None = None
+) -> Figure:
+    """Plot one sector's median P/E with its 25th to 75th percentile band, and cut-offs."""
+    part = pe[pe["gics_sector"] == sector]
+    return plot_spread(
+        part,
+        x="date",
+        y="pe",
+        thresholds=thresholds,
+        title=f"{sector}: median P/E with the 25th to 75th percentile band",
+        ylabel="P/E",
+    )
+
+
+def sector_relative(
+    prices: pd.DataFrame, members: Sequence[str], *, sector: str, fund: str, market: str
+) -> Figure:
+    """Plot a sector's members relative to the sector fund (solid) and the market (dashed).
+
+    Each member starts at 1 on its first common date with each benchmark; a member that
+    joined later starts later.
+    """
+    part = prices[prices["symbol"].isin([*members, fund, market])]
+    return plot_relative(
+        part,
+        x="date",
+        y="adj_close",
+        group="symbol",
+        benchmark=fund,
+        second_benchmark=market,
+        title=f"{sector}: total return relative to {fund} (solid) and the S&P 500 (dashed)",
+        ylabel="growth / benchmark growth (log)",
+    )
+
+
+def sector_benchmarks(
+    prices: pd.DataFrame, sectors: Mapping[str, str], market: str
+) -> Figure:
+    """Plot each sector fund's total return relative to the S&P 500's.
+
+    ``sectors`` maps a GICS sector name to its fund symbol.
+    """
+    funds = list(sectors.values())
+    part = prices[prices["symbol"].isin([*funds, market])]
+    return plot_relative(
+        part,
+        x="date",
+        y="adj_close",
+        group="symbol",
+        benchmark=market,
+        labels={fund: f"{name} ({fund})" for name, fund in sectors.items()},
+        title="GICS sectors: total return relative to the S&P 500 (above 1: beat the market)",
+        ylabel="sector growth / S&P 500 growth (log)",
+    )
 
 
 def pe_eps(pe: pd.DataFrame) -> Figure:
@@ -267,13 +356,13 @@ def pe_price_lead_lag(pe: pd.DataFrame, max_lag: int = 12) -> pd.DataFrame:
     return pd.concat(frames, ignore_index=True)[["symbol", "lag", "correlation"]]
 
 
-def pe_lead_lag(correlations: pd.DataFrame) -> Figure:
-    """Plot the lead-lag profile of P/E and price changes per symbol."""
+def pe_lead_lag(correlations: pd.DataFrame, group: str = "symbol") -> Figure:
+    """Plot the lead-lag profile of P/E and price changes per ``group`` (symbol or sector)."""
     return plot_lag_profile(
         correlations,
         lag="lag",
         value="correlation",
-        group="symbol",
+        group=group,
         title="Monthly P/E changes against price changes k months later",
         xlabel="k (months); positive: P/E changes first",
         ylabel="correlation",

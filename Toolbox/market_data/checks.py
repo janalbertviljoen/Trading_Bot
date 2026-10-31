@@ -5,11 +5,14 @@ Checks of the stored data, as numbers and plots, and the first metric plots.
 
 ``run_checks`` reads the tables the update wrote for an as-of date, prints numeric checks
 (missing values, duplicates, implausible values, coverage and filing delays) and writes
-the named plots of ``market_data.market_analysis``: one folder per source under
-``<results>/market_analysis/<source>/<as_of>/`` (``edgar``, ``yahoo``, ``fred``) and the
-metric plots under ``.../metrics/<as_of>/``. The P/E table and its lead-lag table are
-stored under ``<interim>/metrics/<as_of>/``. The terminal command
-``python -m Toolbox.market_data check`` calls it.
+the named plots of ``market_data.market_analysis`` under
+``<results>/market_analysis/<source>/<as_of>/`` (``edgar``, ``yahoo``, ``fred``,
+``sectors``, ``metrics``). Companies are tagged with the GICS map (``market_data.gics``)
+and grouped by sector: each group is normalised the same way, against its own sector
+fund and the market. Per-company plots are drawn only for a small universe
+(``SMALL_UNIVERSE`` companies or fewer). The P/E and lead-lag tables are stored under
+``<interim>/metrics/<as_of>/``. The terminal command ``python -m Toolbox.market_data
+check`` calls it.
 
 Owns
 ----
@@ -18,13 +21,13 @@ result folders.
 
 Must not
 --------
-Define plots (``market_data.market_analysis``); compute metrics (``market_data.metrics``)
-or clean data (``market_data.clean``).
+Define plots (``market_data.market_analysis``); compute metrics (``market_data.metrics``),
+clean data (``market_data.clean``) or build the GICS map (``market_data.gics``).
 
 Public API
 ----------
-run_checks(as_of, *, storage, results)
-    Write the check and metric plots; return a ``CheckReport``.
+run_checks(as_of, *, storage, results, market, sectors)
+    Write the check, sector and metric plots; return a ``CheckReport``.
 CheckReport
     The numeric checks as lines of text and the paths of the plots written.
 
@@ -33,6 +36,8 @@ Dependency rule
 pandas, the standard library, ``skatkis.io`` and ``market_data``.
 """
 
+import re
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
@@ -42,16 +47,16 @@ from matplotlib.figure import Figure
 
 from Toolbox.market_data import market_analysis as plots
 from Toolbox.market_data.clean import annual_first_reported, select_tags
+from Toolbox.market_data.gics import gics_map
 from Toolbox.market_data.metrics import price_earnings
-from Toolbox.market_data.sources.edgar import format_cik, parse_tickers
 from Toolbox.market_data.update import Storage
 from Toolbox.skatkis.io.figures import save_figure
-from Toolbox.skatkis.io.snapshots import read_snapshot
 from Toolbox.skatkis.io.tables import read_table, write_table
 
 EPS_TOLERANCE = 0.05
 LARGE_DAILY_MOVE = {"yahoo": 0.20, "fred": 0.05}
 LEAD_LAG_MONTHS = 12
+SMALL_UNIVERSE = 10
 
 
 @dataclass
@@ -66,7 +71,14 @@ class CheckReport:
         self.figures.append(save_figure(figure, folder / f"{name}.png"))
 
 
-def run_checks(as_of: date, *, storage: Storage, results: Path) -> CheckReport:
+def run_checks(
+    as_of: date,
+    *,
+    storage: Storage,
+    results: Path,
+    market: str,
+    sectors: Mapping[str, str],
+) -> CheckReport:
     """Check the tables stored for ``as_of`` and write the plots.
 
     Parameters
@@ -77,32 +89,64 @@ def run_checks(as_of: date, *, storage: Storage, results: Path) -> CheckReport:
         Snapshot and table roots.
     results : Path
         Root of the result folders (``results``).
+    market : str
+        The market benchmark symbol (``^SP500TR``).
+    sectors : Mapping[str, str]
+        GICS sector name to its sector fund symbol.
 
     Returns
     -------
     CheckReport
         Numeric checks per source and the paths of the plots written.
     """
-    report = CheckReport()
-    root = results / "market_analysis"
-    day = as_of.isoformat()
+    yahoo = storage.folder("yahoo", as_of)
     facts = select_tags(
         read_table(storage.folder("edgar_companyfacts", as_of) / "facts.parquet")
     )
-    _check_edgar(facts, report, root / "edgar" / day)
-    yahoo = storage.folder("yahoo", as_of)
     prices = read_table(yahoo / "prices.parquet")
-    splits = read_table(yahoo / "splits.parquet")
     dividends = read_table(yahoo / "dividends.parquet")
-    _check_yahoo(prices, dividends, splits, report, root / "yahoo" / day)
     observations = read_table(storage.folder("fred", as_of) / "observations.parquet")
+    constituents = read_table(
+        storage.folder("constituents", as_of) / "constituents.parquet"
+    )
+    gics = gics_map(constituents, funds=sectors)
+    small = (
+        prices.loc[prices["symbol"].isin(gics["symbol"]), "symbol"].nunique()
+        <= SMALL_UNIVERSE
+    )
+
+    report = CheckReport()
+    root = results / "market_analysis"
+    day = as_of.isoformat()
+    _check_edgar(facts, small, report, root / "edgar" / day)
+    _check_yahoo(prices, dividends, small, report, root / "yahoo" / day)
     _check_fred(observations, report, root / "fred" / day)
-    pe, lead_lag = _metric_tables(facts, prices, splits, storage, as_of)
-    _check_metrics(pe, lead_lag, report, root / "metrics" / day)
+    report.lines.append("SECTORS")
+    sector_folder = root / "sectors" / day
+    report.save(
+        plots.sector_benchmarks(prices, sectors, market), sector_folder, "funds"
+    )
+    _check_sectors(prices, gics, market, report, sector_folder)
+
+    tagged = gics[["symbol", "gics_sector"]]
+    eps = annual_first_reported(facts, "eps_diluted").merge(
+        gics[["cik", "symbol"]], on="cik"
+    )
+    pe = price_earnings(prices, eps, read_table(yahoo / "splits.parquet"))
+    pe = pe.merge(tagged, on="symbol", how="left")
+    lead_lag = plots.pe_price_lead_lag(pe, LEAD_LAG_MONTHS).merge(
+        tagged, on="symbol", how="left"
+    )
+    metrics = storage.folder("metrics", as_of)
+    write_table(pe, metrics / "pe.parquet")
+    write_table(lead_lag, metrics / "pe_lead_lag.parquet")
+    _check_metrics(pe, lead_lag, small, report, root / "metrics" / day)
     return report
 
 
-def _check_edgar(facts: pd.DataFrame, report: CheckReport, folder: Path) -> None:
+def _check_edgar(
+    facts: pd.DataFrame, small: bool, report: CheckReport, folder: Path
+) -> None:
     """EDGAR: counts, the EPS cross-check, filing delays; their plots."""
     early = int((facts["filed"] < facts["period_end"]).sum())
     report.lines += [
@@ -119,8 +163,9 @@ def _check_edgar(facts: pd.DataFrame, report: CheckReport, folder: Path) -> None
         ]
     )
     report.save(plots.edgar_coverage(annual), folder, "coverage")
-    for metric in ("revenue", "net_income", "eps_diluted"):
-        report.save(plots.edgar_annual_series(annual, metric), folder, metric)
+    if small:
+        for metric in ("revenue", "net_income", "eps_diluted"):
+            report.save(plots.edgar_annual_series(annual, metric), folder, metric)
 
     keys = ["cik", "entity_name", "period_end"]
     wide = annual.pivot_table(index=keys, columns="field", values="value").reset_index()
@@ -158,7 +203,7 @@ def _check_edgar(facts: pd.DataFrame, report: CheckReport, folder: Path) -> None
 def _check_yahoo(
     prices: pd.DataFrame,
     dividends: pd.DataFrame,
-    splits: pd.DataFrame,
+    small: bool,
     report: CheckReport,
     folder: Path,
 ) -> None:
@@ -167,15 +212,15 @@ def _check_yahoo(
     large = LARGE_DAILY_MOVE["yahoo"]
     report.lines += [
         "YAHOO",
-        f"  price rows {len(prices):,}; symbols {', '.join(sorted(prices['symbol'].unique()))}",
+        f"  price rows {len(prices):,}; symbols {prices['symbol'].nunique()}",
         f"  duplicate (symbol, date) {int(prices.duplicated(['symbol', 'date']).sum())}; "
         f"missing close {int(prices['close'].isna().sum())}; "
         f"close <= 0 {int((prices['close'] <= 0).sum())}; "
-        f"daily moves above {large:.0%} {int((moves > large).sum())}",
-        f"  dividends {len(dividends):,}; splits {len(splits)}",
+        f"daily moves above {large:.0%} {int((moves > large).sum())}; dividends {len(dividends):,}",
     ]
-    report.save(plots.yahoo_total_return(prices), folder, "total_return")
-    report.save(plots.yahoo_relative_return(prices), folder, "relative_return")
+    if small:
+        report.save(plots.yahoo_total_return(prices), folder, "total_return")
+        report.save(plots.yahoo_relative_return(prices), folder, "relative_return")
     report.save(plots.yahoo_trading_days(prices), folder, "trading_days")
     report.save(plots.yahoo_dividends(dividends), folder, "dividends")
 
@@ -198,62 +243,58 @@ def _check_fred(observations: pd.DataFrame, report: CheckReport, folder: Path) -
         )
 
 
-def _metric_tables(
-    facts: pd.DataFrame,
+def _check_sectors(
     prices: pd.DataFrame,
-    splits: pd.DataFrame,
-    storage: Storage,
-    as_of: date,
-) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Compute and store the P/E table and its lead-lag table against price."""
-    eps = annual_first_reported(facts, "eps_diluted")
-    symbols = {cik: _ticker(storage, int(cik), as_of) for cik in eps["cik"].unique()}
-    eps = eps.assign(symbol=eps["cik"].map(symbols)).dropna(subset=["symbol"])
-    pe = price_earnings(prices, eps, splits)
-    lead_lag = plots.pe_price_lead_lag(pe, LEAD_LAG_MONTHS)
-    tables = storage.folder("metrics", as_of)
-    write_table(pe, tables / "pe.parquet")
-    write_table(lead_lag, tables / "pe_lead_lag.parquet")
-    return pe, lead_lag
+    gics: pd.DataFrame,
+    market: str,
+    report: CheckReport,
+    folder: Path,
+) -> None:
+    """Per GICS sector: the members against their sector fund and the market."""
+    priced = gics[gics["symbol"].isin(prices["symbol"])]
+    for (sector, fund), members in priced.groupby(["gics_sector", "sector_fund"]):
+        symbols = [str(s) for s in members["symbol"]]
+        report.lines.append(f"  {sector}: {len(symbols)} members, fund {fund}")
+        figure = plots.sector_relative(
+            prices, symbols, sector=str(sector), fund=str(fund), market=market
+        )
+        report.save(figure, folder, _slug(str(sector)))
 
 
 def _check_metrics(
-    pe: pd.DataFrame, lead_lag: pd.DataFrame, report: CheckReport, folder: Path
+    pe: pd.DataFrame,
+    lead_lag: pd.DataFrame,
+    small: bool,
+    report: CheckReport,
+    folder: Path,
 ) -> None:
-    """P/E: counts and the strongest lead or lag against price; their plots."""
+    """P/E: counts; plots per company for a small universe, per GICS sector always."""
     report.lines += [
         "METRICS",
-        f"  P/E rows {len(pe):,}; symbols {', '.join(sorted(pe['symbol'].unique()))}; "
+        f"  P/E rows {len(pe):,}; symbols {pe['symbol'].nunique()}; "
         f"missing (EPS <= 0) {int(pe['pe'].isna().sum())}",
     ]
-    for symbol, part in lead_lag.groupby("symbol"):
-        lag0 = float(part.loc[part["lag"] == 0, "correlation"].iloc[0])
-        others = part[part["lag"] != 0].sort_values(
-            "correlation", key=abs, ascending=False
+    if small:
+        report.save(plots.pe_over_time(pe), folder, "pe")
+        report.save(plots.pe_eps(pe), folder, "pe_eps")
+        for symbol in sorted(pe["symbol"].unique()):
+            report.save(
+                plots.pe_vs_price(pe, str(symbol)), folder, f"pe_vs_price_{symbol}"
+            )
+        report.save(plots.pe_lead_lag(lead_lag), folder, "pe_lead_lag")
+    report.save(plots.pe_sector_medians(pe), folder, "pe_sector_medians")
+    for sector, _ in pe.groupby("gics_sector"):
+        report.save(
+            plots.pe_sector_spread(pe, str(sector)), folder, f"pe_{_slug(str(sector))}"
         )
-        best_lag, best = int(others["lag"].iloc[0]), float(
-            others["correlation"].iloc[0]
-        )
-        report.lines.append(
-            f"  {symbol}: P/E vs price changes, lag 0 {lag0:.2f}; strongest other lag "
-            f"{best_lag:+d} months ({best:.2f})"
-        )
-    report.save(plots.pe_over_time(pe), folder, "pe")
-    report.save(plots.pe_eps(pe), folder, "pe_eps")
-    for symbol in sorted(pe["symbol"].unique()):
-        report.save(plots.pe_vs_price(pe, str(symbol)), folder, f"pe_vs_price_{symbol}")
-    report.save(plots.pe_lead_lag(lead_lag), folder, "pe_lead_lag")
+    by_sector = pd.DataFrame(
+        lead_lag.groupby(["gics_sector", "lag"], as_index=False)["correlation"].mean()
+    )
+    report.save(
+        plots.pe_lead_lag(by_sector, group="gics_sector"), folder, "pe_lead_lag_sectors"
+    )
 
 
-def _ticker(storage: Storage, cik: int, as_of: date) -> str | None:
-    """Return the company's current first ticker, from its stored ``submissions`` snapshot."""
-    query = format_cik(cik)
-    stored = storage.snapshots.latest_as_of(
-        "edgar_submissions", query, on_or_before=as_of
-    )
-    if stored is None:
-        return None
-    tickers = parse_tickers(
-        read_snapshot(storage.snapshots, "edgar_submissions", query, stored)
-    )
-    return tickers[0] if tickers else None
+def _slug(name: str) -> str:
+    """Return ``name`` as a file name: lower case, words joined by underscores."""
+    return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")

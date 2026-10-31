@@ -32,6 +32,8 @@ update_prices(tickers, *, as_of, storage, daily, monthly)
     ``dividends``, ``splits``.
 update_fx(series_ids, *, as_of, storage, provider)
     FRED series; table ``observations``.
+update_constituents(as_of, *, storage, provider)
+    S&P 500 members and index changes; tables ``constituents`` and ``changes``.
 UpdateResult
     What one update fetched, reused and wrote.
 
@@ -41,22 +43,36 @@ pandas, the standard library, ``skatkis.io`` and ``market_data.sources``.
 """
 
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 
 import pandas as pd
 
+from Toolbox.market_data.sources.constituents import (
+    CHANGES_PAGE,
+    CONSTITUENTS_PAGE,
+    WikipediaPage,
+    parse_changes,
+    parse_constituents,
+)
 from Toolbox.market_data.sources.edgar import (
     EdgarCompanyFacts,
+    EdgarParseError,
     EdgarSubmissions,
     format_cik,
     latest_periodic_filing,
     parse_companyfacts,
 )
 from Toolbox.market_data.sources.fred import FredSeries, load_fred
-from Toolbox.market_data.sources.prices import YahooChart, load_chart, yahoo_symbol
-from Toolbox.skatkis.io.api import ApiClient
+from Toolbox.market_data.sources.prices import (
+    ChartTables,
+    PriceParseError,
+    YahooChart,
+    load_chart,
+    yahoo_symbol,
+)
+from Toolbox.skatkis.io.api import ApiClient, ApiError
 from Toolbox.skatkis.io.snapshots import SnapshotStore, fetch_snapshot, read_snapshot
 from Toolbox.skatkis.io.tables import write_table
 
@@ -97,6 +113,9 @@ class UpdateResult:
         Row count of each table written.
     folder : Path
         Where the tables were written.
+    failed : dict[str, str]
+        Queries that could not be fetched or parsed, with the reason; the rest of the
+        update goes on without them.
     """
 
     source: str
@@ -104,6 +123,7 @@ class UpdateResult:
     reused: tuple[str, ...]
     tables: dict[str, int]
     folder: Path
+    failed: dict[str, str] = field(default_factory=dict[str, str])
 
 
 def update_edgar(
@@ -142,21 +162,29 @@ def update_edgar(
     fetched: list[str] = []
     reused: list[str] = []
     frames: list[pd.DataFrame] = []
+    failed: dict[str, str] = {}
     for cik in ciks:
         query = format_cik(cik)
-        previous = store.latest_as_of(facts_provider.name, query, on_or_before=as_of)
-        latest_filing = latest_periodic_filing(
-            fetch_snapshot(submissions_provider, query, as_of, store)
-        )
-        if previous is not None and (latest_filing is None or latest_filing < previous):
-            content = read_snapshot(store, facts_provider.name, query, previous)
-            snapshot_as_of = previous
-            reused.append(query)
-        else:
-            content = fetch_snapshot(facts_provider, query, as_of, store)
-            snapshot_as_of = as_of
-            fetched.append(query)
-        frame = parse_companyfacts(content)
+        try:
+            previous = store.latest_as_of(
+                facts_provider.name, query, on_or_before=as_of
+            )
+            latest_filing = latest_periodic_filing(
+                fetch_snapshot(submissions_provider, query, as_of, store)
+            )
+            if previous is not None and (
+                latest_filing is None or latest_filing < previous
+            ):
+                content = read_snapshot(store, facts_provider.name, query, previous)
+                snapshot_as_of, done = previous, reused
+            else:
+                content = fetch_snapshot(facts_provider, query, as_of, store)
+                snapshot_as_of, done = as_of, fetched
+            frame = parse_companyfacts(content)
+        except (ApiError, EdgarParseError) as error:
+            failed[query] = str(error)
+            continue
+        done.append(query)
         frame["snapshot_as_of"] = pd.Timestamp(snapshot_as_of)
         frames.append(frame)
     facts = pd.concat(frames, ignore_index=True) if frames else _empty_facts()
@@ -168,6 +196,7 @@ def update_edgar(
         reused=tuple(reused),
         tables={"facts": len(facts)},
         folder=folder,
+        failed=failed,
     )
 
 
@@ -205,21 +234,62 @@ def update_prices(
         for t in tickers
         if store.latest_as_of(daily.name, yahoo_symbol(t), as_of) == as_of
     ]
-    daily_tables = load_chart(tickers, provider=daily, store=store, as_of=as_of)
-    monthly_tables = load_chart(tickers, provider=monthly, store=store, as_of=as_of)
+    parsed: list[tuple[ChartTables, ChartTables]] = []
+    failed: dict[str, str] = {}
+    for ticker in tickers:
+        try:
+            parsed.append(
+                (
+                    load_chart([ticker], provider=daily, store=store, as_of=as_of),
+                    load_chart([ticker], provider=monthly, store=store, as_of=as_of),
+                )
+            )
+        except (ApiError, PriceParseError) as error:
+            failed[ticker] = str(error)
+    empty = load_chart([], provider=daily, store=store, as_of=as_of)
     folder = storage.folder("yahoo", as_of)
     tables = {
-        "prices": daily_tables.prices,
-        "dividends": monthly_tables.dividends,
-        "splits": monthly_tables.splits,
+        "prices": _concat([d.prices for d, _ in parsed], empty.prices),
+        "dividends": _concat([m.dividends for _, m in parsed], empty.dividends),
+        "splits": _concat([m.splits for _, m in parsed], empty.splits),
     }
     for name, table in tables.items():
         write_table(table, folder / f"{name}.parquet")
     return UpdateResult(
         source="yahoo",
-        fetched=tuple(t for t in tickers if t not in stored),
+        fetched=tuple(t for t in tickers if t not in stored and t not in failed),
         reused=tuple(stored),
         tables={name: len(table) for name, table in tables.items()},
+        folder=folder,
+        failed=failed,
+    )
+
+
+def update_constituents(
+    as_of: date, *, storage: Storage, provider: WikipediaPage
+) -> UpdateResult:
+    """Fetch the S&P 500 members and index changes and write their tables.
+
+    Returns
+    -------
+    UpdateResult
+        Tables ``constituents`` and ``changes`` at ``<interim>/constituents/<as_of>/``.
+    """
+    store = storage.snapshots
+    pages = (CONSTITUENTS_PAGE, CHANGES_PAGE)
+    stored = [p for p in pages if store.latest_as_of(provider.name, p, as_of) == as_of]
+    constituents = parse_constituents(
+        fetch_snapshot(provider, CONSTITUENTS_PAGE, as_of, store)
+    )
+    changes = parse_changes(fetch_snapshot(provider, CHANGES_PAGE, as_of, store))
+    folder = storage.folder("constituents", as_of)
+    write_table(constituents, folder / "constituents.parquet")
+    write_table(changes, folder / "changes.parquet")
+    return UpdateResult(
+        source="constituents",
+        fetched=tuple(p for p in pages if p not in stored),
+        reused=tuple(stored),
+        tables={"constituents": len(constituents), "changes": len(changes)},
         folder=folder,
     )
 
@@ -251,6 +321,11 @@ def update_fx(
         tables={"observations": len(observations)},
         folder=folder,
     )
+
+
+def _concat(frames: list[pd.DataFrame], empty: pd.DataFrame) -> pd.DataFrame:
+    """Concatenate ``frames``, or return ``empty`` when there are none."""
+    return pd.concat(frames, ignore_index=True) if frames else empty
 
 
 def _empty_facts() -> pd.DataFrame:
