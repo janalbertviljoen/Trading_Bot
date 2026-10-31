@@ -163,6 +163,9 @@ Fitted to the SOP layout (§3.3) and the spec's stage and node split (§5, §6.2
   of `.claude/rules/pipeline.md` (spec §6) is not built in this slice. Contracts and
   gates stay minimal (declared columns only), as decided.
 
+- 2026-10-31: covered by the warden's first run on the branch; the report and its
+  fixes are recorded in VI_202610_006 ("Warden report").
+
 ## Kickoff prompt
 
 Pick up VI_202610_002. Confirm S_202610_001, S_202610_005 and MD_202610_001 are done and

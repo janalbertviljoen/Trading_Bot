@@ -635,7 +635,7 @@ def _verdict(check: pd.DataFrame, verdicts: Mapping[str, str]) -> str:
     value = weighting_quality(check)["weight_vs_gap"]
     if value > 0.3:  # noqa: PLR2004  bands of the verdict, named in the report text
         return str(verdicts["favours"])
-    if value < -0.3:  # noqa: PLR2004
+    if value < -0.3:  # noqa: PLR2004  band of the verdict, named in the report text
         return str(verdicts["against"])
     return str(verdicts["unrelated"])
 

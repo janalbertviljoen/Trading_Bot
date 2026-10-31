@@ -99,6 +99,9 @@ beside today's members.
   2022-2025 (held-out): wallet x1.65, S&P x1.52, BRK-B x1.65, so Berkshire matched the
   wallet in the test years (about 13% a year each against 11% for the S&P 500).
 
+- 2026-10-31: covered by the warden's first run on the branch; the report and its
+  fixes are recorded in VI_202610_006 ("Warden report").
+
 ## Kickoff prompt
 
 Pick up VI_202610_005. Read VI_202610_004's notes, run `buyability` and `evaluate`, and

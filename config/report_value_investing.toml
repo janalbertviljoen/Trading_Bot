@@ -28,7 +28,10 @@ company; it is a research result, not evidence of a lasting edge."""
 [method]
 title = "Method"
 text = """Company fundamentals are the values first reported in each annual report (10-K) to the SEC, \
-used from the day they were filed, so a decision never uses information published after it. \
+used from the day they were filed. One known exception is still open: when a company reports an \
+item under two labels, the label is chosen by the company's later use, which moves a few scores \
+by about a point on some dates (Appendix [[app:lookahead]]); until it is fixed, every result here \
+is provisional. \
 Prices and dividends are from Yahoo Finance; returns include reinvested dividends and are in US \
 dollars. On each date, only companies already in the S&P 500 are considered, outside the \
 Financials and Real Estate sectors.
@@ -41,8 +44,11 @@ the sum. On the first trading day of January and of July, the {picks} highest-sc
 for {amount} USD, each in proportion to its score.
 
 Three limits apply to every number in this report. Companies that left the index are missing from \
-the data, which flatters the results. The score's design was settled while looking at the years \
-to 2021, so only the years from 2022 test it fairly. There are no trading costs or taxes."""
+the data, which flatters the results. The score's design and every setting of this report (the \
+rules' weighting, the five picks, the decision months, the sell threshold, the start years) were \
+chosen while looking at the whole period from 2016, so no period here is out of sample: the \
+results describe how these rules would have done, not evidence that they will do so. There are no \
+trading costs or taxes."""
 
 [picks]
 title = "Picks per half-year"
@@ -59,13 +65,14 @@ figure = "What each purchase is worth today, by date of purchase, on a logarithm
 
 [value]
 title = "Value over time"
-text = """Table [[tab:value]] and Figure [[fig:value]] follow the three investors. Each puts in {amount} USD every January and July \
+text = """Table [[tab:value]] and Figure [[fig:value]] follow the four investors. Each puts in {amount} USD every January and July \
 from the start year; the value wallet never sells. The return a year is money-weighted: the \
 constant yearly rate that turns the payments into today's value.
 
 The investor who started in 2016 earns {wallet_rate_2016} a year against {sp_rate_2016} in the \
 S&P 500 and {brk_rate_2016} in Berkshire Hathaway. From 2020 the rates are {wallet_rate_2020}, \
-{sp_rate_2020} and {brk_rate_2020}; from 2025, over less than two years, {wallet_rate_2025}, \
+{sp_rate_2020} and {brk_rate_2020}; from 2023 {wallet_rate_2023}, {sp_rate_2023} and \
+{brk_rate_2023}; from 2025, over less than two years, {wallet_rate_2025}, \
 {sp_rate_2025} and {brk_rate_2025}. The wallet's value swings more than either comparison, because \
 five companies of a few industries are far less diversified than the index or Berkshire.
 
@@ -194,8 +201,10 @@ scores of {next_score_date}, the rule would sell part of {sell_now}, and keep th
 
 [conclusions]
 title = "Conclusions"
-text = """Bought twice a year and held, the value picks are worth more today than the same money in \
-the S&P 500 or in Berkshire Hathaway, for each of the three start years. The lead is uneven: the \
+text = """In this sample, the value picks bought twice a year and held are worth more today than the \
+same money in the S&P 500 or in Berkshire Hathaway for each of the four start years. That describes \
+the past under rules and settings chosen while looking at it; it is not a test of the strategy. \
+The lead is uneven: the \
 {best_company_buys} purchases of {best_company} make up {best_company_share} of the {ref_start} investor's \
 value, and the purchases of {loss_years} trail the index.
 
@@ -322,8 +331,8 @@ Three sources of forward information are outside this test. Only today's S&P 500
 are scored: companies join the universe only from the date they entered the index, but \
 companies that later left it are missing, which flatters every result. Sectors are \
 today's, used to leave out Financials and Real Estate in earlier years. And the score's \
-design was settled while looking at 2016 to 2026, so only the years from 2022 test it \
-fairly."""
+design and settings were chosen while looking at 2016 to 2026, so no period tests it fairly: \
+2022 onwards, once meant as a held-out test, was used to choose between models."""
 survivors_title = "Companies missing from the data"
 survivors_text = """Table [[tab:survivors]] counts the companies that left the S&P 500 after each \
 start year; none of them is in the data, of any sector. Most left through an acquisition, often at \

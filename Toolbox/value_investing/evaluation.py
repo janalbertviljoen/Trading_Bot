@@ -460,6 +460,7 @@ def correlation_curve(
         if day not in levels.index:
             continue
         part = own.loc[own["date"] == day]
+        # One row of a date-indexed table: a Series, which pandas' stubs cannot tell.
         start = cast(pd.Series, levels.loc[day])
         for month in months:
             stop = ends[(day, month)]

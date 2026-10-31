@@ -103,6 +103,9 @@ in which each rule grades the companies into buckets instead of a pass/fail cut.
   Less concentrated: 48.1 of 104.3 USD excess remain without the three best positions
   (NUE, LRCX, FSLR).
 
+- 2026-10-31: covered by the warden's first run on the branch; the report and its
+  fixes are recorded in VI_202610_006 ("Warden report").
+
 ## Kickoff prompt
 
 Pick up VI_202610_004. Read VI_202610_003's notes, then run

@@ -379,7 +379,7 @@ def held_value(paths: pd.DataFrame, scenario: int) -> Figure:
         y="value_usd",
         group="holder",
         references=REFERENCES,
-        title=f"100 USD a year from {scenario}",
+        title=f"100 USD each January and July from {scenario}",
         ylabel="Value, USD",
         panel=True,
     )

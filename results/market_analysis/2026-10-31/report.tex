@@ -24,12 +24,13 @@ A concise view of the S\&P 500 over the last five years: company fundamentals fr
 \newpage
 \section{Introduction}
 \label{sec:introduction}
-{\small
-\begin{longtable}{p{3.4cm}p{8.6cm}rl}
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{p{3.4cm}p{8.6cm}rl}
 \hline
 GICS sector & What it covers & Companies & Fund \\
 \hline
-\endhead
 Communication Services & Telecommunication carriers, media, entertainment and interactive online platforms. & 19 & XLC \\
 Consumer Discretionary & Goods and services households buy by choice: cars, retail, hotels, restaurants, leisure. & 47 & XLY \\
 Consumer Staples & Goods households need regardless of the economy: food, beverages, tobacco, household products. & 34 & XLP \\
@@ -40,7 +41,8 @@ Information Technology & Software, IT services, hardware, semiconductors and ele
 Materials & Chemicals, construction materials, containers and packaging, metals and mining. & 24 & XLB \\
 Utilities & Electric, gas and water utilities and independent power producers. & 31 & XLU \\
 \hline
-\end{longtable}}
+\end{tabular}
+\end{table}
 Companies are grouped by the Global Industry Classification Standard (GICS), which S\&P and MSCI use to classify listed companies by their principal business. The report uses the GICS sectors, the top level of the classification; Financials and Real Estate are left out because the balance-sheet rules of value investing do not fit banks, insurers and real-estate trusts. Each sector is compared with its SPDR sector fund, which tracks the S\&P 500 sector index and includes dividends, and with the S\&P 500 total-return index.
 
 Plots name companies by their ticker; Appendix \ref{app:tickers} gives each company's full name, grouped by sector and sorted by ticker. In plots of companies, solid lines are the best and dashed lines the worst by the measure of the section, and each colour is one company. Rankings in the main text use the last five years, and only companies with prices for the whole five years are ranked.
@@ -258,7 +260,7 @@ A series' growth divided by a benchmark's growth over the same period: above one
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{relative_return/summary.png}
+\includegraphics[width=1\textwidth]{relative_return/summary.png}
 \caption{GICS sector funds relative to the S\&P 500 over the last 5 years, each starting at 1; above 1 the sector outperformed the market. Log scale.}
 \end{figure}
 \begin{figure}[H]
@@ -349,7 +351,7 @@ The P/E divides the share price by the latest first-reported annual diluted earn
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{pe/summary.png}
+\includegraphics[width=1\textwidth]{pe/summary.png}
 \caption{Median P/E of the companies in each GICS sector over the last 5 years.}
 \end{figure}
 \begin{figure}[H]
@@ -472,7 +474,7 @@ The trailing dividend yield is the sum of a company's dividends with an ex-date 
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{dividend_yield/summary.png}
+\includegraphics[width=1\textwidth]{dividend_yield/summary.png}
 \caption{Median trailing 12-month dividend yield of the companies in each GICS sector over the last 5 years, percent.}
 \end{figure}
 \begin{figure}[H]
@@ -564,12 +566,13 @@ Over the last 5 years Energy (3.30\%) and Utilities paid the highest median yiel
 The companies analysed, by GICS sector, sorted by ticker. Tickers follow Yahoo Finance (a dash for a share class, as in BF-B).
 
 \subsection{Communication Services}
-{\small
-\begin{longtable}{lp{11cm}}
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lp{11cm}}
 \hline
 Ticker & Company \\
 \hline
-\endhead
 APP & AppLovin \\
 CHTR & Charter Communications \\
 CMCSA & Comcast \\
@@ -593,7 +596,8 @@ TMUS & T-Mobile US \\
 TTWO & Take-Two Interactive \\
 VZ & Verizon \\
 \hline
-\end{longtable}}
+\end{tabular}
+\end{table}
 \subsection{Consumer Discretionary}
 {\small
 \begin{longtable}{lp{11cm}}
@@ -651,12 +655,13 @@ YUM & Yum! Brands \\
 \hline
 \end{longtable}}
 \subsection{Consumer Staples}
-{\small
-\begin{longtable}{lp{11cm}}
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lp{11cm}}
 \hline
 Ticker & Company \\
 \hline
-\endhead
 ADM & Archer Daniels Midland \\
 BF-B & Brown–Forman \\
 BG & Bunge Global \\
@@ -692,14 +697,16 @@ TSN & Tyson Foods \\
 VYLR & Vylor \\
 WMT & Walmart \\
 \hline
-\end{longtable}}
+\end{tabular}
+\end{table}
 \subsection{Energy}
-{\small
-\begin{longtable}{lp{11cm}}
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lp{11cm}}
 \hline
 Ticker & Company \\
 \hline
-\endhead
 APA & APA Corporation \\
 BKR & Baker Hughes \\
 COP & ConocoPhillips \\
@@ -722,7 +729,8 @@ VLO & Valero Energy \\
 WMB & Williams Companies \\
 XOM & ExxonMobil \\
 \hline
-\end{longtable}}
+\end{tabular}
+\end{table}
 \subsection{Health Care}
 {\small
 \begin{longtable}{lp{11cm}}
@@ -969,12 +977,13 @@ ZBRA & Zebra Technologies \\
 \hline
 \end{longtable}}
 \subsection{Materials}
-{\small
-\begin{longtable}{lp{11cm}}
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lp{11cm}}
 \hline
 Ticker & Company \\
 \hline
-\endhead
 ALB & Albemarle Corporation \\
 AMCR & Amcor \\
 APD & Air Products \\
@@ -1000,14 +1009,16 @@ STLD & Steel Dynamics \\
 SW & Smurfit Westrock \\
 VMC & Vulcan Materials Company \\
 \hline
-\end{longtable}}
+\end{tabular}
+\end{table}
 \subsection{Utilities}
-{\small
-\begin{longtable}{lp{11cm}}
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lp{11cm}}
 \hline
 Ticker & Company \\
 \hline
-\endhead
 AEE & Ameren \\
 AEP & American Electric Power \\
 AES & AES Corporation \\
@@ -1040,7 +1051,8 @@ VST & Vistra Corp. \\
 WEC & WEC Energy Group \\
 XEL & Xcel Energy \\
 \hline
-\end{longtable}}
+\end{tabular}
+\end{table}
 \section{Fundamentals: full history per sector}
 \label{app:fundamentals}
 For every GICS sector, the revenue of its companies with the highest (solid) and lowest (dashed) annualised revenue growth over all years in the data.
@@ -1048,55 +1060,55 @@ For every GICS sector, the revenue of its companies with the highest (solid) and
 \subsection{Communication Services}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/fundamentals/communication_services.png}
+\includegraphics[width=1\textwidth]{appendix/fundamentals/communication_services.png}
 \caption{Communication Services: annual revenue of the 10 companies with the highest (solid) and lowest (dashed) revenue growth over the full history; USD millions.}
 \end{figure}
 \subsection{Consumer Discretionary}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/fundamentals/consumer_discretionary.png}
+\includegraphics[width=1\textwidth]{appendix/fundamentals/consumer_discretionary.png}
 \caption{Consumer Discretionary: annual revenue of the 10 companies with the highest (solid) and lowest (dashed) revenue growth over the full history; USD millions.}
 \end{figure}
 \subsection{Consumer Staples}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/fundamentals/consumer_staples.png}
+\includegraphics[width=1\textwidth]{appendix/fundamentals/consumer_staples.png}
 \caption{Consumer Staples: annual revenue of the 10 companies with the highest (solid) and lowest (dashed) revenue growth over the full history; USD millions.}
 \end{figure}
 \subsection{Energy}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/fundamentals/energy.png}
+\includegraphics[width=1\textwidth]{appendix/fundamentals/energy.png}
 \caption{Energy: annual revenue of the 10 companies with the highest (solid) and lowest (dashed) revenue growth over the full history; USD millions.}
 \end{figure}
 \subsection{Health Care}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/fundamentals/health_care.png}
+\includegraphics[width=1\textwidth]{appendix/fundamentals/health_care.png}
 \caption{Health Care: annual revenue of the 10 companies with the highest (solid) and lowest (dashed) revenue growth over the full history; USD millions.}
 \end{figure}
 \subsection{Industrials}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/fundamentals/industrials.png}
+\includegraphics[width=1\textwidth]{appendix/fundamentals/industrials.png}
 \caption{Industrials: annual revenue of the 10 companies with the highest (solid) and lowest (dashed) revenue growth over the full history; USD millions.}
 \end{figure}
 \subsection{Information Technology}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/fundamentals/information_technology.png}
+\includegraphics[width=1\textwidth]{appendix/fundamentals/information_technology.png}
 \caption{Information Technology: annual revenue of the 10 companies with the highest (solid) and lowest (dashed) revenue growth over the full history; USD millions.}
 \end{figure}
 \subsection{Materials}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/fundamentals/materials.png}
+\includegraphics[width=1\textwidth]{appendix/fundamentals/materials.png}
 \caption{Materials: annual revenue of the 10 companies with the highest (solid) and lowest (dashed) revenue growth over the full history; USD millions.}
 \end{figure}
 \subsection{Utilities}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/fundamentals/utilities.png}
+\includegraphics[width=1\textwidth]{appendix/fundamentals/utilities.png}
 \caption{Utilities: annual revenue of the 10 companies with the highest (solid) and lowest (dashed) revenue growth over the full history; USD millions.}
 \end{figure}
 \section{Total return: full history per sector}
@@ -1106,55 +1118,55 @@ For every GICS sector, growth of 1 USD for its companies with the highest (solid
 \subsection{Communication Services}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/total_return/communication_services.png}
+\includegraphics[width=1\textwidth]{appendix/total_return/communication_services.png}
 \caption{Communication Services: growth of 1 USD for the 10 companies with the highest (solid) and lowest (dashed) total return over the full history; log scale.}
 \end{figure}
 \subsection{Consumer Discretionary}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/total_return/consumer_discretionary.png}
+\includegraphics[width=1\textwidth]{appendix/total_return/consumer_discretionary.png}
 \caption{Consumer Discretionary: growth of 1 USD for the 10 companies with the highest (solid) and lowest (dashed) total return over the full history; log scale.}
 \end{figure}
 \subsection{Consumer Staples}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/total_return/consumer_staples.png}
+\includegraphics[width=1\textwidth]{appendix/total_return/consumer_staples.png}
 \caption{Consumer Staples: growth of 1 USD for the 10 companies with the highest (solid) and lowest (dashed) total return over the full history; log scale.}
 \end{figure}
 \subsection{Energy}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/total_return/energy.png}
+\includegraphics[width=1\textwidth]{appendix/total_return/energy.png}
 \caption{Energy: growth of 1 USD for the 10 companies with the highest (solid) and lowest (dashed) total return over the full history; log scale.}
 \end{figure}
 \subsection{Health Care}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/total_return/health_care.png}
+\includegraphics[width=1\textwidth]{appendix/total_return/health_care.png}
 \caption{Health Care: growth of 1 USD for the 10 companies with the highest (solid) and lowest (dashed) total return over the full history; log scale.}
 \end{figure}
 \subsection{Industrials}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/total_return/industrials.png}
+\includegraphics[width=1\textwidth]{appendix/total_return/industrials.png}
 \caption{Industrials: growth of 1 USD for the 10 companies with the highest (solid) and lowest (dashed) total return over the full history; log scale.}
 \end{figure}
 \subsection{Information Technology}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/total_return/information_technology.png}
+\includegraphics[width=1\textwidth]{appendix/total_return/information_technology.png}
 \caption{Information Technology: growth of 1 USD for the 10 companies with the highest (solid) and lowest (dashed) total return over the full history; log scale.}
 \end{figure}
 \subsection{Materials}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/total_return/materials.png}
+\includegraphics[width=1\textwidth]{appendix/total_return/materials.png}
 \caption{Materials: growth of 1 USD for the 10 companies with the highest (solid) and lowest (dashed) total return over the full history; log scale.}
 \end{figure}
 \subsection{Utilities}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/total_return/utilities.png}
+\includegraphics[width=1\textwidth]{appendix/total_return/utilities.png}
 \caption{Utilities: growth of 1 USD for the 10 companies with the highest (solid) and lowest (dashed) total return over the full history; log scale.}
 \end{figure}
 \section{Relative return: full history per sector}
@@ -1164,55 +1176,55 @@ For every GICS sector, growth relative to the sector fund for its companies that
 \subsection{Communication Services}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/relative_return/communication_services.png}
+\includegraphics[width=1\textwidth]{appendix/relative_return/communication_services.png}
 \caption{Communication Services: growth relative to XLC for the 10 companies with the highest (solid) and lowest (dashed) annualised relative return over the full history; log scale.}
 \end{figure}
 \subsection{Consumer Discretionary}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/relative_return/consumer_discretionary.png}
+\includegraphics[width=1\textwidth]{appendix/relative_return/consumer_discretionary.png}
 \caption{Consumer Discretionary: growth relative to XLY for the 10 companies with the highest (solid) and lowest (dashed) annualised relative return over the full history; log scale.}
 \end{figure}
 \subsection{Consumer Staples}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/relative_return/consumer_staples.png}
+\includegraphics[width=1\textwidth]{appendix/relative_return/consumer_staples.png}
 \caption{Consumer Staples: growth relative to XLP for the 10 companies with the highest (solid) and lowest (dashed) annualised relative return over the full history; log scale.}
 \end{figure}
 \subsection{Energy}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/relative_return/energy.png}
+\includegraphics[width=1\textwidth]{appendix/relative_return/energy.png}
 \caption{Energy: growth relative to XLE for the 10 companies with the highest (solid) and lowest (dashed) annualised relative return over the full history; log scale.}
 \end{figure}
 \subsection{Health Care}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/relative_return/health_care.png}
+\includegraphics[width=1\textwidth]{appendix/relative_return/health_care.png}
 \caption{Health Care: growth relative to XLV for the 10 companies with the highest (solid) and lowest (dashed) annualised relative return over the full history; log scale.}
 \end{figure}
 \subsection{Industrials}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/relative_return/industrials.png}
+\includegraphics[width=1\textwidth]{appendix/relative_return/industrials.png}
 \caption{Industrials: growth relative to XLI for the 10 companies with the highest (solid) and lowest (dashed) annualised relative return over the full history; log scale.}
 \end{figure}
 \subsection{Information Technology}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/relative_return/information_technology.png}
+\includegraphics[width=1\textwidth]{appendix/relative_return/information_technology.png}
 \caption{Information Technology: growth relative to XLK for the 10 companies with the highest (solid) and lowest (dashed) annualised relative return over the full history; log scale.}
 \end{figure}
 \subsection{Materials}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/relative_return/materials.png}
+\includegraphics[width=1\textwidth]{appendix/relative_return/materials.png}
 \caption{Materials: growth relative to XLB for the 10 companies with the highest (solid) and lowest (dashed) annualised relative return over the full history; log scale.}
 \end{figure}
 \subsection{Utilities}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/relative_return/utilities.png}
+\includegraphics[width=1\textwidth]{appendix/relative_return/utilities.png}
 \caption{Utilities: growth relative to XLU for the 10 companies with the highest (solid) and lowest (dashed) annualised relative return over the full history; log scale.}
 \end{figure}
 \section{P/E: full history per sector}
@@ -1221,61 +1233,61 @@ For every GICS sector, the P/E of its companies with the lowest (solid) and high
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/pe/lead_lag.png}
+\includegraphics[width=1\textwidth]{appendix/pe/lead_lag.png}
 \caption{Mean correlation, over each sector's companies, of monthly P/E changes with price changes k months later; positive k: the P/E changes first.}
 \end{figure}
 \subsection{Communication Services}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/pe/communication_services.png}
+\includegraphics[width=1\textwidth]{appendix/pe/communication_services.png}
 \caption{Communication Services: P/E of the 10 companies with the lowest (solid) and highest (dashed) median P/E over the full history.}
 \end{figure}
 \subsection{Consumer Discretionary}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/pe/consumer_discretionary.png}
+\includegraphics[width=1\textwidth]{appendix/pe/consumer_discretionary.png}
 \caption{Consumer Discretionary: P/E of the 10 companies with the lowest (solid) and highest (dashed) median P/E over the full history.}
 \end{figure}
 \subsection{Consumer Staples}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/pe/consumer_staples.png}
+\includegraphics[width=1\textwidth]{appendix/pe/consumer_staples.png}
 \caption{Consumer Staples: P/E of the 10 companies with the lowest (solid) and highest (dashed) median P/E over the full history.}
 \end{figure}
 \subsection{Energy}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/pe/energy.png}
+\includegraphics[width=1\textwidth]{appendix/pe/energy.png}
 \caption{Energy: P/E of the 10 companies with the lowest (solid) and highest (dashed) median P/E over the full history.}
 \end{figure}
 \subsection{Health Care}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/pe/health_care.png}
+\includegraphics[width=1\textwidth]{appendix/pe/health_care.png}
 \caption{Health Care: P/E of the 10 companies with the lowest (solid) and highest (dashed) median P/E over the full history.}
 \end{figure}
 \subsection{Industrials}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/pe/industrials.png}
+\includegraphics[width=1\textwidth]{appendix/pe/industrials.png}
 \caption{Industrials: P/E of the 10 companies with the lowest (solid) and highest (dashed) median P/E over the full history.}
 \end{figure}
 \subsection{Information Technology}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/pe/information_technology.png}
+\includegraphics[width=1\textwidth]{appendix/pe/information_technology.png}
 \caption{Information Technology: P/E of the 10 companies with the lowest (solid) and highest (dashed) median P/E over the full history.}
 \end{figure}
 \subsection{Materials}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/pe/materials.png}
+\includegraphics[width=1\textwidth]{appendix/pe/materials.png}
 \caption{Materials: P/E of the 10 companies with the lowest (solid) and highest (dashed) median P/E over the full history.}
 \end{figure}
 \subsection{Utilities}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/pe/utilities.png}
+\includegraphics[width=1\textwidth]{appendix/pe/utilities.png}
 \caption{Utilities: P/E of the 10 companies with the lowest (solid) and highest (dashed) median P/E over the full history.}
 \end{figure}
 \section{Dividend yield: full history per sector}
@@ -1285,55 +1297,55 @@ For every GICS sector, the trailing dividend yield of its companies with the hig
 \subsection{Communication Services}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/dividend_yield/communication_services.png}
+\includegraphics[width=1\textwidth]{appendix/dividend_yield/communication_services.png}
 \caption{Communication Services: trailing dividend yield of the 10 companies with the highest (solid) and lowest (dashed) mean yield over the full history; percent.}
 \end{figure}
 \subsection{Consumer Discretionary}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/dividend_yield/consumer_discretionary.png}
+\includegraphics[width=1\textwidth]{appendix/dividend_yield/consumer_discretionary.png}
 \caption{Consumer Discretionary: trailing dividend yield of the 10 companies with the highest (solid) and lowest (dashed) mean yield over the full history; percent.}
 \end{figure}
 \subsection{Consumer Staples}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/dividend_yield/consumer_staples.png}
+\includegraphics[width=1\textwidth]{appendix/dividend_yield/consumer_staples.png}
 \caption{Consumer Staples: trailing dividend yield of the 10 companies with the highest (solid) and lowest (dashed) mean yield over the full history; percent.}
 \end{figure}
 \subsection{Energy}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/dividend_yield/energy.png}
+\includegraphics[width=1\textwidth]{appendix/dividend_yield/energy.png}
 \caption{Energy: trailing dividend yield of the 10 companies with the highest (solid) and lowest (dashed) mean yield over the full history; percent.}
 \end{figure}
 \subsection{Health Care}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/dividend_yield/health_care.png}
+\includegraphics[width=1\textwidth]{appendix/dividend_yield/health_care.png}
 \caption{Health Care: trailing dividend yield of the 10 companies with the highest (solid) and lowest (dashed) mean yield over the full history; percent.}
 \end{figure}
 \subsection{Industrials}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/dividend_yield/industrials.png}
+\includegraphics[width=1\textwidth]{appendix/dividend_yield/industrials.png}
 \caption{Industrials: trailing dividend yield of the 10 companies with the highest (solid) and lowest (dashed) mean yield over the full history; percent.}
 \end{figure}
 \subsection{Information Technology}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/dividend_yield/information_technology.png}
+\includegraphics[width=1\textwidth]{appendix/dividend_yield/information_technology.png}
 \caption{Information Technology: trailing dividend yield of the 10 companies with the highest (solid) and lowest (dashed) mean yield over the full history; percent.}
 \end{figure}
 \subsection{Materials}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/dividend_yield/materials.png}
+\includegraphics[width=1\textwidth]{appendix/dividend_yield/materials.png}
 \caption{Materials: trailing dividend yield of the 10 companies with the highest (solid) and lowest (dashed) mean yield over the full history; percent.}
 \end{figure}
 \subsection{Utilities}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/dividend_yield/utilities.png}
+\includegraphics[width=1\textwidth]{appendix/dividend_yield/utilities.png}
 \caption{Utilities: trailing dividend yield of the 10 companies with the highest (solid) and lowest (dashed) mean yield over the full history; percent.}
 \end{figure}
 \section{Data checks}
@@ -1342,32 +1354,32 @@ Checks of the data behind the report: how many companies report each field per y
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/data_checks/coverage.png}
+\includegraphics[width=1\textwidth]{appendix/data_checks/coverage.png}
 \caption{Number of companies with a first-reported annual value, per field and fiscal year.}
 \end{figure}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/data_checks/eps_check.png}
+\includegraphics[width=1\textwidth]{appendix/data_checks/eps_check.png}
 \caption{Reported diluted EPS against net income divided by weighted diluted shares, USD per share; points off the diagonal differ.}
 \end{figure}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/data_checks/filing_lag.png}
+\includegraphics[width=1\textwidth]{appendix/data_checks/filing_lag.png}
 \caption{Days from period end to filing for each 10-K and 10-Q.}
 \end{figure}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/data_checks/trading_days.png}
+\includegraphics[width=1\textwidth]{appendix/data_checks/trading_days.png}
 \caption{Trading days per symbol and year, youngest symbols at the top; a row starts in the year the symbol first traded.}
 \end{figure}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/data_checks/DEXSFUS.png}
+\includegraphics[width=1\textwidth]{appendix/data_checks/DEXSFUS.png}
 \caption{USD/ZAR exchange rate (FRED DEXSFUS), rand per US dollar.}
 \end{figure}
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{appendix/data_checks/DEXSFUS_coverage.png}
+\includegraphics[width=1\textwidth]{appendix/data_checks/DEXSFUS_coverage.png}
 \caption{Exchange-rate observations per year.}
 \end{figure}
 \end{document}

@@ -21,11 +21,11 @@
 Each January and July since 2016, a rule-based value score picks 5 S\&P 500 companies, and 100 USD is invested in them, weighted by score and never sold. Investors who started in 2016, 2020, 2023 and 2025 are followed to 30 October 2026, each against the same money in the S\&P 500 total-return index and in Berkshire Hathaway. The reference is the investor who started in 2020: the data hold only today's index members, and 125 companies have left the index since then against 230 since 2016, so fewer failed companies are missing. That investor's 1,400 USD is worth 4,708 USD, against 2,480 USD in the S\&P 500 and 2,415 USD in Berkshire Hathaway; a second wallet that also sells holdings whose score has fallen is worth 4,691 USD. The report closes with the next picks: First Solar (FSLR), Cognizant (CTSH), Snap-on (SNA), Skyworks Solutions (SWKS) and ResMed (RMD). The result rests on few decisions and few companies, with 49\% of the value in one company; it is a research result, not evidence of a lasting edge.
 \end{abstract}
 \section{Method}
-Company fundamentals are the values first reported in each annual report (10-K) to the SEC, used from the day they were filed, so a decision never uses information published after it. Prices and dividends are from Yahoo Finance; returns include reinvested dividends and are in US dollars. On each date, only companies already in the S\&P 500 are considered, outside the Financials and Real Estate sectors.
+Company fundamentals are the values first reported in each annual report (10-K) to the SEC, used from the day they were filed. One known exception is still open: when a company reports an item under two labels, the label is chosen by the company's later use, which moves a few scores by about a point on some dates (Appendix \ref{app:lookahead}); until it is fixed, every result here is provisional. Prices and dividends are from Yahoo Finance; returns include reinvested dividends and are in US dollars. On each date, only companies already in the S\&P 500 are considered, outside the Financials and Real Estate sectors.
 
 Sixteen rules from Graham, Buffett and a net income growth test grade every company. For each rule, the companies are ranked by the rule's value and placed in six equal groups, from 5 points for the best sixth to 0 for the worst; each rule's points are multiplied by its weight, one less the share of companies that pass the rule's threshold, so rules few companies pass count more. The score is the sum. On the first trading day of January and of July, the 5 highest-scoring companies are bought for 100 USD, each in proportion to its score.
 
-Three limits apply to every number in this report. Companies that left the index are missing from the data, which flatters the results. The score's design was settled while looking at the years to 2021, so only the years from 2022 test it fairly. There are no trading costs or taxes.
+Three limits apply to every number in this report. Companies that left the index are missing from the data, which flatters the results. The score's design and every setting of this report (the rules' weighting, the five picks, the decision months, the sell threshold, the start years) were chosen while looking at the whole period from 2016, so no period here is out of sample: the results describe how these rules would have done, not evidence that they will do so. There are no trading costs or taxes.
 
 \section{Picks per half-year}
 \begin{table}[H]
@@ -100,9 +100,9 @@ Start & Holder & Put in & Value & Multiple & A year \\
 \hline
 \end{tabular}
 \end{table}
-Table \ref{tab:value} and Figure \ref{fig:value} follow the three investors. Each puts in 100 USD every January and July from the start year; the value wallet never sells. The return a year is money-weighted: the constant yearly rate that turns the payments into today's value.
+Table \ref{tab:value} and Figure \ref{fig:value} follow the four investors. Each puts in 100 USD every January and July from the start year; the value wallet never sells. The return a year is money-weighted: the constant yearly rate that turns the payments into today's value.
 
-The investor who started in 2016 earns 25.9\% a year against 15.3\% in the S\&P 500 and 13.9\% in Berkshire Hathaway. From 2020 the rates are 33.9\%, 15.9\% and 15.2\%; from 2025, over less than two years, 43.4\%, 15.7\% and 11.1\%. The wallet's value swings more than either comparison, because five companies of a few industries are far less diversified than the index or Berkshire.
+The investor who started in 2016 earns 25.9\% a year against 15.3\% in the S\&P 500 and 13.9\% in Berkshire Hathaway. From 2020 the rates are 33.9\%, 15.9\% and 15.2\%; from 2023 44.3\%, 18.7\% and 14.2\%; from 2025, over less than two years, 43.4\%, 15.7\% and 11.1\%. The wallet's value swings more than either comparison, because five companies of a few industries are far less diversified than the index or Berkshire.
 
 The value wallet with sells buys the same picks with the same money, but at each decision it also sells part of any holding whose score has fallen; Section \ref{sec:selling} describes the rule. From 2016 it is worth 11,062 USD (27.2\% a year), from 2020 4,691 USD (33.8\%) and from 2025 602 USD (43.4\%).
 
@@ -254,7 +254,7 @@ Hasbro (HAS) & 5.59 & 0.25 & 38\% & 2.12 \\
 The investor who started in 2020 holds 16 companies. With the scores of 18 September 2026, the rule would sell part of Intel (INTC), 1\% and Hasbro (HAS), 38\%, and keep the other 14 as they are (Table \ref{tab:sell}).
 
 \section{Conclusions}
-Bought twice a year and held, the value picks are worth more today than the same money in the S\&P 500 or in Berkshire Hathaway, for each of the three start years. The lead is uneven: the 8 purchases of Micron Technology (MU) make up 49\% of the 2020 investor's value, and the purchases of July 2017, January 2018, July 2018 and January 2024 trail the index.
+In this sample, the value picks bought twice a year and held are worth more today than the same money in the S\&P 500 or in Berkshire Hathaway for each of the four start years. That describes the past under rules and settings chosen while looking at it; it is not a test of the strategy. The lead is uneven: the 8 purchases of Micron Technology (MU) make up 49\% of the 2020 investor's value, and the purchases of July 2017, January 2018, July 2018 and January 2024 trail the index.
 
 Before the strategy is used, three steps are needed: the companies that left the index must be added to the data, the score must be tested on more decisions (each quarter instead of each year), and trading costs and taxes must be included.
 
@@ -435,7 +435,7 @@ A score must use only what was known on its date. Four guards are built in. A co
 
 These guards are tested by cutting every input at a date as if it were that day (filings filed on or before it, prices and dividends up to it), scoring the companies again and comparing the scores with the full run (Table \ref{tab:lookahead}). Any difference means information from after the date reached a score. On 21 December 2018, 16 December 2022 and 19 December 2025 the picks were the same. The scores were identical on 19 December 2025; on the other dates a few companies differ by about one point, because when a company reports an item under two labels, the label is chosen by the company's later use. The fix, choosing the label from filings known on the date, is pending; the check runs as a unit test and will pass once it is in.
 
-Three sources of forward information are outside this test. Only today's S\&P 500 members are scored: companies join the universe only from the date they entered the index, but companies that later left it are missing, which flatters every result. Sectors are today's, used to leave out Financials and Real Estate in earlier years. And the score's design was settled while looking at 2016 to 2026, so only the years from 2022 test it fairly.
+Three sources of forward information are outside this test. Only today's S\&P 500 members are scored: companies join the universe only from the date they entered the index, but companies that later left it are missing, which flatters every result. Sectors are today's, used to leave out Financials and Real Estate in earlier years. And the score's design and settings were chosen while looking at 2016 to 2026, so no period tests it fairly: 2022 onwards, once meant as a held-out test, was used to choose between models.
 
 \subsection{Companies missing from the data}
 \begin{table}[H]

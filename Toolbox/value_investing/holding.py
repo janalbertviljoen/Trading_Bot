@@ -87,14 +87,18 @@ from dataclasses import dataclass
 
 import pandas as pd
 
-from Toolbox.skatkis.financial_logic import holding_return, money_weighted_return
+from Toolbox.skatkis.financial_logic import (
+    DAYS_PER_YEAR,
+    annualised_relative_return,
+    holding_return,
+    money_weighted_return,
+)
 from Toolbox.value_investing.inputs import price_on
 from Toolbox.value_investing.rules import pass_column, points_column
 from Toolbox.value_investing.scoring import rule_weights
 
 WALLET = "value wallet"
 MANAGED = "value wallet with sells"
-DAYS_PER_YEAR = 365.25
 
 
 @dataclass(frozen=True)
@@ -198,8 +202,15 @@ def buy_and_hold(  # noqa: PLR0913  one keyword per setting of the run
     lots["years"] = (pd.Timestamp(end) - lots["decision_date"]).dt.days / DAYS_PER_YEAR
     lots["index_usd"] = lots["invested_usd"] * (1 + lots["benchmark_return"])
     lots["ahead_usd"] = lots["value_usd"] - lots["index_usd"]
-    relative = (1 + lots["total_return"]) / (1 + lots["benchmark_return"])
-    lots["annualised_excess"] = relative ** (1 / lots["years"]) - 1
+    lots["annualised_excess"] = [
+        _annualised_excess(float(r), float(b), pd.Timestamp(day), pd.Timestamp(end))
+        for r, b, day in zip(
+            lots["total_return"],
+            lots["benchmark_return"],
+            lots["decision_date"],
+            strict=True,
+        )
+    ]
 
     yearly = (
         lots.groupby("decision_date")
@@ -265,6 +276,24 @@ def buy_and_hold(  # noqa: PLR0913  one keyword per setting of the run
         yearly=yearly,
         paths=pd.concat(path_frames, ignore_index=True)[columns],
         summary=pd.DataFrame(rows),
+    )
+
+
+def _annualised_excess(
+    stock: float, benchmark: float, bought: pd.Timestamp, end: pd.Timestamp
+) -> float:
+    """Return a pick's annualised return over the benchmark from purchase to ``end``.
+
+    Uses ``skatkis.financial_logic.annualised_relative_return`` on the two growth paths;
+    missing when the holding is younger than a day or a return is missing.
+    """
+    if pd.isna(stock) or pd.isna(benchmark) or end <= bought:
+        return float("nan")
+    days = [bought, end]
+    return annualised_relative_return(
+        pd.Series([1.0, 1 + stock], index=days),
+        pd.Series([1.0, 1 + benchmark], index=days),
+        min_years=0.0,
     )
 
 

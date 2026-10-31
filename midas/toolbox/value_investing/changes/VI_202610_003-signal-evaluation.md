@@ -95,6 +95,9 @@ construction. The test below is what decides whether the score predicts.
   average) while the median is positive at 12 and 24 months held-out: most sold stocks
   lagged, a few large winners dominate the mean.
 
+- 2026-10-31: covered by the warden's first run on the branch; the report and its
+  fixes are recorded in VI_202610_006 ("Warden report").
+
 ## Kickoff prompt
 
 Pick up VI_202610_003. Read VI_202610_002's outcome and this file's decisions, build
