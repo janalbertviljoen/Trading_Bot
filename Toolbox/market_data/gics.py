@@ -11,7 +11,8 @@ groups by ``gics_sector``; every group is normalised the same way, only against 
 
 Owns
 ----
-The company-to-sector map and the choice of companies (excluded sectors).
+The company-to-sector map, the choice of companies (excluded sectors) and the date a
+member joined its index where the members page does not give it.
 
 Must not
 --------
@@ -21,6 +22,8 @@ Public API
 ----------
 gics_map(constituents, *, funds, excluded)
     One row per company: ``symbol``, ``cik``, ``gics_sector``, ``sector_fund``.
+fill_date_added(constituents, changes)
+    The members table with each missing ``date_added`` taken from the changes.
 
 Dependency rule
 ---------------
@@ -73,3 +76,37 @@ def gics_map(
     return mapping.astype({"symbol": "string", "gics_sector": "string"}).sort_values(
         "symbol", ignore_index=True
     )
+
+
+def fill_date_added(constituents: pd.DataFrame, changes: pd.DataFrame) -> pd.DataFrame:
+    """Return the members with each missing ``date_added`` taken from the index changes.
+
+    Parameters
+    ----------
+    constituents : pd.DataFrame
+        The constituents table (``CONSTITUENT_COLUMNS``); not modified.
+    changes : pd.DataFrame
+        The index's changes (``CHANGE_COLUMNS``).
+
+    Returns
+    -------
+    pd.DataFrame
+        The same table. A member without ``date_added`` gets the date of its latest
+        addition in ``changes``; a member never added there gets the earliest date of
+        ``changes``, as it joined before the record starts. A given date is kept.
+
+    Notes
+    -----
+    The S&P 400 and 600 pages list only selected changes, so a member that joined
+    after the record starts but whose addition is missing is taken as a member from
+    the record's start: a look-ahead for that company.
+    """
+    added = (
+        changes.dropna(subset=["added_symbol"]).groupby("added_symbol")["date"].max()
+    )
+    start = changes["date"].min()
+    derived = pd.Series(
+        added.reindex(constituents["symbol"].astype(str)).to_numpy(),
+        index=constituents.index,
+    ).fillna(start)
+    return constituents.assign(date_added=constituents["date_added"].fillna(derived))

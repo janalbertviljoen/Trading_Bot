@@ -6,7 +6,8 @@ The shape of a rule's result: the value it tests and its pass flag.
 Every rule function returns ``rule_result(value, passed, evaluable)``: one row per
 (``symbol``, ``date``), the tested value and a float flag that is 1 when the rule
 passes, 0 when it fails and missing when it cannot be evaluated (an input missing, or
-the rule's window not yet full). The score counts a missing flag as 0.
+the rule's window not yet full). The score leaves a missing flag out: it is the mean
+of the flags that exist.
 
 Owns
 ----

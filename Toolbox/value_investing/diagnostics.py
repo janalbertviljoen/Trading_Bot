@@ -4,7 +4,7 @@ value_investing/diagnostics.py
 In-sample checks of the buyability score against what the prices did afterwards.
 
 These tables describe the data; they are diagnostics, not evidence that a strategy
-works (judged out-of-sample only, ``midas/instructions/researcher.md``). ``sample``
+works, which is judged on out-of-sample results only. ``sample``
 picks the companies with the highest and lowest mean score from a date, a casual sample
 for looking at the data. ``forward_excess`` gives each company's total return from one
 rebalance date to the next less ``^SP500TR``'s; ``score_returns`` and
@@ -30,8 +30,10 @@ sample_paths(table, sample_table, levels, *, benchmark, start)
     companies.
 score_returns(table, *, bin_width)
     Mean next-quarter excess return per score bin.
-information_coefficient(table)
+information_coefficient(table, *, min_companies)
     Per date, the rank correlation of the score with the next-quarter excess return.
+survivorship(changes, start_years)
+    Per start year, the companies that left the index since then.
 
 Computes
 --------
@@ -40,26 +42,29 @@ mean buyability score : sample
 score times relative growth, buyability signal : sample_paths
     signal(t) = score(t) * R(t), R the growth over ``^SP500TR`` since ``start``
     (``skatkis.financial_logic.relative_growth``): high when a company scores well and
-    has beaten the market, low when it scores badly and has lagged (user, 2026-10-31).
+    has beaten the market, low when it scores badly and has lagged.
 mean excess return by score : score_returns
     Mean, median and count of ``forward_excess`` per score bin [b, b + w), w the bin
     width; a score of 1 falls in the top bin.
 information coefficient, rank IC : information_coefficient
     Spearman correlation across companies of ``score`` and ``forward_excess``, per date.
+survivorship count, companies removed from the index : survivorship
+    Per start year y: the removals dated in year y or later, and those whose reason
+    names the market value.
 
 Dependency rule
 ---------------
-pandas, ``skatkis.financial_logic`` and ``value_investing.inputs``.
+pandas, ``skatkis.analysis``, ``skatkis.financial_logic`` and
+``value_investing.inputs``.
 """
 
 from collections.abc import Sequence
 
 import pandas as pd
 
+from Toolbox.skatkis.analysis import rank_correlation
 from Toolbox.skatkis.financial_logic import forward_excess_return, relative_growth
 from Toolbox.value_investing.inputs import price_on
-
-MIN_COMPANIES = 20
 
 
 def sample(table: pd.DataFrame, *, mean_from: pd.Timestamp, n: int) -> pd.DataFrame:
@@ -218,16 +223,51 @@ def score_returns(table: pd.DataFrame, *, bin_width: float = 0.1) -> pd.DataFram
     )
 
 
-def information_coefficient(table: pd.DataFrame) -> pd.DataFrame:
+def information_coefficient(table: pd.DataFrame, *, min_companies: int) -> pd.DataFrame:
     """Return, per date, the Spearman correlation of ``score`` and ``forward_excess``.
 
-    Dates with fewer than ``MIN_COMPANIES`` companies having both are left out.
+    Dates with fewer than ``min_companies`` companies having both are left out.
     """
     rows: list[dict[str, object]] = []
     for day, part in table.dropna(subset=["forward_excess"]).groupby("date"):
-        if len(part) < MIN_COMPANIES:
+        if len(part) < min_companies:
             continue
-        # Spearman's correlation is Pearson's on the ranks (average ranks for ties).
-        ic = part["score"].rank().corr(part["forward_excess"].rank())
+        ic = rank_correlation(part["score"], part["forward_excess"])
         rows.append({"date": day, "ic": ic, "companies": len(part)})
     return pd.DataFrame(rows, columns=["date", "ic", "companies"])
+
+
+def survivorship(changes: pd.DataFrame, start_years: Sequence[int]) -> pd.DataFrame:
+    """Return, per start year, the companies that left the index since then.
+
+    Parameters
+    ----------
+    changes : pd.DataFrame
+        The index's changes (``CHANGE_COLUMNS``: ``date``, ``removed_symbol``,
+        ``reason``).
+    start_years : Sequence[int]
+        The start years counted from.
+
+    Returns
+    -------
+    pd.DataFrame
+        Columns ``start``, ``removed`` (removals in or after the start year) and
+        ``market_cap`` (of those, the ones whose reason names the market value, ``market
+        cap``: the likely losers), sorted by start year.
+    """
+    removed = changes.dropna(subset=["removed_symbol"])
+    reason = removed["reason"].fillna("").str.lower()
+    rows = [
+        {
+            "start": start,
+            "removed": int((removed["date"].dt.year >= start).sum()),
+            "market_cap": int(
+                (
+                    (removed["date"].dt.year >= start)
+                    & reason.str.contains("market cap", regex=False)
+                ).sum()
+            ),
+        }
+        for start in sorted(start_years)
+    ]
+    return pd.DataFrame(rows)

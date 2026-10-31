@@ -37,8 +37,8 @@ current ratio : g2a_current_ratio, e1_current_ratio
     E1 1.5); missing when current liabilities <= 0.
 debt to net current assets, debt cover : g2b_debt_cover, e2_debt_cover
     NCA = current assets - current liabilities; pass when long-term debt <= k * NCA
-    (G2b k = 1.0, E2 k = 1.10); value LTD / NCA, missing when NCA <= 0 (then the rule
-    fails unless LTD is 0).
+    (G2b k = 1.0, E2 k = 1.10); value LTD / NCA, missing when NCA <= 0. The rule then
+    fails, except at NCA = 0 with no long-term debt, which passes.
 earnings stability : g3_earnings_stability, e3_earnings_stability
     Pass when diluted EPS > 0 in each of the last n fiscal years (G3 10, E3 5); value
     the number of those years with EPS > 0; not evaluable until n consecutive years are
@@ -145,7 +145,10 @@ def g4_dividend_record(
     -------
     pd.DataFrame
         ``value`` the number of those years with a dividend, ``passed`` when all have
-        one. A company that never paid has value 0 and fails.
+        one. Evaluable only when the company's price history (``inputs.listed``) starts
+        by 1 January of year y - ``years``; a younger history gives NaN (phase-in, as
+        every rule whose window is not yet full). A company with the full history that
+        never paid has value 0 and fails.
     """
     index = inputs.price.index
     dividends = inputs.dividends
@@ -167,8 +170,13 @@ def g4_dividend_record(
     table = counts.to_numpy()
     upper = table[rows, rebalance_years - 1 - first]
     lower = table[rows, rebalance_years - years - 1 - first]
+    window_start = pd.to_datetime(
+        pd.Series(rebalance_years - years).astype(str) + "-01-01"
+    ).to_numpy()
+    listed = inputs.listed.reindex(symbols.astype("string")).to_numpy()
+    evaluable = pd.Series(listed <= window_start, index=index)
     value = pd.Series((upper - lower).astype(float), index=index)
-    return rule_result(value, value >= years, pd.Series(True, index=index))
+    return rule_result(value, value >= years, evaluable)
 
 
 def g5_earnings_growth(
@@ -215,7 +223,9 @@ def g7_moderate_price_to_assets(
 ) -> pd.DataFrame:
     """G7, spec §2.1: P/B at most ``max_pb`` (1.5), or P/E * P/B at most 22.5.
 
-    ``value`` is P/E * P/B. Fails when the average EPS or equity is zero or negative.
+    ``value`` is P/E * P/B. With an average EPS of zero or below, P/E and the product are
+    undefined, so the rule passes on P/B at most ``max_pb`` alone; with equity of zero or
+    below, P/B is undefined and the rule fails.
     """
     pe, pb = ratios["pe_average"], ratios["pb"]
     product = pe * pb

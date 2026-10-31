@@ -1,13 +1,13 @@
 """
 value_investing/holding.py
 --------------------------
-Buy and hold: a fixed amount every year into that year's picks, never sold.
+Buy and hold: a fixed amount at every decision (January and July) into its picks, never sold.
 
 Each decision date, ``amount_usd`` buys the companies picked (``value_investing.
 evaluation.ranked_positions``, buy side) at their weights; every purchase (a lot) is
 held to ``end`` with dividends reinvested (``adj_close``). The same amount on the same
 dates goes into each comparison (``^SP500TR``, ``BRK-B``). An investor who starts in a
-given year buys every year from then on, so a scenario is the set of lots from its start
+given year buys at every decision from then on, so a scenario is the set of lots from its start
 year. ``rule_profile`` compares the rule points of the picks that beat the S&P 500 since
 purchase with those of the picks that did not.
 
@@ -78,8 +78,8 @@ dollar view of winners and losers, payoff ratio : dollar_view
 
 Dependency rule
 ---------------
-pandas, ``skatkis.financial_logic`` and ``value_investing`` (``inputs``, ``rules``,
-``scoring``).
+pandas, ``skatkis.analysis``, ``skatkis.financial_logic`` and ``value_investing``
+(``inputs``, ``rules``, ``scoring``).
 """
 
 from collections.abc import Sequence
@@ -87,6 +87,7 @@ from dataclasses import dataclass
 
 import pandas as pd
 
+from Toolbox.skatkis.analysis import rank_correlation
 from Toolbox.skatkis.financial_logic import (
     DAYS_PER_YEAR,
     annualised_relative_return,
@@ -313,8 +314,10 @@ def _value_path(
             if str(symbol) in levels
             else pd.Series(float("nan"), index=levels.index)
         )
-        # A lot without prices stays in cash at its amount.
-        growth = (series / series.get(pd.Timestamp(day), float("nan"))).fillna(1.0)
+        # After its last price a lot keeps that price, as in ``buy_and_sell``; a lot
+        # without a price on its purchase date stays in cash at its amount.
+        start = series.get(pd.Timestamp(day), float("nan"))
+        growth = (series / start).ffill().fillna(1.0)
         value += float(amount) * growth.where(held, 0.0)
         invested += float(amount) * held
     return pd.DataFrame(
@@ -339,7 +342,7 @@ def rule_profile(
     Returns
     -------
     pd.DataFrame
-        Columns ``rule``, ``group`` (``beat the S&P 500`` or ``did not``), ``points``
+        Columns ``rule``, ``group`` (``beat the index`` or ``did not``), ``points``
         (mean, 0 to 5, each pick weighted by the size of its dollars ahead or behind
         the S&P 500) and ``picks``; a pick with a missing point is left out of that
         rule's mean.
@@ -354,7 +357,7 @@ def rule_profile(
     graded["group"] = (
         graded["annualised_excess"]
         .gt(0)
-        .map({True: "beat the S&P 500", False: "did not"})
+        .map({True: "beat the index", False: "did not"})
     )
     rows: list[dict[str, object]] = []
     for group, part in graded.groupby("group"):
@@ -465,8 +468,7 @@ def rule_weighting(
                 "points_not": _weighted_mean(points[~beat], size[~beat]),
                 "gap": _weighted_mean(points[beat], size[beat])
                 - _weighted_mean(points[~beat], size[~beat]),
-                # Spearman's correlation is Pearson's on the ranks (average for ties).
-                "ic": float(both["p"].rank().corr(both["x"].rank())),
+                "ic": rank_correlation(both["p"], both["x"]),
             }
         )
     return pd.DataFrame(rows)
@@ -478,10 +480,9 @@ def weighting_quality(check: pd.DataFrame) -> dict[str, float]:
     Above 0, the rules that weigh more were the ones whose points went with the picks
     that did better; below 0, the weighting favoured the wrong rules.
     """
-    weight = check["weight"].rank()
     return {
-        "weight_vs_gap": float(weight.corr(check["gap"].rank())),
-        "weight_vs_ic": float(weight.corr(check["ic"].rank())),
+        "weight_vs_gap": rank_correlation(check["weight"], check["gap"]),
+        "weight_vs_ic": rank_correlation(check["weight"], check["ic"]),
     }
 
 
@@ -588,8 +589,8 @@ def buy_and_sell(  # noqa: PLR0913  one keyword per setting of the run
 
     Notes
     -----
-    Holdings are counted in units of ``adj_close``, so dividends stay invested. Each
-    January the sales come first, then the proceeds and ``amount_usd`` buy the picks.
+    Holdings are counted in units of ``adj_close``, so dividends stay invested. At each
+    decision the sales come first, then the proceeds and ``amount_usd`` buy the picks.
     A holding without a score on the score date is kept; money a missing price leaves
     unspent stays in cash. Only the new money counts as money put in; the
     money-weighted return uses it and the value at ``end``.

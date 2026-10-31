@@ -59,13 +59,41 @@ The user's plan after VI_202610_002, in order:
    BTC VWAP work in `notebooks/optimise_strategies.ipynb` (high-frequency triggers
    there; one quarterly decision here). → S_202610_006
 
+### The process so far: from proof of concept to judging a model (2026-10-31, open)
+
+The order followed so far, and the next stage the user set (2026-10-31):
+
+1. **Data.** S&P 500 fundamentals from EDGAR (first-reported, keyed to the filing
+   date), Yahoo prices and dividends, the membership from Wikipedia (MD_202610_001,
+   MD_202610_002).
+2. **Rules and score.** The Graham, Buffett and Munger rules scored and binned per
+   company and date, weighted by pass rate and past success (VI_202610_002 to
+   VI_202610_005).
+3. **Proof of concept.** The value report (VI_202610_006): yearly picks bought and
+   held, or sold when the score falls, against the S&P 500 and Berkshire Hathaway.
+   The wallets beat the index, with the biases stated (today's members only,
+   look-ahead in the tag choice), so the result is provisional.
+4. **Next: the framework for judging a model**, before any parameter is tuned:
+   - reliability on companies the model has not seen, from the same sources: the S&P
+     400 and 600, then a rule-based US universe (MD_202610_004); other exchanges were
+     surveyed and set aside (`midas/toolbox/market_data/notes.md`);
+   - a look at what the model does: each pick's price with its buys and sales, and the
+     USD traded (VI_202610_007). The first look showed the user picks they would not
+     buy and losers held for years ("Picks with weak past returns", "The wallet keeps
+     its losers" below).
+5. **Later: optimisation** of the parameters (thresholds, weights, the sell rule),
+   out-of-sample, as the researcher's workflow sets out (S_202610_006).
+
+The rule behind step 4 is recorded in `midas/instructions/researcher.md` ("Judge the
+model before tuning it").
+
 ### Follow-ups pencilled in after the warden's first run (2026-10-31, open)
 
 Put off by the user as not urgent (2026-10-31); details in VI_202610_006, "Warden
 report":
 
-1. The tag-choice fix (point-in-time label choice), with the user's approval; the two
-   strict-xfail tests then pass (MD_202610_002).
+1. The tag-choice fix (point-in-time label choice): done 2026-11-01 (MD_202610_002);
+   the two strict-xfail tests pass.
 2. Historical S&P 500 members, to remove the survivorship bias (MD_202610_002).
 3. JSE data and the Top 40 comparison: returns-only first, or a paid fundamentals
    source (MD_202610_003).
@@ -114,7 +142,9 @@ leaves little out-of-sample history. Options, for the user to decide:
 - A paid source with point-in-time fundamentals before 2009.
 - Rules phased in: each rule applies only from the first date its window is full.
 
-Decided 2026-10-31: the first three options, recorded in VI_202610_002.
+Decided 2026-10-31, recorded in VI_202610_002: dividend history from the price source,
+the windows as explicit parameters (Graham's and Buffett's values by default), and
+rules phased in until their window is full. G4's phase-in was built on 2026-11-01.
 
 ### Universe looks ahead: today's members scored in the past (2026-10-31, open)
 
@@ -127,7 +157,30 @@ punishes any short book: the equal-weighted wallet of every scored company beats
 removed from the index are still missing until the historical membership of
 MD_202610_002 exists. A methodology change; to be approved by the user.
 
-### Tag choice looks ahead (2026-10-31, open → MD_202610_002)
+### The wallet keeps its losers (2026-10-31, open)
+
+Seen in the first price-history figure (VI_202610_007). The investor who started in
+2023 sold almost nothing in three years: two small trims of Intel (about 4 USD), while
+Skyworks was bought six times in a row as its price fell from about 110 to 65 USD. The
+sell rule looks only at the score (sell below a 0-to-1 score of 0.4), and a company
+whose price falls while its fundamentals hold scores higher, not lower, so the rule
+never fires on it. Whether a price-based exit, a holding limit or a cap on repeat
+purchases helps is a hypothesis for the researcher, once the framework for judging a
+model is in place (`researcher.md`, "Judge the model before tuning it"); the user
+noted (2026-10-31) that the parameters can be optimised later.
+
+### Picks with weak past returns: value traps (2026-10-31, open)
+
+The user looked up the last five years of the 2026-10-30 picks (First Solar, Cognizant,
+Snap-on, Skyworks, ResMed) and would not buy them. A cheap-on-fundamentals screen
+favours companies whose price has fallen, and some fall for a reason (value traps).
+A price-trend or momentum condition (for example: no pick whose 12-month return lags
+the S&P 500 by more than a threshold) would address it, but it is a methodology
+change: a new rule, to be tested as a hypothesis out-of-sample (the researcher, on
+the broader universe of MD_202610_004), not set by looking at today's picks. The price
+history in the report (VI_202610_007) shows the problem first.
+
+### Tag choice looks ahead (2026-10-31, resolved 2026-11-01 in MD_202610_002)
 
 Found by a truncation test (VI_202610_006): cutting the facts at a decision date t
 (filed <= t), prices and dividends at t, and recomputing the scores gives the same
@@ -140,6 +193,8 @@ depends on later filings (Martin Marietta's intangible assets: price to tangible
 5.07 cut, 4.23 full, on 2018-12-21). Fix: choose the tag from filings dated on or before
 each decision date, and keep the truncation test as a unit test over every decision
 date. A change to point-in-time handling: methodology, for the user to approve.
+Approved and built 2026-11-01: the tag is chosen from the filings made by each date; the
+truncation test passes on all three dates.
 
 Other forward information the scores still carry, stated with every result: the
 universe is today's S&P 500 members (companies that left the index are missing; those

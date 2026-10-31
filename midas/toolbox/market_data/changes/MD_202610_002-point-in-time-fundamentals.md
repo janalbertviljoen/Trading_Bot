@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | ready |
+| Status | in progress |
 | Priority | high |
 | Kind | new capability |
 | Depends on | S_202610_001, MD_202610_001 |
@@ -55,6 +55,26 @@ rules either look ahead or use restated values.
 - 2026-10-31 (user): 20 years of history where EDGAR has it; shorter histories stay as
   they are, and rules needing more years return NaN.
 - 2026-10-31 (user): REITs and financial companies are excluded from the universe.
+- 2026-10-31 (user): the tag choice is made point-in-time. The rule above stands (the
+  most recently used tag is canonical), but on each date only filings made by then
+  decide which tag is the latest. Fixes the look-ahead the warden confirmed
+  (VI_202610_006, warden report N1). A methodology change: scores on dates before a
+  company switched tags may change; expected small, as the picks were the same on the
+  three check dates.
+
+## Notes
+
+- 2026-10-31: first slice built in `Toolbox/market_data/fundamentals.py` (not a
+  `layers/` module as the approach says): annual first-reported 10-K values keyed to
+  their filing date, with lags (`annual_series`, `annual_as_of`). Trailing twelve months,
+  the latest quarter and the historical universe are not built yet.
+- 2026-11-01: the tag choice made point-in-time (decision above): `annual_as_of` takes
+  the facts and, on each date, chooses the tags from the filings made by then. The
+  truncation check of the value report finds no score that changes when the inputs are
+  cut at the date; the two strict-xfail tests now pass. On the S&P 500 data of
+  2026-10-31, together with G4's phase-in (VI_202610_002): 6,035 of 20,290 company-dates
+  changed score (4,892 of them G4 moving from failed to not evaluated); the 2016
+  investor's picks changed on 4 of 21 decisions; the wallets moved by under 2%.
 
 ## Kickoff prompt
 

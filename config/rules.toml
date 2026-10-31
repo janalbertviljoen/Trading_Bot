@@ -10,6 +10,11 @@ start = 2009-01-01
 months = [3, 6, 9, 12]
 # Fiscal years of EDGAR history kept per date: the longest window (G5, 13 years).
 history_years = 13
+# A fiscal year end may lie this many days from whole years before the latest one
+# (otherwise the history is cut there); a company whose latest fiscal year ended more
+# than stale_days before the date is not scored on it.
+year_tolerance_days = 45
+stale_days = 550
 
 [valuation]
 # Years in the average EPS of P/E (G6, G7).
@@ -19,6 +24,9 @@ average_years = 3
 # A company is scored (and ranked) on a date only when at least this many rules are
 # evaluable for it (user, 2026-10-31).
 min_available = 5
+# Fewest companies with both values for a rank correlation on a date (rule weights,
+# information coefficient, correlation curve).
+min_companies = 20
 
 # score_binned (VI_202610_004): per rule and date, the companies are graded into this
 # many equal-sized buckets by the rule's value, best bucket buckets - 1 points, worst 0;
@@ -161,9 +169,10 @@ start_usd = 100.0
 compare = ["BRK-B"]
 
 [report]
-# Buy-and-hold report (VI_202610_006): every January amount_usd buys the top `names`
+# Buy-and-hold report (VI_202610_006): every decision (decision_months) amount_usd buys the top `names`
 # ([wallet]) by score_column ([ledger]) in the first universe view, never sold; the
-# same money goes into each of `compare` (S&P 500 first). One investor per start year.
+# same money goes into the index's benchmark (config/indices.toml) and each of `compare`.
+# One investor per start year.
 start_years = [2016, 2020, 2023, 2025]
 # The investor the abstract, conclusions and detailed views follow: a recent start, so
 # fewer of the companies that failed and left the index are missing (user, 2026-10-31).
@@ -172,8 +181,8 @@ reference_start = 2020
 # July), amount_usd at each.
 decision_months = [1, 7]
 amount_usd = 100.0
-compare = ["^SP500TR", "BRK-B"]
-# The wallet with sells (user, 2026-10-31): each January a holding whose 0-to-1 score
+compare = ["BRK-B"]
+# The wallet with sells (user, 2026-10-31): at each decision a holding whose 0-to-1 score
 # (share_column) is at or below sell_threshold sells (sell_threshold - s) /
 # sell_threshold of itself; the proceeds and amount_usd buy that year's picks.
 share_column = "score_weighted_share"
@@ -184,3 +193,14 @@ peer_label = "Magnificent 7"
 # each of these rebalance dates and compares them with the full run.
 lookahead_dates = [2018-12-21, 2022-12-16, 2025-12-19]
 sell_threshold = 0.4
+# Price history of the picks (VI_202610_007, user, 2026-10-31): the companies the
+# investor from pick_scenario traded and the next picks, over the last pick_years years.
+# The weighting test's verdict: above verdict_band the rule weights favour the rules
+# that told winners from losers, below -verdict_band the wrong ones.
+verdict_band = 0.3
+pick_scenario = 2023
+pick_years = 5
+# More companies than pick_page (one page of panels): only the pick_ends best and the
+# pick_ends worst are shown.
+pick_page = 20
+pick_ends = 5

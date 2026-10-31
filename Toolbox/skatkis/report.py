@@ -32,7 +32,7 @@ Section(title, text, figures, subsections)
 Document(title, subtitle, abstract, sections, appendix, contents)
     A whole report, with or without a table of contents.
 write_latex(path, document)
-    Write the ``.tex`` file with a table of contents, links between sections and an
+    Write the ``.tex`` file with an optional table of contents, links between sections and an
     appendix; figures are referenced relative to it.
 compile_pdf(tex, *, engine, cache)
     Run the engine (``tectonic``, ``latexmk`` or ``pdflatex``) and return the PDF path.
@@ -309,7 +309,7 @@ def _table(table: Table) -> list[str]:
     """Return the LaTeX of a table with horizontal rules.
 
     A table of up to ``MAX_UNBROKEN_ROWS`` rows is kept whole on one page, moving to the
-    next page if it does not fit (user, 2026-10-31); a longer one breaks across pages
+    next page if it does not fit; a longer one breaks across pages
     and repeats its header.
     """
     header = " & ".join(escape(h) for h in table.header) + " \\\\"

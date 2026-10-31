@@ -3,7 +3,7 @@
 import pandas as pd
 import pytest
 
-from Toolbox.market_data.fundamentals import annual_as_of, annual_series
+from Toolbox.market_data.fundamentals import annual_as_of
 
 PREFERRED = "IntangibleAssetsNetExcludingGoodwill"  # tag_priority 0
 NARROWER = "FiniteLivedIntangibleAssetsNet"  # tag_priority 1
@@ -57,7 +57,14 @@ def facts() -> pd.DataFrame:
 
 def _latest(facts: pd.DataFrame) -> pd.Series:
     """Return the lag-0 row of AAA's intangible assets on ``DAY``."""
-    known = annual_as_of(annual_series(facts, ["intangible_assets"]), [DAY], depth=3)
+    known = annual_as_of(
+        facts,
+        ["intangible_assets"],
+        [DAY],
+        depth=3,
+        tolerance_days=45,
+        stale_days=550,
+    )
     return known[known["lag"] == 0].iloc[0]
 
 
@@ -79,10 +86,5 @@ def test_cutting_the_facts_at_the_date_gives_the_reference_value(
     assert _latest(facts[facts["filed"] <= DAY])["value"] == 100.0
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="known leak: select_tags ranks tags by their use in later filings; fix "
-    "pending the user's approval (MD_202610_002). Remove this mark with the fix.",
-)
 def test_the_tag_choice_does_not_use_later_filings(facts: pd.DataFrame) -> None:
     assert _latest(facts)["value"] == 100.0

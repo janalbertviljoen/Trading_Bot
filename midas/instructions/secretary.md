@@ -51,6 +51,7 @@ user steer. Do not run checks or tests when picking up or discussing a change.
 | `toolbox/<component>/design/<ID>-<slug>.md` | The design for a change, when it needs one: target structure, approach, steps; no decisions or history |
 | `toolbox/<component>/notes.md` | Drafts: ideas, questions and observations kept over time |
 | [toolbox/_template.md](../toolbox/_template.md) | Copy this to add a change |
+| [assay/notes.md](../assay/notes.md) | Drafts for Project Assay, the consumer app planned on this research |
 | `instructions/` | The agent instructions: `AGENTS.md`, one file per hat, `writing.md`, `guard.md` and `CLAUDE.md` |
 
 ## Naming convention for changes

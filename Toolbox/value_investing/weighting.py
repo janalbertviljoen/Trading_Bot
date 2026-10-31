@@ -6,35 +6,32 @@ that had already followed it by the decision date.
 
 For each rule and earlier rebalance date s, the rank correlation across companies of the
 rule's bucket points on s (``value_investing.scoring.rule_points``) with each company's
-return from s to s + ``months`` less ``^SP500TR``'s. On decision date t a rule's weight
-is the mean of those correlations over the last ``window`` dates s whose return window
-had closed by t (s + ``months`` <= t), and 0 when the mean is negative (user,
-2026-10-31). For a decision in January 2025 with 12-month windows and a window of 12,
-that is the grades of 2020 to 2023 and their returns up to December 2024: everything
-used was known at t. The weights still depend on the universe: with today's members on
+return from s to s + ``months`` less the benchmark's. On decision date t a rule's
+weight is the mean of those correlations over the last ``window`` dates s whose return
+window had closed by t (s + ``months`` <= t), and 0 when the mean is negative. For a
+decision in January 2025 with 12-month windows and a window of 12, that is the 12
+quarterly grades of March 2021 to December 2023 and their returns up to December 2024:
+everything used was known at t. The weights still depend on the universe: with today's members on
 past dates they learn from companies that later joined the index.
 
-``static_weights`` freezes one set of weights instead (user, 2026-10-31): each rule's
+``static_weights`` freezes one set of weights instead: each rule's
 mean correlation over every window closed by ``until`` (the end of the in-sample
 period), used unchanged on every date. Decisions before ``until`` then use weights
 fitted partly on their own outcomes and are in-sample; decisions after it are a test.
 
 Owns
 ----
-The forward excess return used for learning, the rule correlations per date and the
-correlation weights.
+The rule correlations per date and the correlation weights.
 
 Must not
 --------
-Grade or score (``value_investing.scoring``); define returns
-(``skatkis.financial_logic``); choose companies (``value_investing.evaluation``).
+Grade or score (``value_investing.scoring``); compute returns
+(``value_investing.inputs.window_returns``); choose companies
+(``value_investing.evaluation``).
 
 Public API
 ----------
-forward_excess(prices, index, *, benchmark, months)
-    Each company's return over the next months less the benchmark's, with the window's
-    end date.
-rule_correlations(points, excess)
+rule_correlations(points, excess, *, min_companies)
     Per date and rule, the rank correlation of points and forward excess.
 correlation_weights(correlations, ends, *, window)
     Per date, each rule's mean correlation over the last closed windows, floored at 0.
@@ -43,11 +40,10 @@ static_weights(correlations, ends, *, until)
 
 Computes
 --------
-forward excess return for learning : forward_excess
-    x(s) = P(s + m) / P(s) - B(s + m) / B(s), ``adj_close`` levels, m months.
 rule information coefficient, rank IC : rule_correlations
-    Spearman correlation across companies of points_r(s) and x(s), dates with at least
-    ``MIN_COMPANIES`` companies.
+    Spearman correlation across companies of points_r(s) and the excess return x(s)
+    over the next m months (``value_investing.inputs.window_returns``), dates with at
+    least ``min_companies`` companies.
 correlation weight, learned rule weight : correlation_weights
     w_r(t) = max(0, mean of IC_r(s) over the last ``window`` dates s with end(s) <= t);
     missing when no window has closed.
@@ -57,64 +53,17 @@ static correlation weight, frozen rule weight : static_weights
 
 Dependency rule
 ---------------
-pandas, ``skatkis.financial_logic`` and ``value_investing.inputs``.
+pandas and ``skatkis.analysis``.
 """
 
 import pandas as pd
 
-from Toolbox.skatkis.financial_logic import holding_return
-from Toolbox.value_investing.inputs import price_on
-
-MIN_COMPANIES = 20
+from Toolbox.skatkis.analysis import rank_correlation
 
 
-def forward_excess(
-    prices: pd.DataFrame, index: pd.MultiIndex, *, benchmark: str, months: int
+def rule_correlations(
+    points: pd.DataFrame, excess: pd.Series, *, min_companies: int
 ) -> pd.DataFrame:
-    """Return each company's return over the next ``months`` less the benchmark's.
-
-    Parameters
-    ----------
-    prices : pd.DataFrame
-        Columns ``symbol``, ``date``, ``adj_close``, including ``benchmark``.
-    index : pd.MultiIndex
-        (``symbol``, ``date``) rows to compute it for.
-    benchmark : str
-        Total-return benchmark symbol.
-    months : int
-        Length of the window.
-
-    Returns
-    -------
-    pd.DataFrame
-        On ``index``: ``end`` (the window's end date) and ``excess`` (fraction, missing
-        where a level is missing or the window ends after the last benchmark price).
-    """
-    frame = index.to_frame(index=False)
-    frame["end"] = frame["date"] + pd.DateOffset(months=months)
-    last = prices.loc[prices["symbol"] == benchmark, "date"].max()
-    days = sorted({*frame["date"], *frame["end"]})
-    symbols = pd.concat([frame["symbol"], pd.Series([benchmark])]).drop_duplicates()
-    levels = price_on(prices, symbols, days, column="adj_close")
-
-    def level(symbol: pd.Series, day: pd.Series) -> pd.Series:
-        keys = pd.MultiIndex.from_arrays([symbol.astype("string"), day])
-        return pd.Series(levels.reindex(keys).to_numpy(dtype=float), index=frame.index)
-
-    market = pd.Series(benchmark, index=frame.index)
-    own = holding_return(
-        level(frame["symbol"], frame["date"]), level(frame["symbol"], frame["end"])
-    )
-    index_return = holding_return(
-        level(market, frame["date"]), level(market, frame["end"])
-    )
-    excess = (own - index_return).where(frame["end"] <= last)
-    return pd.DataFrame(
-        {"end": frame["end"].to_numpy(), "excess": excess.to_numpy()}, index=index
-    )
-
-
-def rule_correlations(points: pd.DataFrame, excess: pd.Series) -> pd.DataFrame:
     """Return, per date and rule, the Spearman correlation of points and excess.
 
     Parameters
@@ -123,12 +72,14 @@ def rule_correlations(points: pd.DataFrame, excess: pd.Series) -> pd.DataFrame:
         ``<id>_points`` per rule, indexed (``symbol``, ``date``).
     excess : pd.Series
         Forward excess return on the same index.
+    min_companies : int
+        Fewest companies with both for a correlation on a date.
 
     Returns
     -------
     pd.DataFrame
         One row per date, one column per points column; missing where fewer than
-        ``MIN_COMPANIES`` companies have both.
+        ``min_companies`` companies have both.
     """
     dates = points.index.get_level_values("date")
     rows: dict[pd.Timestamp, dict[str, float]] = {}
@@ -139,11 +90,10 @@ def rule_correlations(points: pd.DataFrame, excess: pd.Series) -> pd.DataFrame:
         row: dict[str, float] = {}
         for column in points.columns:
             both = pd.DataFrame({"p": part[column], "x": target}).dropna()
-            if len(both) < MIN_COMPANIES:
+            if len(both) < min_companies:
                 row[column] = float("nan")
                 continue
-            # Spearman's correlation is Pearson's on the ranks (average ranks for ties).
-            row[column] = float(both["p"].rank().corr(both["x"].rank()))
+            row[column] = rank_correlation(both["p"], both["x"])
         rows[pd.Timestamp(day)] = row
     return pd.DataFrame.from_dict(rows, orient="index").rename_axis(index="date")
 

@@ -8,17 +8,18 @@ grades.
 Each rule's flag is 1 (passed), 0 (failed) or missing (not evaluable). ``score`` is the
 mean of the flags that exist, from 0 to 1, so it does not depend on how many rules could
 be evaluated on the date and stays comparable over time while long-window rules phase
-in (user, 2026-10-31). A company evaluable on fewer than ``min_available`` rules on a
-date has no total score there and is not ranked (5, user, 2026-10-31).
+in. A company evaluable on fewer than ``min_available`` rules on a
+date has no total score there and is not ranked (5 in ``config/rules.toml``).
 ``n_passed`` and ``n_available`` keep the counts.
 
-``score_binned`` replaces the pass/fail cut by a grade (VI_202610_004, user 2026-10-31):
+``score_binned`` replaces the pass/fail cut by a grade:
 on each date, the companies evaluable on a rule are put in ``buckets`` (6) equal-sized
 groups by the rule's value, from best to worst; the best group earns ``buckets - 1``
 (5) points, the worst 0. A company evaluable on a rule whose value is undefined (a P/E
-on negative earnings) earns 0. ``score_binned`` is the sum of the points (0 to 75 with
-15 rules), which tells companies just past a cut-off from clear winners; it grows with
-the number of evaluable rules, so it is compared between companies on the same date.
+on negative earnings) earns 0. ``score_binned`` is the sum of the points (at most
+``buckets - 1`` per rule: 0 to 80 with 16 rules), which tells companies just past a
+cut-off from clear winners; it grows with the number of evaluable rules, so it is
+compared between companies on the same date.
 The grades come from the date's own companies, so they use nothing from later dates.
 
 The score is given in total and per rule family. This is a convention of this
@@ -26,7 +27,7 @@ repository, not a published method; every rule counts once, so concepts tested b
 than one rule (the current ratio in G2a and E1) weigh more.
 
 ``score_binned_weighted`` weighs each rule's points by how hard the rule is to pass on
-the date (VI_202610_004, user 2026-10-31): w_r = 1 - the share of evaluable companies
+the date: w_r = 1 - the share of evaluable companies
 passing its threshold, so a rule every company passes weighs 0 and one nobody passes
 weighs 1. The weights are independent of each other (they need not sum to 1) and come
 from the date's own companies.
@@ -164,7 +165,7 @@ def score(
     flags : pd.DataFrame
         One column per rule pass flag (1.0, 0.0 or NaN); not modified.
     families : Mapping[str, str]
-        Pass-flag column to family (``G``, ``E``, ``B``).
+        Pass-flag column to family (``G``, ``E``, ``B``, ``N``).
     points : pd.DataFrame
         ``rule_points`` output on the same index.
     min_available : int
@@ -236,7 +237,9 @@ def learned_score(
     pd.Series
         The score on ``points``' index; a missing point counts as 0.
     """
-    per_row = weights.reindex(points.index.get_level_values("date"))[points.columns]
+    per_row = weights.reindex(
+        index=points.index.get_level_values("date"), columns=points.columns
+    )
     values = per_row.to_numpy(dtype=float)
     total = np.nansum(values, axis=1)
     weighted = np.nansum(values * points.fillna(0.0).to_numpy(dtype=float), axis=1)

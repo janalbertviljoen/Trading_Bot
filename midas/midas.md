@@ -68,3 +68,7 @@ until the portfolio engine (S_202610_006) replaces it. The index and the rename 
 | 2026-10-31 | Reports are LaTeX documents compiled to PDF; the secretary owns their writing and formatting (text in `config/report_*.toml`), the developer the rendering code | user |
 | 2026-10-31 | When asked to run updates, the data update, the check and the LaTeX compile run outside the sandbox (local settings file, git-ignored) | user |
 | 2026-10-31 | Current focus: the value-investing tool, starting with S&P 500 data extraction, and the wallet as backtest engine; the BTC strategy moves to the sandbox | user |
+| 2026-10-31 | The S&P 500 value tool is a proof of concept; the next step is the framework for judging a model (reliability on a broader US universe, MD_202610_004; the picks' price history and trades, VI_202610_007), before any parameter optimisation; recorded in `researcher.md` | user |
+| 2026-10-31 | Pure renames and moves are staged and committed directly, on their own, without asking; other commits still wait for the user (`AGENTS.md`, Working rules) | user |
+| 2026-10-31 | Reliability is tested on a broader US universe from the same EDGAR and Yahoo sources (S&P 1500 first, then a rule-based universe), not on other exchanges; the survey of exchanges is in `toolbox/market_data/notes.md` | user |
+| 2026-11-01 | Project Assay: a consumer app planned on this research, with Midas as its chat assistant; a product only after a strategy proves itself out-of-sample; drafts in `assay/notes.md` | user |

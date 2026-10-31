@@ -13,6 +13,8 @@ Naming and workflow: `midas/instructions/secretary.md`. The methodology is in
 | [VI_202610_004](changes/VI_202610_004-ranked-wallet-binned-score.md) | Ranked wallet and binned score | new capability | in progress | high | VI_202610_002, VI_202610_003 |
 | [VI_202610_005](changes/VI_202610_005-return-correlation-weights.md) | Rule weights from past return correlation, NI1 and the universe on the date | methodology | in progress | high | VI_202610_004 |
 | [VI_202610_006](changes/VI_202610_006-value-report.md) | Value report: buy-and-hold picks, value over time, rules behind the winners | new capability | in progress | high | VI_202610_005 |
+| [VI_202610_007](changes/VI_202610_007-pick-price-history.md) | Price history of the picks in the value report | new capability | in progress | high | VI_202610_006 |
+| [VI_202610_008](changes/VI_202610_008-conservative-and-unicorn-hunter.md) | Two strategies: the conservative picker (S&P 500 top 5, twice a year) and the unicorn hunter (top 20 of all companies, quarterly) | methodology | in discussion | high | MD_202610_004, S_202610_008 |
 
 ## Done
 

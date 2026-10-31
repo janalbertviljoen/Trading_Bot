@@ -27,8 +27,9 @@ table. In one line each:
    result that used a later filing, SEC's `frame`, or today's figures is invalid, not
    just less accurate.
 2. **A value's period is `period_start` to `period_end`.** EDGAR's `fiscal_year` and
-   `fiscal_period` belong to the filing that reported it. A field follows the company's
-   most recently used tag (`market_data.clean.select_tags`).
+   `fiscal_period` belong to the filing that reported it. A field follows the tag the
+   company used most recently by the date, chosen from the filings made by then
+   (`market_data.fundamentals.annual_as_of`); later filings never decide it.
 3. **Never divide an adjusted price by an as-reported figure.** Yahoo prices and
    dividends are split-adjusted as of the fetch date; EDGAR per-share figures are not.
    Undo the split adjustment with the splits table, or compare company totals with

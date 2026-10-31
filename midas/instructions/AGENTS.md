@@ -143,6 +143,10 @@ and is never committed or sent to another service.
 - **Do not commit, push or rewrite history unless asked.** Leave changes in the working
   tree so the user can review them. Creating or switching a branch is fine when the
   user asks for it; committing to it is a separate request.
+- **Renames are the exception: stage and commit them directly** (user, 2026-10-31). A
+  pure move or rename of files (`git mv`) is committed on its own, with no content
+  change in the same commit, so the history shows the move and the review shows only
+  real changes. Never push.
 - Before editing a file, read the rules that govern it: the matching
   `.claude/rules/*.md` (each names the paths it governs), or the Midas index's
   `rules_for(path)` once it exists.

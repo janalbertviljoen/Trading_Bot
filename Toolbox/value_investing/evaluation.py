@@ -22,7 +22,7 @@ Must not
 --------
 Compute the score (``value_investing.scoring``); define returns
 (``skatkis.financial_logic``); trade, size or rebalance a portfolio
-(``skatkis.backtest``, S_202610_006); plot (``value_investing.plots``).
+(``skatkis.backtest``); plot (``value_investing.plots``).
 
 Public API
 ----------
@@ -50,6 +50,8 @@ ranked_wallet(positions, prices, wallet, settings, *, benchmark)
     The ranked wallet's return and excess per decision.
 correlation_curve(table, prices, dates, settings, *, benchmark)
     Rank correlation of score and forward excess return per horizon.
+short_path(path)
+    A ranked wallet's sell book as a model path of its own.
 
 Computes
 --------
@@ -66,33 +68,35 @@ model score, annualised excess of the buy wallet : model_score
     the last window's end.
 ranked book weights : book_weights
     The ``names`` highest (buy) or lowest (sell) scores, extended by ties at the cut-off.
-    ``score``: buy w = s / Σ s over the bought companies (user, 2026-10-31), sell equal
+    ``score``: buy w = s / Σ s over the bought companies, sell equal
     weights; ``rank``: the rank weights, tied companies sharing the mean of the weights
     of the ranks they span, normalised to sum 1. Equal weights when the sum is 0.
 ranked wallet excess : ranked_wallet
     Per book, e = Σ a e_i / A, with a each position's USD, e_i its excess (buy r - b,
     sell b - r) and A the book's money; the wallet is the buy book: wallet return = b +
     e_buy, the index plus the excess. The sell book's e is reported beside it.
+short book return : short_path
+    The sell book's return as a model: b + e_sell, the index plus the sell book's excess.
 information coefficient by horizon, correlation wavelength : correlation_curve
     Per date and horizon h, the Spearman correlation across companies of score and
     r - b over h months; averaged per period.
 
 Dependency rule
 ---------------
-numpy, pandas, ``skatkis.financial_logic`` and ``value_investing.inputs``.
+numpy, pandas, ``skatkis.analysis``, ``skatkis.financial_logic`` and
+``value_investing.inputs``.
 """
 
 from collections.abc import Sequence
 from dataclasses import dataclass, replace
-from typing import cast
 
 import numpy as np
 import pandas as pd
 
-from Toolbox.skatkis.financial_logic import annualised_relative_return, holding_return
-from Toolbox.value_investing.inputs import price_on
+from Toolbox.skatkis.analysis import rank_correlation
+from Toolbox.skatkis.financial_logic import annualised_relative_return
+from Toolbox.value_investing.inputs import window_returns
 
-MIN_COMPANIES = 20
 SIDES = ("buy", "sell")
 
 
@@ -116,6 +120,8 @@ class Evaluation:
         Horizon of the model score.
     correlation_max_months : int
         Longest horizon of the rank correlation curve.
+    min_companies : int
+        Fewest companies for a rank correlation on a date (``[score]``).
     """
 
     first_year: int
@@ -126,6 +132,7 @@ class Evaluation:
     horizons_months: tuple[int, ...]
     score_horizon_months: int
     correlation_max_months: int
+    min_companies: int
 
     def period(self, day: pd.Timestamp) -> str:
         """Return ``in-sample`` or ``held-out`` for a decision date."""
@@ -193,15 +200,6 @@ def signals(
     return pd.concat(frames, ignore_index=True)
 
 
-def _levels(
-    prices: pd.DataFrame, symbols: pd.Series, dates: Sequence[pd.Timestamp]
-) -> pd.Series:
-    """Return ``adj_close`` on or before each date, indexed (``symbol``, ``date``)."""
-    return price_on(
-        prices, symbols.drop_duplicates(), sorted(set(dates)), column="adj_close"
-    )
-
-
 def holdings(
     signal_table: pd.DataFrame,
     prices: pd.DataFrame,
@@ -236,31 +234,27 @@ def holdings(
     frames: list[pd.DataFrame] = []
     for months in settings.horizons_months:
         ends = signal_table["decision_date"] + pd.DateOffset(months=months)
+        part = signal_table.assign(horizon_months=months, end_date=ends)[ends <= end]
+        returns = window_returns(
+            prices,
+            pd.MultiIndex.from_arrays(
+                [part["symbol"].astype("string"), part["decision_date"]],
+                names=["symbol", "date"],
+            ),
+            benchmark=benchmark,
+            months=months,
+        )
         frames.append(
-            signal_table.assign(horizon_months=months, end_date=ends)[ends <= end]
+            part.assign(
+                stock_return=returns["own_return"].to_numpy(),
+                benchmark_return=returns["benchmark_return"].to_numpy(),
+            )
         )
     held = pd.concat(frames, ignore_index=True)
-    symbols = pd.concat([held["symbol"], pd.Series([benchmark])])
-    days = [*held["decision_date"], *held["end_date"]]
-    levels = _levels(prices, symbols, days)
-
-    def level(symbol: pd.Series, day: pd.Series) -> pd.Series:
-        keys = pd.MultiIndex.from_arrays([symbol.astype("string"), day])
-        return pd.Series(levels.reindex(keys).to_numpy(dtype=float), index=held.index)
-
-    market = pd.Series(benchmark, index=held.index)
-    stock = holding_return(
-        level(held["symbol"], held["decision_date"]),
-        level(held["symbol"], held["end_date"]),
-    )
-    index = holding_return(
-        level(market, held["decision_date"]), level(market, held["end_date"])
-    )
+    stock, index = held["stock_return"], held["benchmark_return"]
     buy = held["side"] == "buy"
     size = settings.position_usd
     held = held.assign(
-        stock_return=stock,
-        benchmark_return=index,
         value=size * (1 + stock.where(buy, -stock)),
         benchmark_value=size * (1 + index),
         excess=(stock - index).where(buy, index - stock),
@@ -437,55 +431,40 @@ def correlation_curve(
     -------
     pd.DataFrame
         Columns ``date``, ``period``, ``horizon_months``, ``ic`` (Spearman), ``companies``;
-        dates with fewer than ``MIN_COMPANIES`` companies are left out.
+        dates with fewer than ``settings.min_companies`` companies are left out.
     """
     own = table[table["date"].isin(list(dates))].dropna(subset=["score"])
-    months = range(1, settings.correlation_max_months + 1)
-    end = pd.Timestamp(prices.loc[prices["symbol"] == benchmark, "date"].max())
-    ends = {
-        (pd.Timestamp(d), m): pd.Timestamp(d) + pd.DateOffset(months=m)
-        for d in dates
-        for m in months
-    }
-    days = [*dates, *ends.values()]
-    symbols = pd.concat([own["symbol"], pd.Series([benchmark])])
-    levels = (
-        _levels(prices, symbols, days)
-        .reset_index()
-        .pivot_table(index="date", columns="symbol", values="adj_close")
+    index = pd.MultiIndex.from_arrays(
+        [own["symbol"].astype("string"), own["date"]], names=["symbol", "date"]
     )
+    scores = pd.Series(own["score"].to_numpy(), index=index)
     rows: list[dict[str, object]] = []
-    for value in sorted(own["date"].unique()):
-        day = pd.Timestamp(value)
-        if day not in levels.index:
-            continue
-        part = own.loc[own["date"] == day]
-        # One row of a date-indexed table: a Series, which pandas' stubs cannot tell.
-        start = cast(pd.Series, levels.loc[day])
-        for month in months:
-            stop = ends[(day, month)]
-            if stop > end or stop not in levels.index:
-                continue
-            returns = holding_return(start, cast(pd.Series, levels.loc[stop]))
-            excess = returns.drop(benchmark) - returns[benchmark]
+    for month in range(1, settings.correlation_max_months + 1):
+        excess = window_returns(prices, index, benchmark=benchmark, months=month)
+        for value, part in excess["excess"].groupby(level="date"):
+            day = pd.Timestamp(str(value))
             both = pd.DataFrame(
-                {"score": part.set_index("symbol")["score"], "excess": excess}
+                {
+                    "score": scores.xs(day, level="date"),
+                    "excess": part.droplevel("date"),
+                }
             ).dropna()
-            if len(both) < MIN_COMPANIES:
+            if len(both) < settings.min_companies:
                 continue
-            # Spearman's correlation is Pearson's on the ranks (average ranks for ties).
-            ic = both["score"].rank().corr(both["excess"].rank())
             rows.append(
                 {
                     "date": day,
                     "period": settings.period(day),
                     "horizon_months": month,
-                    "ic": ic,
+                    "ic": rank_correlation(both["score"], both["excess"]),
                     "companies": len(both),
                 }
             )
-    return pd.DataFrame(
-        rows, columns=["date", "period", "horizon_months", "ic", "companies"]
+    columns = ["date", "period", "horizon_months", "ic", "companies"]
+    return (
+        pd.DataFrame(rows, columns=columns)
+        .sort_values(["date", "horizon_months"])
+        .reset_index(drop=True)
     )
 
 
@@ -560,6 +539,8 @@ def book_weights(scores: pd.Series, wallet: Wallet, *, side: str) -> pd.Series:
         strength = chosen
     else:
         strength = pd.Series(1.0, index=chosen.index)
+    if chosen.empty:
+        return chosen.astype(float)
     total = float(strength.sum())
     if total <= 0:
         return pd.Series(1 / len(chosen), index=chosen.index)
@@ -683,3 +664,15 @@ def ranked_wallet(
     path["wallet_return"] = path["benchmark_return"] + path["excess"]
     path["period"] = [settings.period(pd.Timestamp(d)) for d in path["decision_date"]]
     return path
+
+
+def short_path(path: pd.DataFrame) -> pd.DataFrame:
+    """Return a ranked wallet's sell book as a yearly path of its own.
+
+    ``path`` is ``ranked_wallet`` output; the sell book's return is the index's plus
+    its excess (``benchmark_return + short_excess``) and its hit rate the sell book's.
+    """
+    return path.assign(
+        wallet_return=path["benchmark_return"] + path["short_excess"],
+        hit_rate=path["short_hit_rate"],
+    )

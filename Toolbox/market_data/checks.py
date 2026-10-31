@@ -78,6 +78,7 @@ class CheckSettings:
     market: str
     sectors: Mapping[str, str]
     excluded: Sequence[str]
+    index: str = "sp500"
     recent_years: int = 5
     long_years: int = 10
     main_companies: int = 5
@@ -179,7 +180,7 @@ def run_checks(
     prices = read_table(yahoo / "prices.parquet")
     dividends = read_table(yahoo / "dividends.parquet")
     constituents = read_table(
-        storage.folder("constituents", as_of) / "constituents.parquet"
+        storage.folder("constituents", as_of) / settings.index / "constituents.parquet"
     )
     gics = gics_map(constituents, funds=settings.sectors, excluded=settings.excluded)
     gics = gics[gics["symbol"].isin(prices["symbol"])].reset_index(drop=True)

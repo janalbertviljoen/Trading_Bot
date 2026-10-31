@@ -80,7 +80,7 @@ result compounds; shorts come later. Three investors are compared: one who start
 - 2026-10-31 (user): the forward-information check goes into the report's appendix and
   into the unit tests.
 - 2026-10-31: the user's message was cut off at "We can assume every puch"; read as
-  "every purchase is held to today", to confirm.
+  "every purchase is held to today", confirmed by the user on 2026-11-01.
 
 ## Notes
 
@@ -537,5 +537,6 @@ user.
 
 ## Done when
 
-- `report` writes a PDF of about five pages with the picks, the value over time for the
-  three start years against the S&P 500 and Berkshire, and the rules behind the winners.
+- `report` writes a PDF (about fourteen pages, by the user's later decisions) with the
+  picks, the value over time for the four start years against the S&P 500 and
+  Berkshire, and the rules behind the winners.
