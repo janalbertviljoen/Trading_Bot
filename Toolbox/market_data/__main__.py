@@ -128,6 +128,7 @@ def _update(args: argparse.Namespace, storage: Storage) -> int:
     benchmarks = [
         config["benchmarks"]["market"],
         *config["benchmarks"]["sectors"].values(),
+        *config["benchmarks"].get("strategies", []),
     ]
     results: list[UpdateResult] = []
     ciks: list[int | str] = list(args.cik)
@@ -208,7 +209,7 @@ def _parser() -> argparse.ArgumentParser:
         "--ticker",
         nargs="*",
         default=[],
-        help="price symbols (the market and sector benchmarks are always added)",
+        help="price symbols (the market, sector and strategy benchmarks are always added)",
     )
     update.add_argument(
         "--universe",

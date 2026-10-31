@@ -57,6 +57,19 @@ A new engine in `Toolbox/skatkis/backtest/`, alongside the existing single-asset
   same metrics of the S&P 500 imported from an index source. Aggregates use the
   portfolio weights, each company's share of the portfolio's value (user, same day).
 
+- **Sell when a holding drops below the threshold** (user, 2026-10-31). A company
+  already in the wallet whose score falls below the buy threshold is sold, using the
+  short approach (VI_202610_003 and VI_202610_004 measure a sell as gaining when the
+  stock lags the index). It builds on the buy-and-hold wallet of VI_202610_006 and on
+  the trade logic of the single-asset wallet (`skatkis.backtest.wallet`). To discuss:
+  which threshold (the buy cut-off or a lower one, to avoid selling and buying back on
+  small moves), whether "sell" means selling the holding or also shorting it, and
+  where the money goes after a sale. Decided the same day (user): selling the holding
+  only, no short; each January a holding whose score on 0 to 1 is at or below 0.4
+  sells the share (0.4 - s) / 0.4 of itself, and the proceeds are reinvested with the
+  new 100 USD in that year's picks. Built first in the value tool's report
+  (VI_202610_006).
+
 ## Open decisions (user)
 
 - How a ratio is aggregated with the weights. Proposed: a weighted harmonic mean for

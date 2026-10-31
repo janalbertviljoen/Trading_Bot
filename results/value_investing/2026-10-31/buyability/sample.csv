@@ -1,0 +1,21 @@
+group,symbol,gics_sector,mean_score
+best,LEN,Consumer Discretionary,0.84
+best,NKE,Consumer Discretionary,0.80
+best,AOS,Industrials,0.79
+best,FAST,Industrials,0.77
+best,BG,Consumer Staples,0.75
+best,PCAR,Industrials,0.75
+best,HRL,Consumer Staples,0.71
+best,SNA,Industrials,0.71
+best,META,Communication Services,0.69
+best,STLD,Materials,0.68
+worst,ECHO,Communication Services,0.00
+worst,GDDY,Information Technology,0.06
+worst,LYV,Communication Services,0.08
+worst,FDXF,Industrials,0.10
+worst,BSX,Health Care,0.10
+worst,PANW,Information Technology,0.13
+worst,SOLV,Health Care,0.13
+worst,ADSK,Information Technology,0.14
+worst,KVUE,Consumer Staples,0.14
+worst,NCLH,Consumer Discretionary,0.14

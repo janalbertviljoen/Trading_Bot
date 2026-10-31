@@ -12,8 +12,8 @@ formatting per source, are in ``market_data.market_analysis``, which calls these
 
 Owns
 ----
-The plot layouts for series over time, coverage, normalised growth, scatter checks, two
-series on two axes and lag profiles; the lagged correlation.
+The plot layouts for series over time, coverage, normalised growth, scatter checks,
+grouped bars, two series on two axes and lag profiles; the lagged correlation.
 
 Must not
 --------
@@ -31,6 +31,8 @@ plot_normalised(df, *, x, y, group, highlight, ...)
     Growth of one unit per group from their first common date.
 plot_scatter(df, *, x, y, group, diagonal, ...)
     One value against another, optionally with the line y = x.
+plot_bars(df, *, x, y, group, ...)
+    A value per category as bars, side by side per group.
 plot_dual_axis(df, *, x, left, right, ...)
     Two series over the same horizontal axis, each on its own vertical axis.
 plot_relative(df, *, x, y, group, benchmark, second_benchmark, ...)
@@ -102,6 +104,7 @@ def plot_series(
     markers: bool = False,
     thresholds: Mapping[str, float] | None = None,
     panel: bool = False,
+    references: Mapping[str, str] | None = None,
 ) -> Figure:
     """Plot ``y`` against ``x``: one colour per ``group``, one line style per ``style``.
 
@@ -131,6 +134,9 @@ def plot_series(
     panel : bool
         A small figure (``PANEL``) with the legend inside, for grids of plots placed side
         by side in a report.
+    references : Mapping[str, str], optional
+        ``group`` values drawn thick and black in the given matplotlib line style
+        (``{"benchmark": "--"}``), so benchmarks stand out from every other line.
 
     Raises
     ------
@@ -155,21 +161,27 @@ def plot_series(
     colours = _palette(len(groups))
     figure = Figure(figsize=PANEL if panel else WIDE)
     axes = figure.add_subplot()
+    reference = dict(references or {})
     for (name, part), colour in zip(groups, colours, strict=True):
         thick = highlight is not None and name == highlight
         for index, value in enumerate(styles):
             line = part if value is None else part[part[style] == value]
+            if line.empty:
+                continue
             line = line.sort_values(x)
             label = name if value is None or index == 0 else None
+            if name in reference:
+                label = name
             axes.plot(
                 line[x],
                 line[y],
                 label=label,
-                color="black" if thick else colour,
-                lw=2.4 if thick else 1.2,
-                ls=LINE_STYLES[index % len(LINE_STYLES)],
+                color="black" if thick or name in reference else colour,
+                lw=2.4 if thick or name in reference else 1.2,
+                ls=reference.get(str(name), LINE_STYLES[index % len(LINE_STYLES)]),
                 marker="o" if markers else None,
                 ms=3,
+                zorder=3 if name in reference else 2,
             )
     if style:
         _style_key(axes, [str(v) for v in styles])
@@ -317,6 +329,8 @@ def plot_scatter(
     title: str = "",
     xlabel: str = "",
     ylabel: str = "",
+    labels: str | None = None,
+    thresholds: Mapping[str, float] | None = None,
 ) -> Figure:
     """Plot ``y`` against ``x`` as points, one colour per group.
 
@@ -332,16 +346,72 @@ def plot_scatter(
         Draw the line y = x, for checking two measures of the same quantity.
     title, xlabel, ylabel : str
         Labels.
+    labels : str, optional
+        Column whose value is written next to each point.
+    thresholds : Mapping[str, float], optional
+        Named horizontal lines, such as zero.
     """
     figure = Figure(figsize=(6.0, 6.0))
     axes = figure.add_subplot()
     for name, part in _groups(df, group):
         axes.scatter(part[x], part[y], s=12, label=name, alpha=0.8)
+    if labels is not None:
+        for px, py, text in zip(df[x], df[y], df[labels], strict=True):
+            axes.annotate(
+                str(text),
+                (px, py),
+                xytext=(3, 3),
+                textcoords="offset points",
+                fontsize=8,
+            )
+    _thresholds(axes, thresholds)
     if diagonal and len(df):
         low = float(np.nanmin(df[[x, y]].to_numpy()))
         high = float(np.nanmax(df[[x, y]].to_numpy()))
         axes.plot([low, high], [low, high], color="grey", lw=1, ls="--")
     axes.set_xlabel(xlabel or x)
+    _finish(axes, title=title, ylabel=ylabel or y, legend=group is not None)
+    figure.tight_layout()
+    return figure
+
+
+def plot_bars(
+    df: pd.DataFrame,
+    *,
+    x: str,
+    y: str,
+    group: str | None = None,
+    title: str = "",
+    ylabel: str = "",
+) -> Figure:
+    """Plot ``y`` per category of ``x`` as bars, one bar per group side by side.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Long table, one row per category (and group); not modified.
+    x : str
+        The categories, in the order they first appear.
+    y : str
+        The bar heights.
+    group : str, optional
+        Column whose values get one colour and one bar each per category.
+    title, ylabel : str
+        Labels.
+    """
+    categories = list(dict.fromkeys(df[x].tolist()))
+    groups = list(_groups(df, group))
+    figure = Figure(figsize=WIDE)
+    axes = figure.add_subplot()
+    width = 0.8 / max(len(groups), 1)
+    positions = np.arange(len(categories))
+    for index, ((name, part), colour) in enumerate(
+        zip(groups, _palette(len(groups)), strict=True)
+    ):
+        heights = part.set_index(x)[y].reindex(categories).to_numpy(dtype=float)
+        offset = (index - (len(groups) - 1) / 2) * width
+        axes.bar(positions + offset, heights, width=width, label=name, color=colour)
+    axes.set_xticks(positions, [str(c) for c in categories])
     _finish(axes, title=title, ylabel=ylabel or y, legend=group is not None)
     figure.tight_layout()
     return figure

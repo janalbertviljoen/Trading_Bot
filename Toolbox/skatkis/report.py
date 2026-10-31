@@ -20,16 +20,17 @@ an engine itself (the command line passes the one it found).
 
 Public API
 ----------
-ReportFigure(path, caption)
-    A saved image and its caption.
+ReportFigure(path, caption, label, width)
+    A saved image, its caption, an optional label for references and its width.
 FigureGroup(panels, caption, columns)
     Several images in one figure, lettered (a), (b), ..., in columns.
-Table(header, rows, columns)
-    A table inside a section; long tables break across pages.
+Table(header, rows, columns, caption, label, breaks)
+    A table inside a section, numbered when it has a caption; kept whole on one page
+    unless it is longer than ``MAX_UNBROKEN_ROWS`` rows.
 Section(title, text, figures, subsections)
     A numbered section.
-Document(title, subtitle, abstract, sections, appendix)
-    A whole report.
+Document(title, subtitle, abstract, sections, appendix, contents)
+    A whole report, with or without a table of contents.
 write_latex(path, document)
     Write the ``.tex`` file with a table of contents, links between sections and an
     appendix; figures are referenced relative to it.
@@ -64,6 +65,7 @@ PREAMBLE = r"""\documentclass[11pt,a4paper]{article}
 \usepackage[hidelinks,bookmarksnumbered]{hyperref}
 """
 
+MAX_UNBROKEN_ROWS = 40  # tables up to this length are kept whole on one page
 _SPECIAL = {
     "\\": r"\textbackslash{}",
     "&": r"\&",
@@ -80,31 +82,47 @@ _SPECIAL = {
 
 @dataclass(frozen=True)
 class ReportFigure:
-    """A saved figure (PNG or PDF) and its caption."""
+    """A saved figure (PNG or PDF) and its caption; ``label`` lets text refer to it.
+
+    ``width`` is the share of the text width the image takes (1 by default; less for a
+    square plot).
+    """
 
     path: Path
     caption: str
+    label: str | None = None
+    width: float = 1.0
 
 
 @dataclass(frozen=True)
 class FigureGroup:
     """Several images in one figure, in ``columns`` columns, each with a sub-caption.
 
-    The panels are lettered (a), (b), ... and the figure has one ``caption``.
+    The panels are lettered (a), (b), ... and the figure has one ``caption``; ``label``
+    lets text refer to it.
     """
 
     panels: Sequence[ReportFigure]
     caption: str
     columns: int = 2
+    label: str | None = None
 
 
 @dataclass(frozen=True)
 class Table:
-    """A simple table: column headings, rows of cells and LaTeX column types."""
+    """A simple table: column headings, rows of cells and LaTeX column types.
+
+    With a ``caption`` the table is numbered (Table 1, 2, ...) and ``label`` lets text
+    refer to it with ``[[label]]``. ``breaks`` lists the rows (counted from 0) after
+    which a horizontal rule separates groups.
+    """
 
     header: Sequence[str]
     rows: Sequence[Sequence[str]]
     columns: str
+    caption: str = ""
+    label: str | None = None
+    breaks: Sequence[int] = ()
 
 
 @dataclass(frozen=True)
@@ -141,13 +159,18 @@ def escape(text: str) -> str:
 
 @dataclass(frozen=True)
 class Document:
-    """A whole report: title, subtitle, abstract, main sections and appendix."""
+    """A whole report: title, subtitle, abstract, main sections and appendix.
+
+    ``contents`` puts a table of contents on its own page after the abstract; a short
+    report can leave it out.
+    """
 
     title: str
     subtitle: str
     abstract: str
     sections: Sequence[Section]
     appendix: Sequence[Section] = ()
+    contents: bool = True
 
 
 def write_latex(path: Path, document: Document) -> Path:
@@ -163,8 +186,9 @@ def write_latex(path: Path, document: Document) -> Path:
 
     Notes
     -----
-    The document opens with a table of contents; sections, figures and references are
-    links in the PDF. Text is escaped for LaTeX except inline maths between dollar signs
+    The document opens with a table of contents unless ``document.contents`` is False;
+    sections, figures and references are links in the PDF. Text is escaped for LaTeX
+    except inline maths between dollar signs
     and ``[[label]]`` references. Figures are referenced by paths relative to the
     ``.tex`` file, so the folder moves as a whole. The document has no date of its own,
     so the same input gives the same file.
@@ -182,9 +206,9 @@ def write_latex(path: Path, document: Document) -> Path:
         "\\begin{abstract}",
         escape(document.abstract),
         "\\end{abstract}",
-        "\\tableofcontents",
-        "\\newpage",
     ]
+    if document.contents:
+        lines += ["\\tableofcontents", "\\newpage"]
     for section in document.sections:
         lines += _section(section, path.parent, level="section")
     if document.appendix:
@@ -256,8 +280,10 @@ def _figure(item: ReportFigure | FigureGroup, folder: Path) -> list[str]:
         return [
             "\\begin{figure}[H]",
             "\\centering",
-            f"\\includegraphics[width=\\textwidth]{{{relpath(item.path, folder)}}}",
+            f"\\includegraphics[width={item.width:g}\\textwidth]"
+            f"{{{relpath(item.path, folder)}}}",
             f"\\caption{{{escape(item.caption)}}}",
+            *([f"\\label{{{item.label}}}"] if item.label else []),
             "\\end{figure}",
         ]
     width = 0.98 / item.columns - 0.01
@@ -272,21 +298,48 @@ def _figure(item: ReportFigure | FigureGroup, folder: Path) -> list[str]:
             f"\\caption{{{escape(panel.caption)}}}",
             "\\end{subfigure}\\hfill",
         ]
-    lines += [f"\\caption{{{escape(item.caption)}}}", "\\end{figure}"]
+    lines.append(f"\\caption{{{escape(item.caption)}}}")
+    if item.label:
+        lines.append(f"\\label{{{item.label}}}")
+    lines.append("\\end{figure}")
     return lines
 
 
 def _table(table: Table) -> list[str]:
-    """Return the LaTeX of a table with horizontal rules; long tables break across pages."""
+    """Return the LaTeX of a table with horizontal rules.
+
+    A table of up to ``MAX_UNBROKEN_ROWS`` rows is kept whole on one page, moving to the
+    next page if it does not fit (user, 2026-10-31); a longer one breaks across pages
+    and repeats its header.
+    """
     header = " & ".join(escape(h) for h in table.header) + " \\\\"
-    lines = [
-        "{\\small",
-        f"\\begin{{longtable}}{{{table.columns}}}",
-        "\\hline",
-        header,
-        "\\hline",
-        "\\endhead",
-    ]
-    lines += [" & ".join(escape(c) for c in row) + " \\\\" for row in table.rows]
+    body: list[str] = []
+    for index, row in enumerate(table.rows):
+        body.append(" & ".join(escape(c) for c in row) + " \\\\")
+        if index in table.breaks and index < len(table.rows) - 1:
+            body.append("\\hline")
+    caption = ""
+    if table.caption:
+        label = f"\\label{{{table.label}}}" if table.label else ""
+        caption = f"\\caption{{{escape(table.caption)}}}{label}"
+    if len(table.rows) <= MAX_UNBROKEN_ROWS:
+        return [
+            "\\begin{table}[H]",
+            "\\centering",
+            "\\small",
+            *([caption] if caption else []),
+            f"\\begin{{tabular}}{{{table.columns}}}",
+            "\\hline",
+            header,
+            "\\hline",
+            *body,
+            "\\hline",
+            "\\end{tabular}",
+            "\\end{table}",
+        ]
+    lines = ["{\\small", f"\\begin{{longtable}}{{{table.columns}}}"]
+    if caption:
+        lines.append(caption + "\\\\")
+    lines += ["\\hline", header, "\\hline", "\\endhead", *body]
     lines += ["\\hline", "\\end{longtable}}"]
     return lines

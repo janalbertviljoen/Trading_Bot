@@ -44,6 +44,10 @@ excluded_sectors = ["Financials", "Real Estate"]
 # Total-return benchmarks: the market, and per GICS sector the SPDR sector fund, whose
 # adjusted close includes dividends (the S&P sector indices on Yahoo are price-only).
 market = "^SP500TR"
+# Strategies the tools are compared with: Berkshire Hathaway class B, the Buffett
+# strategy the value rules follow (user, 2026-10-31). Prices only; Financials stay out
+# of the stock universe.
+strategies = ["BRK-B"]
 
 [benchmarks.sectors]
 "Communication Services" = "XLC"

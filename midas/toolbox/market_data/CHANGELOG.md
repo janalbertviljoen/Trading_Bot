@@ -10,6 +10,7 @@ workflow: `midas/instructions/secretary.md`.
 |---|---|---|---|---|---|
 | [MD_202610_001](changes/MD_202610_001-sp500-data-sources.md) | S&P 500 data sources: EDGAR fundamentals, prices and dividends, FX, historical constituents | new capability | in progress | high | S_202610_001; spec §9.1 |
 | [MD_202610_002](changes/MD_202610_002-point-in-time-fundamentals.md) | Point-in-time fundamentals panel: filing-date keying, first-reported values, TTM | new capability | ready | high | S_202610_001, MD_202610_001 |
+| [MD_202610_003](changes/MD_202610_003-jse-top-40.md) | JSE data and a Top 40 comparison | new capability | in discussion | medium | MD_202610_001; spec §9.1 |
 
 ## Done
 

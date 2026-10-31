@@ -2,10 +2,11 @@
 
 | Field | Value |
 |---|---|
-| Status | ready |
+| Status | in progress |
 | Priority | medium |
 | Kind | new capability |
 | Depends on | S_202610_001, S_202610_005, MD_202610_002 |
+| Branch | `feature/value-investing/vi-202610-002-rule-catalogue` |
 | Raised | 2026-10-31 |
 
 ## Description
@@ -20,7 +21,36 @@ backtested, and two documents hold the same rules.
 The tool keeps the name `value_investing` (user, 2026-10-31). The change waits for the
 repository layout, the SOP and the data sources.
 
-## Approach
+## Agreed approach
+
+### First slice: buyability score (agreed 2026-10-31)
+
+The first slice turns the rules with a pass/fail threshold into a buyability score, to
+see what the data looks like before any selection or backtest.
+
+- **Grid.** One row per company and rebalance date (third Friday of March, June,
+  September and December), one column per rule flag. One long table; a company's
+  history is `groupby("symbol")`, and other tables join on company and date.
+- **Data basis.** Annual first-reported 10-K values, in force from their filing date
+  (`market_data.clean.annual_first_reported`), through a thin as-of-filing annual panel
+  in `market_data`, the first slice of MD_202610_002. The move to TTM flows and
+  latest-quarter balance sheets is a later methodology change. Prices are the
+  rebalance-date close; per-share EDGAR values are put on the price's split basis
+  (`metrics.split_factor`) before they are averaged, compared or divided into prices.
+- **Rules in the slice.** G2a, G2b, G3, G4, G5, G6, G7, E1–E6, NN and B1; G1 off.
+  G4 and E4 use the Yahoo dividend history. B2–B5, M1 and Q1–Q3 follow once their
+  thresholds are set.
+- **Score.** The share of evaluable rules passed, from 0 to 1: the mean of the flags
+  that exist, so the score stays comparable over time while long-window rules phase in.
+  `n_passed` and `n_available` keep the counts. Reported in total and per family
+  (G, E, B). No total score below 5 evaluable rules.
+- **Diagnostics.** Ten companies with the highest and ten with the lowest mean score
+  from 2016, their score over time against their total return relative to
+  `^SP500TR`, and the score against the next quarter's excess return; in-sample,
+  labelled as diagnostics. Plots in `results/value_investing/`.
+- **Kind.** New capability; no baseline exists, so none moves.
+
+### Full catalogue
 
 Fitted to the SOP layout (§3.3) and the spec's stage and node split (§5, §6.2):
 
@@ -60,6 +90,27 @@ Fitted to the SOP layout (§3.3) and the spec's stage and node split (§5, §6.2
 
 ## Decisions
 
+- 2026-10-31 (user): first slice as in "Agreed approach": annual first-reported values
+  now, TTM later as a methodology change.
+- 2026-10-31 (user): a rule that cannot be evaluated scores 0: a company not measured
+  on a rule has not earned its point. `n_available` is shown beside the score.
+  Superseded the same day, below.
+- 2026-10-31 (user): the score is the mean of the evaluable flags (0 to 1), not their
+  sum, so it ignores how many rules were available on the date and gives a consistent
+  view over time.
+- 2026-10-31 (user): a company is scored and ranked on a date only with at least 5
+  evaluable rules (`[score] min_available` in `config/rules.toml`); the family scores
+  keep their value below it. From 2016 a median of 368 of 396 companies are ranked per
+  date.
+- 2026-10-31 (user): B1's debt-to-equity cap is 0.5.
+- 2026-10-31 (user): the sample is also shown as score * growth relative to the whole
+  `^SP500TR` (not the GICS sector fund), cumulative since 2016, to amplify agreement
+  between the rules and the market: high for good-scoring outperformers, low for
+  bad-scoring laggards. The ratio score / growth was considered and not taken: if the
+  score predicts outperformance the two cancel instead of separating.
+- 2026-10-31 (user): one point per rule, and the score per family as well.
+- 2026-10-31 (user): the ten best and ten worst for the diagnostics are chosen on the
+  mean score from 2016; a casual sample for checking the data, not a selection.
 - 2026-10-31 (user): plots of a rule's metric show the rule's cut-off as a labelled
   horizontal line (for example P/E 15 for G6). Supported by `thresholds` in
   `skatkis.analysis` (`plot_series`, `plot_spread`) and the P/E plots of
@@ -83,6 +134,34 @@ Fitted to the SOP layout (§3.3) and the spec's stage and node split (§5, §6.2
   3. Rules are phased in: a rule gives NaN until its window is full at the rebalance
      date, and gates and the composite rank treat NaN as "not yet available", so the
      backtest can start before every rule applies.
+
+## Notes
+
+- 2026-10-31: first slice built and running end to end:
+  `python -m Toolbox.value_investing buyability --as-of 2026-10-31` (about 3 s for 396
+  companies and 71 rebalance dates, 2009-03 to 2026-09). Table in
+  `data/interim/value_investing/<as_of>/buyability.parquet`; plots, `sample.csv` and
+  `score_returns.csv` in `results/value_investing/<as_of>/buyability/`.
+- 2026-10-31: modules: `market_data/fundamentals.py` (as-of annual panel, first slice of
+  MD_202610_002), `market_data.metrics.split_factors`,
+  `skatkis.financial_logic.relative_growth` and `forward_excess_return`;
+  `value_investing/inputs.py`, `layers/valuation.py`, `layers/graham.py`,
+  `layers/buffett.py`, `flags.py`, `rules.py`, `scoring.py`, `pipeline.py`,
+  `diagnostics.py`, `plots.py`, `__main__.py`; `config/rules.toml`.
+- 2026-10-31: checks done: Apple EPS split adjustment (FY2013 39.75 / 28 = 1.42), Apple
+  G4 = 14 years (dividend resumed 2012), Coca-Cola P/B about 11 and failing B1 on debt;
+  G6 pass rate jumps to 30% in the March 2020 crash; G3 and G5 phase in about 2017 and
+  2020 as the notes predicted.
+- 2026-10-31: first in-sample look (sum score): no monotonic relation between score and
+  the next quarter's excess return; mean rank correlation from 2016 is -0.01. With the
+  mean score: -0.008, and the best ten from 2016 include EMR and XOM at 1.00 on two
+  evaluable rules (EDGAR gaps, tool notes); 43 companies average fewer than 8
+  evaluable rules from 2016, 13 fewer than 5. The worst ten are
+  mostly companies with short or missing history (spin-offs, recent listings, EDGAR
+  gaps), not companies failing the rules.
+- 2026-10-31: `pipeline.py` wires the stages in order; the DAG engine with node caching
+  of `.claude/rules/pipeline.md` (spec §6) is not built in this slice. Contracts and
+  gates stay minimal (declared columns only), as decided.
 
 ## Kickoff prompt
 
