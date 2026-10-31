@@ -55,7 +55,9 @@ user steer. Do not run checks or tests when picking up or discussing a change.
 | Prefix | Registry | Scope |
 |---|---|---|
 | `S` | [toolbox/skatkis/CHANGELOG.md](../toolbox/skatkis/CHANGELOG.md) | `skatkis` (shared infrastructure, backtest engine, Midas's index) and repository setup |
+| `MD` | [toolbox/market_data/CHANGELOG.md](../toolbox/market_data/CHANGELOG.md) | the shared `market_data` package (sources, cleaned tables, shared metrics) |
 | `VI` | [toolbox/value_investing/CHANGELOG.md](../toolbox/value_investing/CHANGELOG.md) | the `value_investing` tool |
+| `HOM` | [toolbox/hand_o_midas/CHANGELOG.md](../toolbox/hand_o_midas/CHANGELOG.md) | the `hand_o_midas` machine-learning tool |
 
 ## Working on a change
 

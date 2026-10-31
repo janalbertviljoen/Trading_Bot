@@ -61,4 +61,6 @@ until the portfolio engine (S_202610_006) replaces it. The index and the rename 
 | 2026-10-31 | One MCP server with two profiles: `index` (read-only) and `lab` (backtests and data) | user |
 | 2026-10-31 | Lifecycle order: build until the framework produces plots → warden's report → documentation (docstrings for agents, README for people) → unit tests last, which may be committed directly | user |
 | 2026-10-31 | The MCP server lives in `Toolbox/skatkis/midas/`; its lab tools run the BTC harness in `Toolbox/SandBox/btc_vwap/`, a temporary dependency of `skatkis` on the sandbox until S_202610_006 (S_202610_001; awaits the user's explicit confirmation) | developer |
+| 2026-10-31 | `midas/instructions/quant.md` holds what the developer and the researcher share about data: the sources, their traps and the working rules; the detailed source reference is official documentation, in the tool README | user |
+| 2026-10-31 | A second tool, `hand_o_midas` (machine learning, prefix `HOM`), beside `value_investing`; both read one shared data package (sources, cleaned tables, shared metrics) between `skatkis` and the tools, so `skatkis` stays free of domain knowledge | user |
 | 2026-10-31 | Current focus: the value-investing tool, starting with S&P 500 data extraction, and the wallet as backtest engine; the BTC strategy moves to the sandbox | user |

@@ -43,6 +43,15 @@ A new engine in `Toolbox/skatkis/backtest/`, alongside the existing single-asset
 - performance metrics (return, drawdown, Sharpe, turnover) in `skatkis.financial_logic`,
   shared with the existing `summarise`.
 
+## Proposed by the user (2026-10-31)
+
+- **Relative wealth against the index.** Results are normalised to what the same
+  deposits would be worth in the S&P 500 total-return index, for example
+  $W_t = V_t / V^{\text{S\&P}}_t$, where $V_t$ is the portfolio value on day $t$ and
+  $V^{\text{S\&P}}_t$ the value of the same deposits, on the same dates, invested in
+  `^SP500TR`. Above 1 the strategy beat an index fund. Both value investing and
+  `hand_o_midas` strategies are compared on it.
+
 ## Open decisions (user)
 
 - Spec §9.4: wallet input contract: signals, target weights (proposed) or orders.

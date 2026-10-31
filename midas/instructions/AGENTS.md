@@ -18,6 +18,9 @@ the role a task needs before starting it:
   under `midas/`.
 - [researcher.md](researcher.md): improving strategy performance and proving it
   out-of-sample.
+- [quant.md](quant.md): the data sources, their traps and the rules that keep results
+  honest; shared by the developer and the researcher. Read it before working with data,
+  metrics, rankings, strategies or the wallet.
 - [warden.md](warden.md): the pre-commit review, its checklist and its report.
 - [writing.md](writing.md): the rules for writing any file, shared by every role that
   writes. Read it with your role's file.
@@ -35,9 +38,13 @@ on out-of-sample excess return over the S&P 500 total-return index.
 - `Toolbox/skatkis/`: shared infrastructure with no tool-specific domain knowledge:
   pipeline contracts, registry and validation, IO, general financial mathematics
   (`skatkis.financial_logic`), the backtest wallet engine, and Midas's index server.
-- `Toolbox/value_investing/`: the value-investing tool: schema, contracts, sources
-  (EDGAR, prices, constituents), layers (metrics, ranking), validation, strategy
-  registry, pipeline.
+- `Toolbox/market_data/`: shared market data read by every tool: sources (EDGAR,
+  prices and dividends, FX, constituents), cleaned standard tables and the shared
+  metrics (each ratio owned once). Depends on `skatkis` only.
+- `Toolbox/value_investing/`: the rule-based tool: Graham, Buffett and Munger rule
+  thresholds, gates, ranking and strategies, on `market_data`.
+- `Toolbox/hand_o_midas/`: the machine-learning tool: sub-models trained on
+  `market_data` with walk-forward splits, turned into strategies.
 - `Toolbox/SandBox/`: exploratory code outside the standard and excluded from lint,
   including the original BTC VWAP bot.
 - `notebooks/`: run scripts and notebooks: paths, configuration and display only; no

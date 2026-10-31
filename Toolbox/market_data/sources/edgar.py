@@ -1,6 +1,6 @@
 """
-value_investing/sources/edgar.py
---------------------------------
+market_data/sources/edgar.py
+----------------------------
 SEC EDGAR XBRL ``companyfacts``: every value a company has reported, with its filing.
 
 The provider fetches one company's ``companyfacts`` JSON per CIK through the central
@@ -25,6 +25,10 @@ edgar_client(user_agent, *, max_requests_per_second, ...)
     An ``ApiClient`` with the headers SEC requires.
 EdgarCompanyFacts(client)
     The ``DataProvider`` for ``companyfacts``; the query is a CIK.
+EdgarSubmissions(client)
+    The ``DataProvider`` for ``submissions``, a company's filing index.
+latest_periodic_filing(content)
+    The date of the latest 10-K or 10-Q in a ``submissions`` payload.
 parse_companyfacts(content, tag_map)
     Raw JSON to one row per reported value of a mapped tag.
 load_companyfacts(ciks, *, provider, store, as_of, tag_map)
@@ -34,7 +38,7 @@ format_cik(cik)
 
 Dependency rule
 ---------------
-pandas, the standard library, ``skatkis.io`` and ``value_investing.sources.tag_map``.
+pandas, the standard library, ``skatkis.io`` and ``market_data.sources.tag_map``.
 """
 
 import json
@@ -45,12 +49,14 @@ from typing import Any, cast
 
 import pandas as pd
 
+from Toolbox.market_data.sources.tag_map import TAG_MAP, FieldMap
 from Toolbox.skatkis.io.api import ApiClient
 from Toolbox.skatkis.io.provider import DataProvider, RawPayload
 from Toolbox.skatkis.io.snapshots import SnapshotStore, fetch_snapshot
-from Toolbox.value_investing.sources.tag_map import TAG_MAP, FieldMap
 
 COMPANYFACTS_URL = "https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json"
+SUBMISSIONS_URL = "https://data.sec.gov/submissions/CIK{cik}.json"
+PERIODIC_FORMS = frozenset({"10-K", "10-Q", "10-K/A", "10-Q/A"})
 SEC_MAX_REQUESTS_PER_SECOND = 10.0
 CIK_DIGITS = 10
 
@@ -119,7 +125,7 @@ def edgar_client(
     max_requests_per_second : float
         At most 10 (SEC's limit).
     timeout_seconds, max_retries, backoff_seconds
-        Passed to ``ApiClient``; values come from ``config/value_investing.toml``.
+        Passed to ``ApiClient``; values come from ``config/market_data.toml``.
 
     Raises
     ------
@@ -161,6 +167,50 @@ class EdgarCompanyFacts(DataProvider):
         """
         url = self.url_template.format(cik=format_cik(query))
         return RawPayload(content=self.client.get(url), extension="json")
+
+
+@dataclass(frozen=True)
+class EdgarSubmissions(DataProvider):
+    """``DataProvider`` for EDGAR ``submissions``, a company's filing index; the query is a CIK."""
+
+    client: ApiClient
+    url_template: str = SUBMISSIONS_URL
+
+    @property
+    def name(self) -> str:
+        """Snapshot folder name: ``edgar_submissions``."""
+        return "edgar_submissions"
+
+    def fetch(self, query: str, as_of: date) -> RawPayload:
+        """Return the ``submissions`` JSON for CIK ``query``."""
+        url = self.url_template.format(cik=format_cik(query))
+        return RawPayload(content=self.client.get(url), extension="json")
+
+
+def latest_periodic_filing(content: bytes) -> date | None:
+    """Return the latest filing date of a 10-K or 10-Q (or amendment) in ``submissions``.
+
+    Reads the ``filings.recent`` index, which holds a company's latest filings (at least
+    a year, and up to 1,000). Returns ``None`` if it lists no periodic filing.
+
+    Raises
+    ------
+    EdgarParseError
+        If the payload is not ``submissions`` JSON.
+    """
+    try:
+        recent = cast(dict[str, list[str]], json.loads(content)["filings"]["recent"])
+        forms, dates = recent["form"], recent["filingDate"]
+    except (json.JSONDecodeError, KeyError, TypeError) as error:
+        raise EdgarParseError(
+            f"submissions payload lacks filings.recent ({error})"
+        ) from error
+    periodic = [
+        date.fromisoformat(d)
+        for f, d in zip(forms, dates, strict=True)
+        if f in PERIODIC_FORMS
+    ]
+    return max(periodic, default=None)
 
 
 def parse_companyfacts(

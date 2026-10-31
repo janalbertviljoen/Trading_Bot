@@ -21,7 +21,8 @@ overwrite a stored snapshot.
 Public API
 ----------
 SnapshotStore(root)
-    Where snapshots live, normally ``data/raw``.
+    Where snapshots live, normally ``data/raw``; ``latest_as_of`` finds the newest
+    stored snapshot of a query up to a date.
 fetch_snapshot(provider, query, as_of, store)
     Return the stored payload, fetching and storing it first if absent.
 read_snapshot(store, source, query, as_of)
@@ -59,6 +60,29 @@ class SnapshotStore:
     def folder(self, source: str, as_of: date) -> Path:
         """Return ``<root>/<source>/<as_of>``."""
         return self.root / source / as_of.isoformat()
+
+    def latest_as_of(self, source: str, query: str, on_or_before: date) -> date | None:
+        """Return the latest as-of date on or before ``on_or_before`` holding ``query``.
+
+        Returns ``None`` when no stored snapshot of ``source`` holds ``query`` by then.
+        Used to reuse a snapshot that is still current instead of fetching it again.
+        """
+        source_root = self.root / source
+        if not source_root.is_dir():
+            return None
+        dates: list[date] = []
+        for folder in source_root.iterdir():
+            try:
+                dates.append(date.fromisoformat(folder.name))
+            except ValueError:
+                continue
+        for candidate in sorted(dates, reverse=True):
+            if (
+                candidate <= on_or_before
+                and query in _read_manifest(self.folder(source, candidate))["entries"]
+            ):
+                return candidate
+        return None
 
 
 def fetch_snapshot(

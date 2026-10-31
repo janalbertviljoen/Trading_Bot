@@ -1,23 +1,23 @@
-# VI_202610_003: Point-in-time fundamentals panel
+# MD_202610_002: Point-in-time fundamentals panel
 
 | Field | Value |
 |---|---|
 | Status | ready |
 | Priority | high |
 | Kind | new capability |
-| Depends on | S_202610_001, VI_202610_001 |
+| Depends on | S_202610_001, MD_202610_001 |
 | Raised | 2026-10-31 |
 
 ## Description
 
 Spec §5 stage 2 (`fundamentals.point_in_time`): turn the cached API pulls of
-VI_202610_001 into one panel per ticker and rebalance date that holds only what was
+MD_202610_001 into one panel per ticker and rebalance date that holds only what was
 known on that date. Every rule in VI_202610_002 consumes this panel; without it, the
 rules either look ahead or use restated values.
 
 ## Approach
 
-- `Toolbox/value_investing/layers/fundamentals.py`, one layer, sole owner of
+- `Toolbox/market_data/layers/fundamentals.py`, one layer, sole owner of
   point-in-time alignment and the TTM convention.
 - **Filing-date keying** (spec §3.3): a value counts from its EDGAR `filed` date; a
   rebalance at date $t$ sees only filings with $\text{filed} \le t$, same-day filings
@@ -54,7 +54,7 @@ rules either look ahead or use restated values.
 
 ## Kickoff prompt
 
-Pick up VI_202610_003. Confirm VI_202610_001 is done and the decisions above are made.
+Pick up MD_202610_002. Confirm MD_202610_001 is done and the decisions above are made.
 Read spec §3 and §5 and the tool's notes, then build the filing-date alignment on a
 small fixture universe first and show a panel for one company across several
 rebalance dates.

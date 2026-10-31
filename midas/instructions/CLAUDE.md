@@ -7,7 +7,8 @@ it. This file holds only what is specific to Claude Code.
 
 - **Hats load on demand.** In the main session, read `developer.md` before writing code
   or official documentation and `secretary.md` before writing in `midas/`, each with
-  `writing.md`; a big change usually needs both. The researcher and the warden are
+  `writing.md`, and `quant.md` before working with data, metrics, strategies or the
+  wallet; a big change usually needs both. The researcher and the warden are
   subagents: `.claude/agents/midas-researcher.md` and `.claude/agents/midas-warden.md`
   (read-only, no Bash). Start the warden as `developer.md`, "Building and finalising",
   describes.

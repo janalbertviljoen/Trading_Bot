@@ -1,4 +1,4 @@
-# VI_202610_001: S&P 500 data sources
+# MD_202610_001: S&P 500 data sources
 
 | Field | Value |
 |---|---|
@@ -26,8 +26,8 @@ in `skatkis`, one adapter per vendor is in the tool.
 | `Toolbox/skatkis/io/api.py` | `ApiClient` | HTTP GET with configured headers, rate limit, retries and timeout; no vendor knowledge |
 | `Toolbox/skatkis/io/provider.py` | `DataProvider` (abstract base class) | The single provider interface of spec §1.2: a query and an explicit `as_of` date in, raw data out |
 | `Toolbox/skatkis/io/snapshots.py` | raw snapshots | Fetch once and store under `data/raw/<source>/<as_of>/` with a manifest; reruns read the stored snapshot |
-| `Toolbox/value_investing/sources/` | `edgar.py`, `constituents.py`, `prices.py`, `fx.py`, `tag_map.py` | Vendor details: endpoints, User-Agent, field mapping |
-| `Toolbox/value_investing/preprocess/` | cleaning | Canonical names, units and types, standardised in the tool |
+| `Toolbox/market_data/sources/` | `edgar.py`, `constituents.py`, `prices.py`, `fx.py`, `tag_map.py` | Vendor details: endpoints, User-Agent, field mapping |
+| `Toolbox/market_data/preprocess/` | cleaning | Canonical names, units and types, standardised in the tool |
 | then | validation | Declared columns only during the build |
 
 `yfinance` is a library rather than an HTTP API, so its adapter bypasses `ApiClient` but
@@ -68,7 +68,7 @@ Per source:
 - 2026-10-31 (user): focus on the product first; validation stays minimal during the
   build (declared columns only), because the data comes through APIs.
 - 2026-10-31 (user): the point-in-time panel is built from these sources; it is raised
-  as its own change, VI_202610_003.
+  as its own change, MD_202610_002.
 - 2026-10-31 (user, spec §9.5): report in ZAR where a rate is available, otherwise in
   USD, because the money is invested from the JSE and the exchange rate affects the
   result. A USD/ZAR daily rate is therefore a data source of this change.
@@ -89,10 +89,49 @@ Per source:
 - 2026-10-31 (user, decision of the same day applied to the area rules): network access
   is allowed in `skatkis.io`'s API client as well as in source modules;
   `.claude/rules/sources.md` is updated to match.
+- 2026-10-31 (user, superseding "20 years where EDGAR has it"): only data from 2006
+  onwards is of interest; prices and the exchange rate are requested from 2006. EDGAR
+  returns a company's full document, so its values are trimmed to periods from 2006 when
+  cleaned. Dividends are requested from 1986, so the 20-year dividend record (G4) can
+  be evaluated from the start (user, same day).
+- 2026-10-31 (user): the sources, the cleaned standard tables and the shared metrics
+  (ratios such as P/E, current ratio, ROE, owned once) move out of `value_investing`
+  into a new shared package between `skatkis` and the tools, so `value_investing` and
+  the machine-learning tool `hand_o_midas` (HOM_202610_001) both read from it.
+  `skatkis` stays free of domain knowledge. `value_investing` keeps the rule thresholds,
+  gates, ranking and strategies. The package is `Toolbox/market_data/`, and this change
+  moved from the `value_investing` log (VI_202610_001) to the new `market_data` log
+  (user, same day).
+- 2026-10-31 (user): before any feature engineering, the cleaned data is checked
+  visually: plots per source showing coverage, gaps and outliers (plots from
+  S_202610_007).
+- 2026-10-31 (user): pulling data is an automated pipeline run by one terminal command,
+  not scripts in `notebooks/`; it updates the data when EDGAR has new filings.
+- 2026-10-31 (user): the pipeline as proposed: `Toolbox/market_data/update.py` with the
+  command `python -m Toolbox.market_data update --as-of <date>` (not in `skatkis.io`,
+  which stays the generic machinery); `--as-of` always explicit; EDGAR incremental
+  through the `submissions` filing index; prices and FX in full per as-of date;
+  companies and symbols as arguments until the constituents source exists; the
+  `notebooks/fetch_*.py` scripts removed.
 
 ## Notes
 
 ### Progress
+
+- 2026-10-31: update pipeline built (`update.py`, `__main__.py`,
+  `EdgarSubmissions` and `latest_periodic_filing` in `sources/edgar.py`,
+  `SnapshotStore.latest_as_of` in `skatkis.io.snapshots`). Live run: EDGAR reused all
+  three companies (no filing since the snapshot), prices and FX written. The
+  incremental rule checked offline: a company that filed after its snapshot is fetched
+  again, one that did not is reused without a download. Plots of the run scripts move
+  to S_202610_007. VS Code hides `__pycache__` and `__init__.py`
+  (`.vscode/settings.json`, user's request).
+- 2026-10-31: moved to `Toolbox/market_data/` (sources, `config/market_data.toml`, the
+  "Data sources" section now in the package README). Prices requested daily from 2006,
+  dividends and splits through monthly bars from 1986, FX from 2006; snapshots fetched
+  with the earlier ranges were deleted (same as-of date, different request). Re-pulled:
+  prices from 2006-01-03 for Apple, Microsoft, Coca-Cola and `^SP500TR`, dividends from
+  1986, 5,214 FX rates from 2006; raw data about 1.6 MB in total.
 
 - 2026-10-31: step 1 built. `skatkis.io` (`api.py`, `provider.py`, `snapshots.py`,
   `tables.py`, `config.py`), the EDGAR source (`sources/edgar.py`, `sources/tag_map.py`
@@ -112,6 +151,17 @@ Per source:
   `liabilities_and_equity` mapped so total liabilities can be derived where a company
   does not report them. History reaches back to periods ending 2006–2007 only, which
   is short for the long Graham windows: see the tool's notes.
+- 2026-10-31: prices built (`sources/prices.py`, run script `notebooks/fetch_prices.py`):
+  Yahoo's chart endpoint through `ApiClient` instead of the `yfinance` library (same
+  data; raw JSON snapshots and no extra dependency). Prices, dividends and splits from
+  1970 for Apple, Microsoft, Coca-Cola and `^SP500TR`; total-return growth plotted.
+  In the sandbox, Python downloads are cut off at random by its network proxy (`curl`
+  is not), so some pulls needed several runs; outside the sandbox this does not apply.
+- 2026-10-31: exchange rate built (`sources/fred.py`, run script `notebooks/fetch_fx.py`):
+  FRED `DEXSFUS` through `ApiClient`, by the official API when `FRED_API_KEY` is set
+  and otherwise by the keyless chart CSV, both parsed to one table. Pulled without a
+  key: 11,738 daily rates from 1980-01-02 (the series starts in 1980, not 1971) to
+  2026-10-23 (H.10 is published weekly, so the latest rates lag by about a week).
 
 ### Source research (2026-10-31)
 
@@ -136,7 +186,7 @@ Per source:
 
 ## Kickoff prompt
 
-Pick up VI_202610_001. Read spec §1, §3, §4, §6 and the tool's notes, confirm the
+Pick up MD_202610_001. Read spec §1, §3, §4, §6 and the tool's notes, confirm the
 decisions above are made, then propose the source modules and canonical fields before
 building the EDGAR client first.
 

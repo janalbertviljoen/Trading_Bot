@@ -1,6 +1,6 @@
 """
-value_investing/sources/tag_map.py
-----------------------------------
+market_data/sources/tag_map.py
+------------------------------
 Maps XBRL tags in SEC EDGAR filings to the tool's canonical fundamental fields.
 
 Companies report the same concept under different us-gaap tags, and change tags over
@@ -20,7 +20,7 @@ The canonical fundamental field names, their units and their XBRL tags.
 
 Must not
 --------
-Parse filings (``value_investing.sources.edgar``); choose between tags or periods
+Parse filings (``market_data.sources.edgar``); choose between tags or periods
 (point-in-time stage).
 
 Public API

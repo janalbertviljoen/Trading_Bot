@@ -5,7 +5,7 @@
 | Status | ready |
 | Priority | medium |
 | Kind | new capability |
-| Depends on | S_202610_001, S_202610_005, VI_202610_003 |
+| Depends on | S_202610_001, S_202610_005, MD_202610_002 |
 | Raised | 2026-10-31 |
 
 ## Description
@@ -66,11 +66,22 @@ Fitted to the SOP layout (§3.3) and the spec's stage and node split (§5, §6.2
   interpolation until the data has been looked at.
 - 2026-10-31 (user): product first; validation stays minimal (declared columns only)
   until the framework runs end to end.
-- 2026-10-31: the point-in-time panel this change consumes is VI_202610_003.
+- 2026-10-31: the point-in-time panel this change consumes is MD_202610_002.
+- 2026-10-31 (user, on the short EDGAR history; tool notes): three measures, all to be
+  built.
+  1. G4 (and E4) take the dividend history from the price source (Yahoo dividends,
+     back to 1970), not from EDGAR. Built in MD_202610_001 (`sources/prices.py`).
+  2. The look-back windows of G3, G5, G4, E3, E5 and B1 are explicit parameters in
+     `config/*.toml`, defaulting to Graham's and Buffett's values (10, 13, 20, 5, 4
+     and 10 years). A shorter window is a methodology change: run as a recorded
+     experiment, never as the default.
+  3. Rules are phased in: a rule gives NaN until its window is full at the rebalance
+     date, and gates and the composite rank treat NaN as "not yet available", so the
+     backtest can start before every rule applies.
 
 ## Kickoff prompt
 
-Pick up VI_202610_002. Confirm S_202610_001, S_202610_005 and VI_202610_001 are done and
+Pick up VI_202610_002. Confirm S_202610_001, S_202610_005 and MD_202610_001 are done and
 the decisions above are made. Read spec §2, §3, §5 and §6, the SOP sections cited in
 the approach, and the tool's notes. Propose the registry interface, the context object
 and the output columns, then build `layers/valuation.py` and `layers/graham.py` first.

@@ -2,7 +2,8 @@
 
 How Midas designs and builds changes: code, tests and the official documentation. It
 adds to the rules for every hat in [AGENTS.md](AGENTS.md); where they differ,
-`AGENTS.md` wins. Read it with [writing.md](writing.md).
+`AGENTS.md` wins. Read it with [writing.md](writing.md), and with [quant.md](quant.md)
+before working with data, metrics, rankings, strategies or the wallet.
 
 The developer writes code and official documentation, and the files outside `midas/`
 that are not code: `.claude/` (rules, skills, agents) and the root `AGENTS.md` and
