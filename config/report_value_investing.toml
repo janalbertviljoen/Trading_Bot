@@ -1,0 +1,344 @@
+# Text of the value-investing report (python -m Toolbox.value_investing report).
+# Owned by the secretary: wording, structure and captions. The code places the tables and
+# figures and fills the placeholders: {end} (valuation date), {first_year}, {last_year},
+# {picks} (companies per decision), {amount} (USD per decision); per start year s in 2016, 2020,
+# 2025: {invested_s}, {wallet_s}, {sp_s}, {brk_s} (value today, USD), {wallet_rate_s},
+# {sp_rate_s}, {brk_rate_s} (money-weighted return a year); {best_pick}, {best_year},
+# {best_multiple} (best single purchase); {best_company}, {best_company_buys},
+# {best_company_share} (the company worth most across its purchases, and its share of the
+# 2016 investor's value); {winners}, {losers}, {winner_rules}, {loser_rules} (named from
+# [rule_names]), {loss_years}; the wallet with sells: {managed_s}, {managed_rate_s},
+# {threshold}, {first_start}, {sales}, {sold_usd}; next year: {next_score_date},
+# {next_picks}, {sell_now}, {holdings}, {keep_now}. Inline maths between $...$;
+# write { and } inside texts as {{ and }}.
+
+title = "Value investing: buy-and-hold results"
+abstract = """Each January and July since {first_year}, a rule-based value score picks {picks} S&P \
+500 companies, and {amount} USD is invested in them, weighted by score and never sold. Investors who \
+started in 2016, 2020, 2023 and 2025 are followed to {end}, each against the same money in the S&P \
+500 total-return index and in Berkshire Hathaway. The reference is the investor who started in \
+{ref_start}: the data hold only today's index members, and {ref_removed} companies have left the \
+index since then against {first_removed} since {first_year_start}, so fewer failed companies are \
+missing. That investor's {ref_invested} USD is worth {ref_wallet} USD, against {ref_sp} USD in \
+the S&P 500 and {ref_brk} USD in Berkshire Hathaway; a second wallet that also sells holdings whose \
+score has fallen is worth {ref_managed} USD. The report closes with the next picks: {next_picks}. \
+The result rests on few decisions and few companies, with {best_company_share} of the value in one \
+company; it is a research result, not evidence of a lasting edge."""
+
+[method]
+title = "Method"
+text = """Company fundamentals are the values first reported in each annual report (10-K) to the SEC, \
+used from the day they were filed. One known exception is still open: when a company reports an \
+item under two labels, the label is chosen by the company's later use, which moves a few scores \
+by about a point on some dates (Appendix [[app:lookahead]]); until it is fixed, every result here \
+is provisional. \
+Prices and dividends are from Yahoo Finance; returns include reinvested dividends and are in US \
+dollars. On each date, only companies already in the S&P 500 are considered, outside the \
+Financials and Real Estate sectors.
+
+Sixteen rules from Graham, Buffett and a net income growth test grade every company. For each rule, \
+the companies are ranked by the rule's value and placed in six equal groups, from 5 points for the \
+best sixth to 0 for the worst; each rule's points are multiplied by its weight, one less the share \
+of companies that pass the rule's threshold, so rules few companies pass count more. The score is \
+the sum. On the first trading day of January and of July, the {picks} highest-scoring companies are bought \
+for {amount} USD, each in proportion to its score.
+
+Three limits apply to every number in this report. Companies that left the index are missing from \
+the data, which flatters the results. The score's design and every setting of this report (the \
+rules' weighting, the five picks, the decision months, the sell threshold, the start years) were \
+chosen while looking at the whole period from 2016, so no period here is out of sample: the \
+results describe how these rules would have done, not evidence that they will do so. There are no \
+trading costs or taxes."""
+
+[picks]
+title = "Picks per half-year"
+text = """Table [[tab:picks]] lists the companies bought each January and July, with their weights, and what each \
+{amount} USD is worth on {end}, next to the same money in the S&P 500 and in Berkshire Hathaway. \
+Figure [[fig:yearly]] shows the same values. The picks lean to technology hardware and semiconductors, steel \
+and industrial companies; the best single purchase is {best_pick} in {best_year}, now worth \
+{best_multiple} times its cost. The purchases of {loss_years} are worth less today than the same \
+money in the S&P 500. Appendix [[app:purchases]] lists every purchase of the wallet with sells of \
+the investor who started in {first_start}, with its price at purchase and today, what later sales \
+took from it, what it keeps today and its total return with dividends."""
+table_caption = "Purchases per half-year and their value today (USD)."
+figure = "What each purchase is worth today, by date of purchase, on a logarithmic scale."
+
+[value]
+title = "Value over time"
+text = """Table [[tab:value]] and Figure [[fig:value]] follow the four investors. Each puts in {amount} USD every January and July \
+from the start year; the value wallet never sells. The return a year is money-weighted: the \
+constant yearly rate that turns the payments into today's value.
+
+The investor who started in 2016 earns {wallet_rate_2016} a year against {sp_rate_2016} in the \
+S&P 500 and {brk_rate_2016} in Berkshire Hathaway. From 2020 the rates are {wallet_rate_2020}, \
+{sp_rate_2020} and {brk_rate_2020}; from 2023 {wallet_rate_2023}, {sp_rate_2023} and \
+{brk_rate_2023}; from 2025, over less than two years, {wallet_rate_2025}, \
+{sp_rate_2025} and {brk_rate_2025}. The wallet's value swings more than either comparison, because \
+five companies of a few industries are far less diversified than the index or Berkshire.
+
+The value wallet with sells buys the same picks with the same money, but at each decision it also \
+sells part of any holding whose score has fallen; Section [[sec:selling]] describes the rule. From \
+2016 it is worth {managed_2016} USD ({managed_rate_2016} a year), from 2020 {managed_2020} USD \
+({managed_rate_2020}) and from 2025 {managed_2025} USD ({managed_rate_2025})."""
+table_caption = "Money put in and value today per start year (USD), and the money-weighted return a year."
+figure = "Value of 100 USD every January and July from each start year, in USD, next to the money put in; the S&P 500 dashed and Berkshire Hathaway dash-dot."
+
+[selling]
+title = "Selling below the threshold"
+text = """Each January and July, before buying, the wallet with sells checks every company it holds. The \
+score is put on a scale from 0 to 1, the share of the most the company could score on the rules \
+it is measured on. A holding scoring {threshold} or less is sold in part: the share sold is \
+({threshold} less the score) divided by {threshold}, so all of it at a score of 0 and almost none \
+just under {threshold}. Holdings are sold, never sold short. The proceeds are added to the decision's \
+{amount} USD and buy its picks. Table [[tab:sales]] lists the {sales} sales of the investor who \
+started in {first_start}, worth {sold_usd} USD in all."""
+table_caption = "Sales of the investor who started in {first_start}: share of each holding sold, its score on the 0-to-1 scale, and the proceeds."
+
+[contents]
+title = "Wallet contents"
+text = """Figure [[fig:contents]] follows every company in the wallet with sells of the investor \
+who started in {first_start}, month by month. A line starts or steps up when the company is \
+bought, steps down when part of it is sold, and rises or falls with the price in between. The \
+dashed lines follow the same money in the S&P 500 and in Berkshire Hathaway, divided by the number \
+of companies the wallet holds on the date, so they show what one holding would be worth in the \
+index or in Berkshire. Appendix [[app:contents]] gives each holding's value after every January's \
+trades, the money put in and the proceeds of sales."""
+figure = "Value of each holding in the wallet with sells (solid) and of the S&P 500 and Berkshire Hathaway divided by the number of holdings (dashed), in USD on a logarithmic scale."
+appendix_title = "Wallet contents by year"
+table_caption = "Wallet with sells of the investor who started in {first_start}: value of each holding after each January's trades and today (USD), and the money put in and the proceeds of sales to date, July decisions included."
+
+[rules]
+title = "Rules behind the winners"
+text = """Of the picks, {winners} have done better than the S&P 500 since their purchase and \
+{losers} have not, but a count treats a large win and a small loss alike. Table [[tab:dollars]] \
+weighs them in dollars: each pick's value today less what the same money would be worth in the \
+S&P 500. The winners are {winners_usd} USD ahead of the index and the laggards {losers_usd} USD \
+behind, a net {net_usd} USD, the wallet's whole lead over the index. The median winner is \
+{winners_median} USD ahead and the median laggard {losers_median} USD behind; the average win is \
+{payoff} times the average loss. The wins are concentrated: the {top_n} largest, {top_picks}, make \
+up {top_share} of the winners' total.
+
+Figure [[fig:rules]] compares the mean points per rule of the winners and of the laggards on the day they \
+were picked, each pick weighted by its dollars ahead or behind the index, so the large wins and \
+losses count most; the rules are ordered by how much more the winners scored. The winners scored \
+most above the others on {winner_rules}; the picks that lagged scored higher on {loser_rules}. With \
+so few picks, these differences describe this sample; they do not establish which rules work. \
+Appendix [[app:rules]] explains each rule, and Appendix [[app:weighting]] tests whether the rule \
+weights favour the rules that told winners from losers."""
+table_caption = "Dollars ahead of the same money in the S&P 500, per pick: total, average and median of the picks that beat the index and of those that lagged it."
+figure = "Mean points per rule (0 to 5) of the picks that beat the S&P 500 since purchase and of those that did not, each pick weighted by its dollars ahead or behind the index."
+list_title = "The rules"
+list_caption = "The rules: what each measures, the better direction and when a company passes."
+list_text = """Table [[tab:rules]] explains each rule: what it measures, whether a higher or a lower value \
+earns more points, and when a company passes it. The points come from the company's rank on the \
+measure among all companies on the date; the pass threshold sets the rule's weight. Rules G \
+follow Graham's defensive investor (The Intelligent Investor, chapter 14), rules E his \
+enterprising investor (chapter 15) and his net-net test (NN), B1 Buffett's return on equity, and \
+NI1 was added for net income growth. Two pairs test the same measure at different strictness \
+(G2a and E1, G2b and E2), so the current ratio and debt count twice."""
+
+[weighting]
+title = "Testing the weighting"
+text = """Each rule's points are multiplied by its weight, one less the share of companies passing \
+it on the date, so a rule few companies pass counts more. A good weighting gives most weight to the \
+rules whose points went with better returns. Table [[tab:weighting]] sets each rule's mean weight on the dates the \
+picks were made against two measures of how well it told the {picks_n} picks apart: the gap \
+between the mean points of the picks that beat the S&P 500 and of those that did not, weighted by \
+dollars as in Figure [[fig:rules]], and the rank \
+correlation of the rule's points with each pick's return a year above the S&P 500. Figure [[fig:weighting]] plots \
+weight against gap; a good weighting puts its rules on a rising line, with the heavy rules above \
+zero.
+
+Across the rules, the rank correlation of weight and gap is {quality_gap}, and of weight and \
+correlation {quality_ic}."""
+table_caption = "Each rule's weight w_r on the picks' dates (overall, for the picks that beat the S&P 500 and for the others), the dollar-weighted mean points, the gap and the rank correlation with the return a year above the S&P 500."
+figure = "Each rule's mean weight against the gap in points between the picks that beat the S&P 500 and the others, weighted by dollars; rules above the line told winners from losers."
+
+[weighting.verdicts]
+favours = """The weighting leans towards the rules that worked, though far from fully. Weighted \
+heavily but with a negative gap: {overweighted}. A positive gap but a light weight: \
+{underweighted}. A rule's weight hardly differs between the dates of winning and losing picks \
+(columns w_r beat and w_r not), because it is set across all companies on a date, not per pick. \
+These differences suggest where the weighting could be tuned; any change must be tested on years \
+it was not fitted on."""
+unrelated = """The weighting is unrelated to which rules worked. Weighted heavily but with a \
+negative gap: {overweighted}. A positive gap but a light weight: {underweighted}. Any change to the \
+weights must be tested on years it was not fitted on."""
+against = """The weighting favours the rules that did not work. Weighted heavily but with a \
+negative gap: {overweighted}. A positive gap but a light weight: {underweighted}. Any change to the \
+weights must be tested on years it was not fitted on."""
+
+[peers]
+title = "The Magnificent 7"
+text = """The best-known growth companies of the period, the {peer_label}, are rarely picked. On \
+the latest score date {peer_best} ranks highest of them, {peer_best_rank} of {peer_companies} \
+companies, and {peer_worst} lowest at {peer_worst_rank} (Table [[tab:peers]]). The rules are \
+Graham's and Buffett's, written to avoid paying a high price for growth: Figure [[fig:peers]] shows \
+that the {peer_label} score far fewer points than the picks on {peer_behind}, and more only on \
+{peer_ahead}.
+
+The same {amount} USD at each decision, split equally over the {peer_label} in the index on the \
+date and never sold, is worth {peer_2016} USD from 2016 ({peer_rate_2016} a year), {peer_2020} USD \
+from 2020 ({peer_rate_2020}) and {peer_2025} USD from 2025 ({peer_rate_2025}), against \
+{wallet_2016}, {wallet_2020} and {wallet_2025} USD in the value wallet. The comparison picks the \
+{peer_label} with hindsight: they are named for having been the winners of these years."""
+table_caption = "The Magnificent 7 on the score: score and score on the 0-to-1 scale on the latest score date, rank among the companies scored then, and median rank on the dates of the decisions since 2016."
+figure = "Mean points per rule (0 to 5) of the Magnificent 7 and of our picks on the decision dates since 2016, the rules ordered by how many more points the picks scored."
+
+[next]
+title = "The next picks"
+text = """On the latest score date, {next_score_date}, the five highest-scoring companies are \
+{next_picks} (Table [[tab:next]]). Each would receive its share of the next decision's {amount} USD and of any \
+proceeds from sales. The decision is taken on the first trading day of January with the scores \
+known then, which include the annual reports filed until that day; these picks are a preview and \
+may change."""
+table_caption = "The next picks on the latest score date: score, score on the 0-to-1 scale, weight and USD of each 100 USD."
+sell_title = "Sell check"
+sell_caption = "Holdings the rule would sell in part: value today, score on the 0-to-1 scale, share to sell and amount."
+sell_text = """The investor who started in {first_start} holds {holdings} companies. With the \
+scores of {next_score_date}, the rule would sell part of {sell_now}, and keep the other \
+{keep_now} as they are (Table [[tab:sell]])."""
+
+[conclusions]
+title = "Conclusions"
+text = """In this sample, the value picks bought twice a year and held are worth more today than the \
+same money in the S&P 500 or in Berkshire Hathaway for each of the four start years. That describes \
+the past under rules and settings chosen while looking at it; it is not a test of the strategy. \
+The lead is uneven: the \
+{best_company_buys} purchases of {best_company} make up {best_company_share} of the {ref_start} investor's \
+value, and the purchases of {loss_years} trail the index.
+
+Before the strategy is used, three steps are needed: the companies that left the index must be \
+added to the data, the score must be tested on more decisions (each quarter instead of each \
+year), and trading costs and taxes must be included."""
+
+[appendix]
+title = "Every purchase"
+text = ""
+table_caption = "Every purchase of the wallet with sells of the investor who started in {first_start}: weight in the decision's purchase, USD invested (the decision's 100 USD and the proceeds of sales), split-adjusted price at purchase and today, USD sold from it later, USD it keeps today and its total return with dividends, (sold + kept) / invested - 1."
+
+[rule_names]
+G2a = "current ratio"
+G2b = "debt to working capital"
+G3 = "10 years of profit"
+G4 = "20 years of dividends"
+G5 = "10-year earnings growth"
+G6 = "P/E"
+G7 = "P/E times P/B"
+E1 = "current ratio (lenient)"
+E2 = "debt to working capital (lenient)"
+E3 = "5 years of profit"
+E4 = "current dividend"
+E5 = "4-year earnings growth"
+E6 = "price to tangible assets"
+NN = "net-net"
+B1 = "return on equity"
+NI1 = "net income growth"
+
+[sectors]
+"Communication Services" = "Communication"
+"Consumer Discretionary" = "Discretionary"
+"Consumer Staples" = "Staples"
+"Information Technology" = "Technology"
+"Health Care" = "Health care"
+
+# What each rule measures and when it passes; {name} placeholders are the rule's
+# thresholds in config/rules.toml ([rules.<ID>], with [valuation] merged in).
+[rule_texts.G2a]
+measures = "Current assets divided by current liabilities: what the company owns against what it owes within a year."
+passes = "at least {min_current_ratio}"
+
+[rule_texts.G2b]
+measures = "Long-term debt divided by net current assets (current assets less current liabilities)."
+passes = "at most {max_debt_to_net_current_assets}"
+
+[rule_texts.G3]
+measures = "Number of the last {years} fiscal years with positive earnings per share."
+passes = "all {years} years"
+
+[rule_texts.G4]
+measures = "Number of the {years} calendar years before the decision in which a dividend was paid."
+passes = "all {years} years"
+
+[rule_texts.G5]
+measures = "Average earnings per share of the last {average_years} years over the average of {average_years} years a decade earlier."
+passes = "at least {min_growth}"
+
+[rule_texts.G6]
+measures = "Price over the average earnings per share of the last {average_years} years."
+passes = "at most {max_pe}"
+
+[rule_texts.G7]
+measures = "P/E as in G6 times the price over book value per share."
+passes = "P/B at most {max_pb}, or the product at most {max_pe_times_pb}"
+
+[rule_texts.E1]
+measures = "Current ratio, as G2a."
+passes = "at least {min_current_ratio}"
+
+[rule_texts.E2]
+measures = "Long-term debt over net current assets, as G2b."
+passes = "at most {max_debt_to_net_current_assets}"
+
+[rule_texts.E3]
+measures = "Number of the last {years} fiscal years with positive earnings per share."
+passes = "all {years} years"
+
+[rule_texts.E4]
+measures = "Dividends paid over the last {window_days} days, as a yield on the price."
+passes = "any dividend"
+
+[rule_texts.E5]
+measures = "Change in earnings per share over {years} years, relative to the earlier figure."
+passes = "earnings per share grew"
+
+[rule_texts.E6]
+measures = "Market value over net tangible assets (equity less goodwill and other intangible assets)."
+passes = "at most {max_price_to_net_tangible_assets}"
+
+[rule_texts.NN]
+measures = "Market value over net current asset value (current assets less all liabilities)."
+passes = "at most {max_price_to_ncav:.2f}"
+
+[rule_texts.B1]
+measures = "Number of the last {years} years with return on equity (net income over equity) of at least {min_roe:.0%}."
+passes = "at least {min_years_passed} years, and long-term debt at most {max_debt_to_equity} times equity"
+
+[rule_texts.NI1]
+measures = "Growth of net income from the year before to the latest year."
+passes = "net income grew"
+
+[lookahead]
+title = "Forward information"
+text = """A score must use only what was known on its date. Four guards are built in. A \
+company's figures count from the day its annual report was filed with the SEC, and of all \
+the figures filed for a year only the first reported is used, never a later restatement. \
+Prices are the close on the scoring date and dividends are counted by their ex-date. Each \
+January and July purchase uses the scores of the rebalance date two weeks before it. Rule \
+weights come from the companies on the date alone.
+
+These guards are tested by cutting every input at a date as if it were that day (filings \
+filed on or before it, prices and dividends up to it), scoring the companies again and \
+comparing the scores with the full run (Table [[tab:lookahead]]). Any difference means \
+information from after the date reached a score. On {lookahead_dates} the picks were \
+{lookahead_picks}. The scores were identical on {lookahead_clean}; on the other dates a few \
+companies differ by about one point, because when a company reports an item under two \
+labels, the label is chosen by the company's later use. The fix, choosing the label from \
+filings known on the date, is pending; the check runs as a unit test and will pass once it \
+is in.
+
+Three sources of forward information are outside this test. Only today's S&P 500 members \
+are scored: companies join the universe only from the date they entered the index, but \
+companies that later left it are missing, which flatters every result. Sectors are \
+today's, used to leave out Financials and Real Estate in earlier years. And the score's \
+design and settings were chosen while looking at 2016 to 2026, so no period tests it fairly: \
+2022 onwards, once meant as a held-out test, was used to choose between models."""
+survivors_title = "Companies missing from the data"
+survivors_text = """Table [[tab:survivors]] counts the companies that left the S&P 500 after each \
+start year; none of them is in the data, of any sector. Most left through an acquisition, often at \
+a premium; those that dropped out on their market value are the likely losers a real investor could \
+have picked. The later the start, the fewer are missing, which is why the investor who started in \
+{ref_start} is the reference of this report. The bias is removed only when the historical members \
+of the index are added to the data."""
+survivors_caption = "Companies that left the S&P 500 since each start year, all missing from the data: in all, on their market value, and through an acquisition or another reason."
+table_caption = "Truncation check: companies scored on the date, companies whose score differs when every input is cut at the date (per score), and whether the five picks are the same."

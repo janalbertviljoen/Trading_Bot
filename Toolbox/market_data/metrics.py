@@ -21,7 +21,9 @@ Choose tags or first-reported values (``market_data.clean``); apply rule thresho
 Public API
 ----------
 split_factor(splits, symbol, dates)
-    Product of the split ratios after each date, per symbol.
+    Product of the split ratios after each date, for one symbol.
+split_factors(splits, frame, *, symbol, date)
+    The same factor for each row of a table holding many symbols.
 price_earnings(prices, eps, splits)
     Daily P/E per symbol on the latest annual EPS filed before the day.
 dividend_yield(prices, dividends, *, window_days)
@@ -36,6 +38,8 @@ Computes
 split factor : split_factor
     F(d) = product of numerator / denominator over the symbol's splits dated after d;
     F = 1 when there are none.
+split factor per row : split_factors
+    F(symbol, date) per row, as ``split_factor``; 1 for a symbol without splits.
 price-to-earnings ratio, P/E : price_earnings
     P/E(t) = close(t) / (EPS / F(filed)), where EPS is the latest first-reported annual
     diluted EPS filed before day t; missing when that EPS is zero or negative.
@@ -80,6 +84,33 @@ def split_factor(splits: pd.DataFrame, symbol: str, dates: pd.Series) -> np.ndar
     query = np.asarray(dates, dtype="datetime64[ns]")
     positions: np.ndarray = np.searchsorted(split_days, query, side="right")
     return suffix[positions]
+
+
+def split_factors(
+    splits: pd.DataFrame, frame: pd.DataFrame, *, symbol: str, date: str
+) -> pd.Series:
+    """Return the split factor of each row of ``frame``, from its symbol and date.
+
+    Parameters
+    ----------
+    splits : pd.DataFrame
+        Columns ``symbol``, ``date``, ``numerator``, ``denominator``.
+    frame : pd.DataFrame
+        Any table with a symbol column and a datetime column; not modified.
+    symbol, date : str
+        Names of those two columns.
+
+    Returns
+    -------
+    pd.Series
+        Float factor on ``frame``'s index: dividing a per-share value reported on that
+        date by it, or multiplying a share count by it, puts the value on the basis of
+        the prices (after the last split). 1.0 where no split follows.
+    """
+    factors = pd.Series(1.0, index=frame.index)
+    for name, part in frame.groupby(symbol):
+        factors.loc[part.index] = split_factor(splits, str(name), part[date])
+    return factors
 
 
 def price_earnings(

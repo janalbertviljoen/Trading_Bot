@@ -1,0 +1,186 @@
+# Thresholds and windows of the value-investing rules (Toolbox/value_investing).
+# Values, not behaviour: each [rules.<ID>] table is passed to that rule's function.
+# Rule definitions and sources: docs/value_investing_bot_spec.md §2.
+# The windows default to Graham's and Buffett's values; a shorter window is a
+# methodology change, run as a recorded experiment (VI_202610_002, 2026-10-31).
+
+[schedule]
+# Rebalance on the third Friday of March, June, September and December.
+start = 2009-01-01
+months = [3, 6, 9, 12]
+# Fiscal years of EDGAR history kept per date: the longest window (G5, 13 years).
+history_years = 13
+
+[valuation]
+# Years in the average EPS of P/E (G6, G7).
+average_years = 3
+
+[score]
+# A company is scored (and ranked) on a date only when at least this many rules are
+# evaluable for it (user, 2026-10-31).
+min_available = 5
+
+# score_binned (VI_202610_004): per rule and date, the companies are graded into this
+# many equal-sized buckets by the rule's value, best bucket buckets - 1 points, worst 0;
+# the score is the sum of the points. score_binned_weighted weighs each rule's points
+# by 1 - its pass rate on the date.
+buckets = 6
+
+[universe]
+excluded_sectors = ["Financials", "Real Estate"]
+# Views written and compared (VI_202610_005): "on_date" keeps on each date only the
+# companies already in the S&P 500 (date_added <= date); "current" scores today's
+# members on every date. The first view feeds the diagnostic plots.
+views = ["on_date", "current"]
+
+# Graham, defensive investor (The Intelligent Investor, rev. ed., ch. 14)
+
+[rules.G2a]
+min_current_ratio = 2.0
+
+[rules.G2b]
+# Long-term debt at most this multiple of net current assets.
+max_debt_to_net_current_assets = 1.0
+
+[rules.G3]
+years = 10
+
+[rules.G4]
+# A dividend in each of this many calendar years before the rebalance year.
+years = 20
+
+[rules.G5]
+years = 13
+average_years = 3
+min_growth = 1.33
+
+[rules.G6]
+max_pe = 15.0
+
+[rules.G7]
+max_pb = 1.5
+max_pe_times_pb = 22.5
+
+# Graham, enterprising investor (ch. 15)
+
+[rules.E1]
+min_current_ratio = 1.5
+
+[rules.E2]
+max_debt_to_net_current_assets = 1.10
+
+[rules.E3]
+years = 5
+
+[rules.E4]
+window_days = 365
+
+[rules.E5]
+years = 4
+
+[rules.E6]
+max_price_to_net_tangible_assets = 1.20
+
+# Graham, derived measures
+
+[rules.NN]
+max_price_to_ncav = 0.6667
+
+# Buffett and Munger
+
+[rules.B1]
+years = 10
+min_roe = 0.15
+# "Most" of the years: at least this many of them. Debt cap confirmed by the user
+# (2026-10-31).
+min_years_passed = 7
+max_debt_to_equity = 0.5
+
+# Growth (VI_202610_005)
+
+[rules.NI1]
+# One-year net income growth; no threshold beyond growth itself.
+
+[learning]
+# score_ic (VI_202610_005): rule weights from the rank correlation of each rule's
+# points with the next `months` months' return over the benchmark, averaged over the
+# last `window` rebalance dates whose window had closed; negative means give 0.
+months = 12
+window = 12
+# score_ic_static: one frozen set of weights from every window closed by this date
+# (the end of the in-sample period), used on every date; decisions after it are a test.
+static_until = 2021-12-31
+
+[diagnostics]
+# The casual sample: companies with the highest and lowest mean score from this date.
+mean_from = 2016-01-01
+companies = 10
+
+[evaluation]
+# Paper test of the score (VI_202610_003): at the first trading day of each year from
+# first_year, buy position_usd of every company with score >= buy_threshold and sell
+# the same of every company with score <= sell_threshold, held for each horizon.
+first_year = 2017
+held_out_from = 2022
+buy_threshold = 0.6
+sell_threshold = 0.4
+position_usd = 100.0
+horizons_months = [1, 3, 12, 24]
+# The model score: annualised excess of the buy wallet at this horizon.
+score_horizon_months = 12
+# Rank correlation of score and forward excess return at 1 to this many months.
+correlation_max_months = 24
+
+[wallet]
+# Ranked wallet (VI_202610_004): each decision date, book_usd buys the `names` highest
+# scores (ties at the cut-off included), weight score / sum of their scores, held
+# horizon_months. The same money sells the `names` lowest, equal weights, reported
+# apart. Weighting "rank" uses rank_weights instead, normalised to the book.
+names = 5
+book_usd = 100.0
+horizon_months = 12
+rank_weights = [40.0, 20.0, 10.0, 5.0, 5.0]
+# Models compared: each score column with each weighting.
+score_columns = [
+    "score",
+    "score_binned",
+    "score_binned_weighted",
+    "score_ic",
+    "score_ic_static",
+]
+weightings = ["score"]
+
+[ledger]
+# The wallet whose ledger is written (ledger.csv, ledger.md): the ranked top-`names`
+# wallet on this score in the first universe view, starting with start_usd and
+# reinvesting the whole balance at every decision.
+score_column = "score_binned_weighted"
+start_usd = 100.0
+# Followed with the same money beside ^SP500TR: Berkshire Hathaway, the strategy the
+# value rules follow (user, 2026-10-31).
+compare = ["BRK-B"]
+
+[report]
+# Buy-and-hold report (VI_202610_006): every January amount_usd buys the top `names`
+# ([wallet]) by score_column ([ledger]) in the first universe view, never sold; the
+# same money goes into each of `compare` (S&P 500 first). One investor per start year.
+start_years = [2016, 2020, 2023, 2025]
+# The investor the abstract, conclusions and detailed views follow: a recent start, so
+# fewer of the companies that failed and left the index are missing (user, 2026-10-31).
+reference_start = 2020
+# Decisions on the first trading day of these months (user, 2026-10-31: January and
+# July), amount_usd at each.
+decision_months = [1, 7]
+amount_usd = 100.0
+compare = ["^SP500TR", "BRK-B"]
+# The wallet with sells (user, 2026-10-31): each January a holding whose 0-to-1 score
+# (share_column) is at or below sell_threshold sells (sell_threshold - s) /
+# sell_threshold of itself; the proceeds and amount_usd buy that year's picks.
+share_column = "score_weighted_share"
+# The peer group the picks are compared with (user, 2026-10-31).
+peers = ["AAPL", "MSFT", "AMZN", "GOOGL", "META", "NVDA", "TSLA"]
+peer_label = "Magnificent 7"
+# The forward-information check in the report: scores again with every input cut at
+# each of these rebalance dates and compares them with the full run.
+lookahead_dates = [2018-12-21, 2022-12-16, 2025-12-19]
+sell_threshold = 0.4
