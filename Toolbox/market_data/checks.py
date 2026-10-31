@@ -118,9 +118,7 @@ def _check_edgar(facts: pd.DataFrame, report: CheckReport, folder: Path) -> None
             for f in sorted(facts["field"].unique())
         ]
     )
-    for cik, part in annual.groupby("cik"):
-        entity = str(part["entity_name"].iloc[0])
-        report.save(plots.edgar_coverage(annual, entity), folder, f"coverage_{cik}")
+    report.save(plots.edgar_coverage(annual), folder, "coverage")
     for metric in ("revenue", "net_income", "eps_diluted"):
         report.save(plots.edgar_annual_series(annual, metric), folder, metric)
 
@@ -177,6 +175,7 @@ def _check_yahoo(
         f"  dividends {len(dividends):,}; splits {len(splits)}",
     ]
     report.save(plots.yahoo_total_return(prices), folder, "total_return")
+    report.save(plots.yahoo_relative_return(prices), folder, "relative_return")
     report.save(plots.yahoo_trading_days(prices), folder, "trading_days")
     report.save(plots.yahoo_dividends(dividends), folder, "dividends")
 

@@ -54,6 +54,11 @@ Per source:
   `skatkis.io`, with a manifest (source, query, as-of date, row count, hash).
 - Tests with small recorded fixtures; no network in unit tests.
 
+## Open decisions (user)
+
+- Source of the imported S&P 500 P/E (benchmark): Robert Shiller's monthly data (Yale,
+  Excel, needs an Excel reader) or S&P Dow Jones Indices' quarterly EPS sheet.
+
 ## Decisions
 
 - 2026-10-31 (user): the free version (spec §9.1): EDGAR for fundamentals, Wikipedia
@@ -113,6 +118,9 @@ Per source:
   through the `submissions` filing index; prices and FX in full per as-of date;
   companies and symbols as arguments until the constituents source exists; the
   `notebooks/fetch_*.py` scripts removed.
+- 2026-10-31 (user): the S&P 500 P/E used for comparison is imported from an index
+  source, not computed from the members. Model portfolios get their own aggregate P/E
+  (and other aggregate metrics), compared against that benchmark.
 
 ## Notes
 

@@ -20,8 +20,8 @@ clean data (``market_data.clean``); save files (callers, through ``skatkis.io``)
 
 Public API
 ----------
-edgar_coverage(annual, entity_name)
-    First-reported annual values per field and fiscal year for one company.
+edgar_coverage(annual)
+    Number of companies with a first-reported annual value, per field and fiscal year.
 edgar_annual_series(annual, field)
     One field's first-reported annual values per company.
 edgar_eps_check(wide)
@@ -30,6 +30,8 @@ edgar_filing_lag(lag)
     Days from period end to filing, per form.
 yahoo_total_return(prices)
     Growth of 1 USD with dividends reinvested, against ``^SP500TR``.
+yahoo_relative_return(prices)
+    Total return of each company divided by that of ``^SP500TR``.
 yahoo_trading_days(prices)
     Trading days per symbol and year.
 yahoo_dividends(dividends)
@@ -67,6 +69,7 @@ from Toolbox.skatkis.analysis import (
     plot_dual_axis,
     plot_lag_profile,
     plot_normalised,
+    plot_relative,
     plot_scatter,
     plot_series,
 )
@@ -74,15 +77,17 @@ from Toolbox.skatkis.analysis import (
 BENCHMARK = "^SP500TR"
 
 
-def edgar_coverage(annual: pd.DataFrame, entity_name: str) -> Figure:
-    """Plot one company's first-reported annual values per field and fiscal year end.
+def edgar_coverage(annual: pd.DataFrame) -> Figure:
+    """Plot the number of companies with a first-reported annual value, per field and year.
 
-    ``annual`` has columns ``entity_name``, ``field``, ``period_end``.
+    ``annual`` has columns ``cik``, ``field``, ``period_end``; a cell below the number of
+    companies shows a gap in the data.
     """
-    part = annual[annual["entity_name"] == entity_name]
-    part = part.assign(year=part["period_end"].dt.year)
-    title = f"{entity_name}: first-reported annual values per field and fiscal year end"
-    return plot_coverage(part, row="field", column="year", title=title)
+    present = annual.assign(year=annual["period_end"].dt.year)
+    present = present.drop_duplicates(["cik", "field", "year"])
+    companies = annual["cik"].nunique()
+    title = f"Companies (of {companies}) with a first-reported annual value, per field and year"
+    return plot_coverage(present, row="field", column="year", title=title)
 
 
 def edgar_annual_series(annual: pd.DataFrame, field: str) -> Figure:
@@ -146,6 +151,19 @@ def yahoo_total_return(prices: pd.DataFrame) -> Figure:
         group="symbol",
         highlight=BENCHMARK,
         ylabel="Growth of 1 USD, dividends reinvested (log)",
+    )
+
+
+def yahoo_relative_return(prices: pd.DataFrame) -> Figure:
+    """Plot each company's total return divided by the S&P 500's (above 1: beat the index)."""
+    return plot_relative(
+        prices,
+        x="date",
+        y="adj_close",
+        group="symbol",
+        benchmark=BENCHMARK,
+        title="Total return relative to the S&P 500 (above 1: beat an index fund; log)",
+        ylabel="company growth / S&P 500 growth",
     )
 
 

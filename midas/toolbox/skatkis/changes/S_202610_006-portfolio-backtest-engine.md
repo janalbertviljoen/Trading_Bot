@@ -52,7 +52,19 @@ A new engine in `Toolbox/skatkis/backtest/`, alongside the existing single-asset
   `^SP500TR`. Above 1 the strategy beat an index fund. Both value investing and
   `hand_o_midas` strategies are compared on it.
 
+- **Aggregate metrics against the benchmark** (user, 2026-10-31). Each model portfolio
+  gets aggregate metrics such as its P/E (computed from its holdings), compared with the
+  same metrics of the S&P 500 imported from an index source. Aggregates use the
+  portfolio weights, each company's share of the portfolio's value (user, same day).
+
 ## Open decisions (user)
+
+- How a ratio is aggregated with the weights. Proposed: a weighted harmonic mean for
+  price ratios, $\text{P/E}_{\text{portfolio}} = 1 / \sum_i (w_i / \text{P/E}_i)$,
+  where $w_i$ is company $i$'s weight, which equals total value over total earnings; a
+  weighted arithmetic mean of P/Es is pulled up by one company with tiny earnings
+  (Coca-Cola's P/E of about 160 in 2018). Companies with zero or negative earnings
+  need a rule (left out, or counted with their losses).
 
 - Spec §9.4: wallet input contract: signals, target weights (proposed) or orders.
 - Spec §9.2: bottom ten as avoid/sell only, or shorted?

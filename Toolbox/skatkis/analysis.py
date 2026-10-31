@@ -31,6 +31,8 @@ plot_scatter(df, *, x, y, group, diagonal, ...)
     One value against another, optionally with the line y = x.
 plot_dual_axis(df, *, x, left, right, ...)
     Two series over the same horizontal axis, each on its own vertical axis.
+plot_relative(df, *, x, y, group, benchmark, ...)
+    Each group's growth divided by the benchmark's, from their first common date.
 plot_lag_profile(df, *, lag, value, group, ...)
     A statistic per lag, one line per group, with the zero lag marked.
 lagged_correlation(a, b, lags)
@@ -40,6 +42,9 @@ Computes
 --------
 growth of one unit, normalised series : plot_normalised
     Each group's value divided by its value on the first date all groups have a value.
+relative growth, relative performance : plot_relative
+    Growth of one unit of each group divided by growth of one unit of the benchmark, both
+    from the first date all have a value; above 1 the group did better.
 lagged correlation, cross-correlation, lead-lag : lagged_correlation
     For each lag k, the Pearson correlation of a(t) with b(t + k) over the positions where
     both exist; k > 0 means ``a`` leads ``b`` by k steps.
@@ -89,14 +94,14 @@ def plot_series(
     log : bool
         Logarithmic vertical axis.
     markers : bool
-        Draw points instead of lines (for sparse data such as annual values).
+        Mark each point on the line (for sparse data such as annual values).
     """
     figure = Figure(figsize=WIDE)
     axes = figure.add_subplot()
     for name, unsorted in _groups(df, group):
         part = unsorted.sort_values(x)
         if markers:
-            axes.plot(part[x], part[y], label=name, ls="none", marker="o", ms=3)
+            axes.plot(part[x], part[y], label=name, lw=1, marker="o", ms=3)
         else:
             axes.plot(part[x], part[y], label=name, lw=1.2)
     _finish(axes, title=title, ylabel=ylabel, legend=group is not None, log=log)
@@ -280,6 +285,56 @@ def plot_dual_axis(
     twin.set_ylabel(right_label or right, color="tab:orange")
     axes.set_title(title)
     axes.grid(alpha=0.3)
+    figure.tight_layout()
+    return figure
+
+
+def plot_relative(
+    df: pd.DataFrame,
+    *,
+    x: str,
+    y: str,
+    group: str,
+    benchmark: str,
+    title: str = "",
+    ylabel: str = "Relative to the benchmark",
+) -> Figure:
+    """Plot each group's growth divided by the benchmark's growth, with a line at 1.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Long table including the benchmark's rows; not modified.
+    x, y, group : str
+        Date, value and group columns.
+    benchmark : str
+        The group every other group is divided by.
+    title, ylabel : str
+        Labels.
+
+    Notes
+    -----
+    Only dates on which every group has a value are kept, so all lines start at 1 on
+    the same date. Above 1, the group grew more than the benchmark since that date.
+    """
+    wide = df.pivot_table(index=x, columns=group, values=y).dropna()
+    growth = wide / wide.iloc[0]
+    figure = Figure(figsize=WIDE)
+    axes = figure.add_subplot()
+    for name in growth.columns:
+        if name != benchmark:
+            axes.plot(
+                growth.index, growth[name] / growth[benchmark], label=str(name), lw=1.2
+            )
+    axes.axhline(1, color="black", lw=1)
+    start = pd.Timestamp(growth.index[0]).date() if len(growth) else "-"
+    _finish(
+        axes,
+        title=title or f"Relative to {benchmark} since {start}",
+        ylabel=ylabel,
+        legend=True,
+        log=True,
+    )
     figure.tight_layout()
     return figure
 

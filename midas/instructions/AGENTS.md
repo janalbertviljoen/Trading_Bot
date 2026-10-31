@@ -50,7 +50,8 @@ on out-of-sample excess return over the S&P 500 total-return index.
 - `notebooks/`: interactive notebooks only (display and exploration); no scripts and no
   reusable logic. Repeatable work runs as terminal commands (`python -m Toolbox.<package>
   <command>`) or through the MCP server.
-- `results/`: plots and reports written by the commands, git-ignored like `data/`:
+- `results/`: plots and reports written by the commands, tracked in git so changes show
+  for review (raw vendor data stays in the git-ignored `data/`):
   `market_analysis/<source>/<as_of>/` per source, and one folder per tool
   (`value_investing/`, `hand_o_midas/`) for how its strategies perform.
 - `tests/`: mirrors `Toolbox/`.

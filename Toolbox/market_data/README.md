@@ -171,13 +171,14 @@ values, duplicates, implausible values, filing delays, coverage) and writes plot
 
 | Folder | Plots |
 |---|---|
-| `edgar/` | Coverage per company (field × fiscal year), first-reported revenue, net income and diluted EPS, reported EPS against net income / diluted shares, days from period end to filing |
-| `yahoo/` | Growth of 1 USD with dividends reinvested against `^SP500TR`, trading days per year, dividends per year |
+| `edgar/` | Coverage: companies with a value per field and fiscal year, first-reported revenue, net income and diluted EPS, reported EPS against net income / diluted shares, days from period end to filing |
+| `yahoo/` | Growth of 1 USD with dividends reinvested against `^SP500TR`, each company's total return divided by the S&P 500's (above 1: it beat an index fund), trading days per year, dividends per year |
 | `fred/` | The exchange rate and its observations per year |
 | `metrics/` | P/E per company and the EPS behind it; P/E and price on two axes per company; the lead-lag profile of monthly P/E changes against price changes 12 months either side |
 
 The P/E and lead-lag tables are also stored under `data/interim/metrics/<as_of>/`.
-`results/` is git-ignored like `data/`.
+`results/` is tracked in git, so new and changed plots show in the changes view; the
+raw and parsed data stay in the git-ignored `data/`.
 
 The plots are named functions in `market_analysis.py` (`edgar_coverage`, `pe_vs_price`,
 `pe_lead_lag`, ...), one per thing shown, with its titles and units, so a plot looks the

@@ -44,6 +44,16 @@ heat maps, wallet outcomes, normalised series).
 
 ## Notes
 
+- 2026-10-31 (user feedback): per-company coverage plots always showed 1 (one first-reported
+  value per year), so coverage is one plot of the number of companies with a value per
+  field and year; marker plots now draw lines through their points; new
+  `plot_relative` (generic) and `yahoo_relative_return` (company total return divided by
+  the S&P 500's). The coverage plot exposed three tag gaps, closed with fallbacks
+  (`CostOfGoodsSold`, `PaymentsToAcquireProductiveAssets`,
+  `FiniteLivedIntangibleAssetsNet`, `OtherIntangibleAssetsNet`); the gaps left are real
+  (Coca-Cola reports no total liabilities, Apple no goodwill from 2018 and no dividends or
+  debt before 2013). P/E against the S&P 500 waits for an index P/E source.
+
 - 2026-10-31: split in two (user): generic layouts and statistics in `skatkis.analysis`
   (with `plot_dual_axis`,
   `plot_lag_profile`, `lagged_correlation`), and the named market plots with their

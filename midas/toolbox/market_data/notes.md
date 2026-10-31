@@ -40,3 +40,11 @@ the later basis. Rules comparing per-share values across years (G3, G5, E5) need
 one basis, from the Yahoo splits table, applied point-in-time (only splits before the
 rebalance date).
 
+### Share count reported on two dates per 10-K (2026-10-31, open → MD_202610_002)
+
+`shares_outstanding` comes from the cover page (`dei:EntityCommonStockSharesOutstanding`,
+dated a few days before filing) and from the balance sheet
+(`us-gaap:CommonStockSharesOutstanding`, dated at the period end), so a 10-K can give two
+share counts with different dates. The point-in-time stage must pick one convention
+(the cover-page count is the latest known at filing).
+

@@ -7,8 +7,10 @@ Companies report the same concept under different us-gaap tags, and change tags 
 time (revenue moved to ``RevenueFromContractWithCustomerExcludingAssessedTax`` under ASC
 606). Each canonical field lists its tags in priority order; the parser keeps every
 listed tag with its priority, and choosing between them is left to a later stage. A
-lower-priority tag can be narrower than its field (``Depreciation`` without amortisation
-for ``depreciation_amortization``); its ``tag`` column shows which was used. Total
+lower-priority tag can be narrower or broader than its field (``Depreciation`` without
+amortisation for ``depreciation_amortization``, ``FiniteLivedIntangibleAssetsNet``
+without indefinite-lived intangibles, ``PaymentsToAcquireProductiveAssets`` with more than
+property, plant and equipment); its ``tag`` column shows which was used. Total
 liabilities are not reported by every company; ``liabilities_and_equity`` lets a later
 stage derive them. The
 fields cover the data needs of the rule catalogue (spec §2). Financial companies and
@@ -81,7 +83,9 @@ TAG_MAP: tuple[FieldMap, ...] = (
         ),
     ),
     FieldMap(
-        "cost_of_revenue", USD, _gaap("CostOfRevenue", "CostOfGoodsAndServicesSold")
+        "cost_of_revenue",
+        USD,
+        _gaap("CostOfRevenue", "CostOfGoodsAndServicesSold", "CostOfGoodsSold"),
     ),
     FieldMap("gross_profit", USD, _gaap("GrossProfit")),
     FieldMap("operating_income", USD, _gaap("OperatingIncomeLoss")),
@@ -111,7 +115,12 @@ TAG_MAP: tuple[FieldMap, ...] = (
         ),
     ),
     FieldMap(
-        "capital_expenditure", USD, _gaap("PaymentsToAcquirePropertyPlantAndEquipment")
+        "capital_expenditure",
+        USD,
+        _gaap(
+            "PaymentsToAcquirePropertyPlantAndEquipment",
+            "PaymentsToAcquireProductiveAssets",
+        ),
     ),
     FieldMap(
         "depreciation_amortization",
@@ -155,7 +164,15 @@ TAG_MAP: tuple[FieldMap, ...] = (
     FieldMap("cash", USD, _gaap("CashAndCashEquivalentsAtCarryingValue")),
     FieldMap("ppe_net", USD, _gaap("PropertyPlantAndEquipmentNet")),
     FieldMap("goodwill", USD, _gaap("Goodwill")),
-    FieldMap("intangible_assets", USD, _gaap("IntangibleAssetsNetExcludingGoodwill")),
+    FieldMap(
+        "intangible_assets",
+        USD,
+        _gaap(
+            "IntangibleAssetsNetExcludingGoodwill",
+            "FiniteLivedIntangibleAssetsNet",
+            "OtherIntangibleAssetsNet",
+        ),
+    ),
     FieldMap(
         "shares_outstanding",
         SHARES,
