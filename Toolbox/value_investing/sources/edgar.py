@@ -1,0 +1,299 @@
+"""
+value_investing/sources/edgar.py
+--------------------------------
+SEC EDGAR XBRL ``companyfacts``: every value a company has reported, with its filing.
+
+The provider fetches one company's ``companyfacts`` JSON per CIK through the central
+``ApiClient``; snapshots store it as received. The parser maps the tags in ``TAG_MAP``
+to canonical fields and returns one row per reported value, keeping the filing date,
+form, fiscal period and accession number so the point-in-time stage can pick the
+values first reported before each rebalance date (spec §3.3, §3.5). SEC requires a
+declared User-Agent (a name and an e-mail address) and at most 10 requests per second.
+
+Owns
+----
+The EDGAR endpoint and headers, the ``companyfacts`` source model and its columns.
+
+Must not
+--------
+Choose between tags, periods or restatements (point-in-time stage); compute ratios
+(metrics layers); read the User-Agent from the environment (the command-line boundary).
+
+Public API
+----------
+edgar_client(user_agent, *, max_requests_per_second, ...)
+    An ``ApiClient`` with the headers SEC requires.
+EdgarCompanyFacts(client)
+    The ``DataProvider`` for ``companyfacts``; the query is a CIK.
+parse_companyfacts(content, tag_map)
+    Raw JSON to one row per reported value of a mapped tag.
+load_companyfacts(ciks, *, provider, store, as_of, tag_map)
+    Snapshot and parse several companies into one table.
+format_cik(cik)
+    A CIK as the 10-digit, zero-padded string EDGAR uses.
+
+Dependency rule
+---------------
+pandas, the standard library, ``skatkis.io`` and ``value_investing.sources.tag_map``.
+"""
+
+import json
+from collections.abc import Sequence
+from dataclasses import dataclass
+from datetime import date
+from typing import Any, cast
+
+import pandas as pd
+
+from Toolbox.skatkis.io.api import ApiClient
+from Toolbox.skatkis.io.provider import DataProvider, RawPayload
+from Toolbox.skatkis.io.snapshots import SnapshotStore, fetch_snapshot
+from Toolbox.value_investing.sources.tag_map import TAG_MAP, FieldMap
+
+COMPANYFACTS_URL = "https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json"
+SEC_MAX_REQUESTS_PER_SECOND = 10.0
+CIK_DIGITS = 10
+
+COMPANYFACTS_COLUMNS: dict[str, str] = {
+    "cik": "int64",
+    "entity_name": "string",
+    "field": "string",
+    "taxonomy": "string",
+    "tag": "string",
+    "tag_priority": "int64",
+    "unit": "string",
+    "value": "float64",
+    "period_start": "datetime64[ns]",
+    "period_end": "datetime64[ns]",
+    "fiscal_year": "Int64",
+    "fiscal_period": "string",
+    "form": "string",
+    "filed": "datetime64[ns]",
+    "accession": "string",
+    "frame": "string",
+}
+"""Columns of the parsed table and their dtypes.
+
+``tag_priority`` is the tag's position in its field's ``FieldMap.tags`` (0 = preferred).
+``period_start`` is missing for balance-sheet values (instants). ``filed`` is the date
+the filing was accepted by SEC. ``frame`` is SEC's calendar frame (e.g. ``CY2023Q4I``),
+present only on the value SEC deems current for that period.
+"""
+
+_SORT_ORDER = ["field", "tag_priority", "period_end", "filed", "accession"]
+
+
+class EdgarParseError(ValueError):
+    """A ``companyfacts`` payload is malformed or reports a field in the wrong unit."""
+
+
+def format_cik(cik: int | str) -> str:
+    """Return ``cik`` as the 10-digit, zero-padded string EDGAR uses.
+
+    Raises
+    ------
+    ValueError
+        If ``cik`` is not a positive integer of at most 10 digits.
+    """
+    text = str(cik).strip()
+    if not text.isdigit() or len(text) > CIK_DIGITS or int(text) == 0:
+        raise ValueError(f"not a CIK: {cik!r}")
+    return text.zfill(CIK_DIGITS)
+
+
+def edgar_client(
+    user_agent: str,
+    *,
+    max_requests_per_second: float,
+    timeout_seconds: float,
+    max_retries: int,
+    backoff_seconds: float,
+) -> ApiClient:
+    """Return an ``ApiClient`` that sends the User-Agent SEC requires.
+
+    Parameters
+    ----------
+    user_agent : str
+        A name and contact e-mail address, e.g. ``"Jane Doe jane@example.com"``; read
+        from the environment by the caller.
+    max_requests_per_second : float
+        At most 10 (SEC's limit).
+    timeout_seconds, max_retries, backoff_seconds
+        Passed to ``ApiClient``; values come from ``config/value_investing.toml``.
+
+    Raises
+    ------
+    ValueError
+        If the User-Agent has no e-mail address or the rate exceeds SEC's limit.
+    """
+    if "@" not in user_agent:
+        raise ValueError("the SEC User-Agent must contain a contact e-mail address")
+    if max_requests_per_second > SEC_MAX_REQUESTS_PER_SECOND:
+        raise ValueError(
+            f"SEC allows at most {SEC_MAX_REQUESTS_PER_SECOND:g} requests per second"
+        )
+    return ApiClient(
+        headers={"User-Agent": user_agent},
+        max_requests_per_second=max_requests_per_second,
+        timeout_seconds=timeout_seconds,
+        max_retries=max_retries,
+        backoff_seconds=backoff_seconds,
+    )
+
+
+@dataclass(frozen=True)
+class EdgarCompanyFacts(DataProvider):
+    """``DataProvider`` for EDGAR ``companyfacts``; the query is a CIK."""
+
+    client: ApiClient
+    url_template: str = COMPANYFACTS_URL
+
+    @property
+    def name(self) -> str:
+        """Snapshot folder name: ``edgar_companyfacts``."""
+        return "edgar_companyfacts"
+
+    def fetch(self, query: str, as_of: date) -> RawPayload:
+        """Return the ``companyfacts`` JSON for CIK ``query``.
+
+        EDGAR serves only the current version, so ``as_of`` labels the snapshot; the
+        filing date of each value is what makes the data point-in-time.
+        """
+        url = self.url_template.format(cik=format_cik(query))
+        return RawPayload(content=self.client.get(url), extension="json")
+
+
+def parse_companyfacts(
+    content: bytes, tag_map: Sequence[FieldMap] = TAG_MAP
+) -> pd.DataFrame:
+    """Return one row per reported value of every mapped tag in a ``companyfacts`` payload.
+
+    Parameters
+    ----------
+    content : bytes
+        The ``companyfacts`` JSON as received.
+    tag_map : Sequence[FieldMap]
+        Fields and tags to keep; unmapped tags are dropped.
+
+    Returns
+    -------
+    pd.DataFrame
+        Columns and dtypes of ``COMPANYFACTS_COLUMNS``, sorted by field, tag priority,
+        period end, filing date and accession. Values are as filed: amendments and
+        restatements appear as further rows, none is removed.
+
+    Raises
+    ------
+    EdgarParseError
+        If the payload is not ``companyfacts`` JSON, a fact lacks a required key
+        (``end``, ``val``, ``accn``, ``form``, ``filed``), or a mapped tag is reported
+        only in units other than its field's unit. The message names the CIK, tag and
+        period.
+    """
+    try:
+        document = json.loads(content)
+    except json.JSONDecodeError as error:
+        raise EdgarParseError(
+            f"companyfacts payload is not valid JSON: {error}"
+        ) from error
+    if (
+        not isinstance(document, dict)
+        or "cik" not in document
+        or "facts" not in document
+    ):
+        raise EdgarParseError("companyfacts payload lacks 'cik' or 'facts'")
+    doc = cast(dict[str, Any], document)
+    cik = int(doc["cik"])
+    entity_name = str(doc.get("entityName", ""))
+    facts = cast(dict[str, dict[str, Any]], doc["facts"])
+
+    rows: list[dict[str, object]] = []
+    for mapping in tag_map:
+        for priority, (taxonomy, tag) in enumerate(mapping.tags):
+            concept = facts.get(taxonomy, {}).get(tag)
+            if concept is None:
+                continue
+            units = cast(
+                dict[str, list[dict[str, Any]]], cast(dict[str, Any], concept)["units"]
+            )
+            if mapping.unit not in units:
+                raise EdgarParseError(
+                    f"CIK {cik:010d}: {taxonomy}:{tag} (field {mapping.field!r}) is reported "
+                    f"in {sorted(units)}, expected {mapping.unit!r}"
+                )
+            for fact in units[mapping.unit]:
+                try:
+                    rows.append(
+                        {
+                            "cik": cik,
+                            "entity_name": entity_name,
+                            "field": mapping.field,
+                            "taxonomy": taxonomy,
+                            "tag": tag,
+                            "tag_priority": priority,
+                            "unit": mapping.unit,
+                            "value": float(fact["val"]),
+                            "period_start": fact.get("start"),
+                            "period_end": fact["end"],
+                            "fiscal_year": fact.get("fy"),
+                            "fiscal_period": fact.get("fp"),
+                            "form": fact["form"],
+                            "filed": fact["filed"],
+                            "accession": fact["accn"],
+                            "frame": fact.get("frame"),
+                        }
+                    )
+                except KeyError as error:
+                    raise EdgarParseError(
+                        f"CIK {cik:010d}: {taxonomy}:{tag} value for period ending "
+                        f"{fact.get('end')} lacks {error}"
+                    ) from error
+    return _to_frame(rows)
+
+
+def load_companyfacts(
+    ciks: Sequence[int | str],
+    *,
+    provider: DataProvider,
+    store: SnapshotStore,
+    as_of: date,
+    tag_map: Sequence[FieldMap] = TAG_MAP,
+) -> pd.DataFrame:
+    """Snapshot (if not stored yet) and parse ``companyfacts`` for each CIK.
+
+    Parameters
+    ----------
+    ciks : Sequence[int | str]
+        Companies to load.
+    provider : DataProvider
+        Normally ``EdgarCompanyFacts``.
+    store : SnapshotStore
+        Raw snapshot root (``data/raw``).
+    as_of : date
+        Snapshot date.
+    tag_map : Sequence[FieldMap]
+        Fields and tags to keep.
+
+    Returns
+    -------
+    pd.DataFrame
+        The rows of ``parse_companyfacts`` for every CIK, in the order given.
+    """
+    frames = [
+        parse_companyfacts(
+            fetch_snapshot(provider, format_cik(cik), as_of, store), tag_map
+        )
+        for cik in ciks
+    ]
+    if not frames:
+        return _to_frame([])
+    return pd.concat(frames, ignore_index=True)
+
+
+def _to_frame(rows: list[dict[str, object]]) -> pd.DataFrame:
+    """Build the parsed table with ``COMPANYFACTS_COLUMNS`` dtypes and sort order."""
+    frame = pd.DataFrame(rows, columns=list(COMPANYFACTS_COLUMNS))
+    for column in ("period_start", "period_end", "filed"):
+        frame[column] = pd.to_datetime(frame[column], format="%Y-%m-%d")
+    frame = frame.astype(COMPANYFACTS_COLUMNS)
+    return frame.sort_values(_SORT_ORDER, kind="stable").reset_index(drop=True)

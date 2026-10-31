@@ -13,6 +13,7 @@ core = [
     "pandas>=2.2",
     "matplotlib>=3.8",
     "requests>=2.31",
+    "pyarrow>=17.0",
 ]
 mcp = ["fastmcp>=2.0"]
 notebooks = ["ipykernel>=6.29"]
@@ -55,7 +56,9 @@ extend-exclude = ["Toolbox/SandBox", "notebooks", "data", "*.ipynb"]
 
 [tool.ruff.lint]
 select = ["E", "W", "F", "I", "B", "UP", "N", "D", "ANN", "SIM", "RUF", "PL", "PD", "NPY"]
-ignore = ["D203", "D213"]
+# D205 and D400 conflict with the module docstring heading of .claude/rules/docstrings.md
+# (path line, dash underline, then the summary).
+ignore = ["D203", "D213", "D205", "D400"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"

@@ -48,3 +48,30 @@ The statement is kept out of the repository, in the git-ignored `data/private/`.
 
 Spec §1.3 prescribes Google style; the user chose the numpydoc structure of
 `.claude/rules/docstrings.md`. The spec is updated in S_202610_003.
+
+## Open methodology questions
+
+### EDGAR history is too short for the long Graham windows (2026-10-31, open)
+
+Found in the first live pull (VI_202610_001, Apple, Microsoft, Coca-Cola). XBRL
+filings start in mid-2009; with comparative figures, values reach back to periods ending
+in 2006–2007, but nothing was filed in XBRL before 2009. SEC's Financial Statement Data
+Sets also start in 2009. So "20 years where EDGAR has it" gives about 17–20 years of
+periods, and the rules with long windows first become computable late:
+
+| Rule | Window | First rebalance with a full window (about) |
+|---|---|---|
+| G3 earnings stability, B1 ROE | 10 years | 2016–2017 |
+| G5 earnings growth | 13 years | 2019–2020 |
+| G4 dividend record | 20 years | 2026 or later |
+
+A backtest with the full defensive rules would then cover only about 2017–2026, which
+leaves little out-of-sample history. Options, for the user to decide:
+
+- Dividend history (G4) from the price source instead: `yfinance` dividends go back
+  decades, though not point-in-time filings.
+- Shorter windows as explicit, configurable parameters: a methodology change, recorded
+  as such.
+- A paid source with point-in-time fundamentals before 2009.
+- Rules phased in: each rule applies only from the first date its window is full.
+

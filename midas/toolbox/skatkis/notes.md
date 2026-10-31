@@ -21,7 +21,8 @@ Found when executing the notebooks after S_202610_001; all predate the move.
 `notebooks/run_bot.ipynb` uses `dict_read_data` in cell 3 before cell 7 defines it,
 calls `PromisedLandTrader` without `dict_detect_range` and `dict_trade_range`, and uses
 `bb` in the Fourier cells without importing it. `notebooks/optimise_strategies.ipynb`
-uses `df_time_top` and `highest_comb` in cell 54, which no cell defines.
+uses `df_time_top` in cell 54 and `highest_comb` in cells 54 and 62, which no cell
+defines; everything else, including the full parameter grid, runs.
 
 ### The regression baseline makes no trades (2026-10-31, open)
 

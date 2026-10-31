@@ -2,7 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | agreed |
+| Status | in progress |
+| Branch | `feature/value-investing/vi-202610-001-sp500-data-sources` |
 | Priority | high |
 | Kind | new capability |
 | Depends on | S_202610_001 |
@@ -81,8 +82,36 @@ Per source:
   in USD. ZAR is secondary: added once the analysis is refined, and used to track the
   actual record of the sleeve. The exchange rate comes from FRED `DEXSFUS`.
 - 2026-10-31 (user, spec §9.6): the DAG engine is the stdlib `graphlib` registry.
+- 2026-10-31 (user): storage. Raw snapshots keep the vendor's own format as received
+  (EDGAR JSON, gzipped), so cleaning can be rebuilt without calling the API again.
+  From cleaning onwards, tables are Parquet (spec §6, `io/artefacts.py`), adding
+  `pyarrow` as a dependency. Manifests hash the content, not the file bytes.
+- 2026-10-31 (user, decision of the same day applied to the area rules): network access
+  is allowed in `skatkis.io`'s API client as well as in source modules;
+  `.claude/rules/sources.md` is updated to match.
 
 ## Notes
+
+### Progress
+
+- 2026-10-31: step 1 built. `skatkis.io` (`api.py`, `provider.py`, `snapshots.py`,
+  `tables.py`, `config.py`), the EDGAR source (`sources/edgar.py`, `sources/tag_map.py`
+  with 26 canonical fields), `config/value_investing.toml` and the run script
+  `notebooks/fetch_edgar.py`. HTTP uses the standard library's `urllib` (`requests` has
+  no type stubs for strict pyright). Ruff's D205 and D400 are switched off because they
+  conflict with the module docstring heading of `.claude/rules/docstrings.md`. Checked
+  offline with a synthetic payload (retries, snapshot reuse, integrity check, key
+  redaction, unit and CIK errors); Black, ruff and pyright clean. Not yet run against
+  SEC: it needs the user's User-Agent, and `pyarrow` still has to be installed.
+- 2026-10-31: first live pull (Apple, Microsoft, Coca-Cola; User-Agent given by the
+  user): 16,403 values, all 26 fields found. The pull needed two fixes in `ApiClient`:
+  responses cut off mid-transfer are retried, and responses are requested gzip-encoded
+  (large uncompressed responses were cut off repeatedly). Tag fallbacks added for
+  revenue (`SalesRevenueGoodsNet`), long-term debt
+  (`LongTermDebtAndCapitalLeaseObligations`) and D&A (`Depreciation`), and
+  `liabilities_and_equity` mapped so total liabilities can be derived where a company
+  does not report them. History reaches back to periods ending 2006–2007 only, which
+  is short for the long Graham windows: see the tool's notes.
 
 ### Source research (2026-10-31)
 

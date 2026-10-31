@@ -18,8 +18,13 @@ paths:
 - Raw pulls are cached as immutable snapshots under `data/raw/<source>/<as_of>/` with a
   manifest (source, query, as-of date, row count, hash). `data/` is git-ignored; vendor
   data is never committed or sent elsewhere.
-- File reading and writing goes through `skatkis.io`; network access only in source
-  modules.
+- File reading and writing goes through `skatkis.io`. Network access only through
+  `skatkis.io.api.ApiClient`, the central API handler, or in source modules (for a
+  vendor library such as `yfinance`); the vendor's endpoints and headers live in the
+  tool's source module.
+- Raw snapshots keep the vendor's format as received (gzipped); tables from cleaning
+  onwards are Parquet through `skatkis.io.tables`. Manifests hash the content, not the
+  file bytes.
 - API keys come from the environment, read at the command-line boundary and passed in;
   never hardcoded, logged or written to a snapshot. Respect vendor rate limits (SEC: a
   declared User-Agent, at most 10 requests per second).

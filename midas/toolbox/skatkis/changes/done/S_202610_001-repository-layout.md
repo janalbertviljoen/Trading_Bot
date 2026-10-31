@@ -47,8 +47,9 @@ only in imports, root-path depth and docstrings. `regression_check` on
 `BTCUSDT_1h_2025-06-01_2025-10-01` returned `unchanged`; pytest passed 9 tests; Black,
 ruff and pyright (strict) were clean. In `notebooks/run_bot.ipynb` the new imports, the
 data fetch, the wallet and the plots work; its other failures were already in 3ebb40f
-and are logged in `midas/toolbox/skatkis/notes.md`. The `optimise_strategies.ipynb`
-grid run had not finished at closing.
+and are logged in `midas/toolbox/skatkis/notes.md`. `notebooks/optimise_strategies.ipynb`
+(run completed after closing, 2026-10-31) runs its full grid, analysis and plots;
+only cells 54 and 62 fail, on names no cell defines.
 
 **Warden's fixes, in the closing commit.** Change IDs removed from the server and
 package docstrings; old module names updated in the legacy agents
