@@ -35,5 +35,5 @@ def save_figure(figure: Figure, path: Path, *, dpi: int = 110) -> Path:
     if path.suffix != ".png":
         raise ValueError(f"figure path must end in .png: {path}")
     path.parent.mkdir(parents=True, exist_ok=True)
-    figure.savefig(path, dpi=dpi)
+    figure.savefig(path, dpi=dpi, bbox_inches="tight")
     return path

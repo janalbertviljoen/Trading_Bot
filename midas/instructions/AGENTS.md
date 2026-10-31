@@ -198,7 +198,7 @@ hats are separated by what they may write; each record has one owner.
 | Hat | Does | Writes | Rules |
 |---|---|---|---|
 | **Index** | The MCP server: answers questions about code, rules and documents | nothing | `developer.md`, "Working on Midas's code" |
-| **Secretary** | Keeps the notes, change logs, change files, designs, decisions and outcome minutes, and the agent instructions | `midas/`, the only hat that writes there | [secretary.md](secretary.md) |
+| **Secretary** | Keeps the notes, change logs, change files, designs, decisions and outcome minutes, and the agent instructions; writes and formats the PDF reports | `midas/`, the only hat that writes there; the report text in `config/report_*.toml` | [secretary.md](secretary.md) |
 | **Developer** | Designs the change with the user, builds code and tests, updates the official documentation after the warden's report | code, official documentation, `.claude/` rules and agents, the root pointers; nothing in `midas/` | [developer.md](developer.md) |
 | **Researcher** | Improves strategy performance with hypothesis-driven, out-of-sample backtests | strategy code, config and tests on its branch | [researcher.md](researcher.md) |
 | **Warden** | Applies the rules strictly to a finished change and gives the user a pre-commit report | nothing | [warden.md](warden.md) |

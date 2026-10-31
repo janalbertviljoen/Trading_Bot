@@ -73,6 +73,7 @@ convention = "numpy"
 "Toolbox/skatkis/backtest/wallet.py" = ["D"]
 # Plot functions take many keyword-only labelling options.
 "Toolbox/skatkis/analysis.py" = ["PLR0913"]
+"Toolbox/market_data/market_analysis.py" = ["PLR0913"]
 # MCP tool signatures are the tools' input schemas, so they take many arguments.
 "Toolbox/skatkis/midas/**" = ["D", "PLR0913", "PLR0917"]
 

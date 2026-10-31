@@ -36,6 +36,8 @@ The standard library, ``skatkis.io`` and ``market_data``.
 
 import argparse
 import os
+import shutil
+import subprocess
 import sys
 from collections.abc import Sequence
 from datetime import date
@@ -43,6 +45,7 @@ from pathlib import Path
 
 from Toolbox.market_data.checks import run_checks
 from Toolbox.market_data.gics import gics_map
+from Toolbox.market_data.report import ReportContext, build_report
 from Toolbox.market_data.sources.constituents import WikipediaPage, wikipedia_client
 from Toolbox.market_data.sources.edgar import edgar_client
 from Toolbox.market_data.sources.fred import FredSeries, fred_client
@@ -58,9 +61,11 @@ from Toolbox.market_data.update import (
 from Toolbox.skatkis.io.config import load_config
 from Toolbox.skatkis.io.snapshots import SnapshotStore
 from Toolbox.skatkis.io.tables import read_table
+from Toolbox.skatkis.report import compile_pdf
 
 SOURCES = ("edgar", "prices", "fx")
 UNIVERSES = ("sp500",)
+LATEX_ENGINES = ("tectonic", "latexmk", "pdflatex")
 FX_SERIES = ("DEXSFUS",)
 
 
@@ -69,20 +74,49 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     storage = Storage(SnapshotStore(args.data_dir / "raw"), args.data_dir / "interim")
     if args.command == "check":
-        benchmarks = load_config(args.config)["benchmarks"]
-        report = run_checks(
-            args.as_of,
-            storage=storage,
-            results=args.results_dir,
-            market=benchmarks["market"],
-            sectors=benchmarks["sectors"],
-        )
-        print("\n".join(report.lines))
-        print(
-            f"\n{len(report.figures)} plots under {args.results_dir / 'market_analysis'}"
-        )
-        return 0
+        return _check(args, storage)
     return _update(args, storage)
+
+
+def _check(args: argparse.Namespace, storage: Storage) -> int:
+    """Write the check plots and the report; compile the report if an engine is found."""
+    benchmarks = load_config(args.config)["benchmarks"]
+    report = run_checks(
+        args.as_of,
+        storage=storage,
+        results=args.results_dir,
+        market=benchmarks["market"],
+        sectors=benchmarks["sectors"],
+    )
+    print("\n".join(report.lines))
+    tex = build_report(
+        ReportContext(report.plots, report.facts, report.sectors),
+        load_config(args.report_text),
+        folder=report.folder,
+        subtitle=f"Data as of {args.as_of.isoformat()}; {len(report.sectors)} GICS sectors",
+    )
+    print(f"\n{len(report.plots)} plots and {tex.name} in {report.folder}")
+    engine = next((e for e in LATEX_ENGINES if shutil.which(e)), None)
+    if engine is None:
+        print(
+            "No LaTeX engine found (tectonic, latexmk, pdflatex): report.tex not compiled."
+        )
+        print("Install one, e.g. `brew install tectonic`, and run check again.")
+        return 0
+    try:
+        pdf = compile_pdf(
+            tex,
+            engine=str(shutil.which(engine)),
+            cache=args.data_dir / "cache" / "tectonic",
+        )
+    except subprocess.CalledProcessError as error:
+        detail = (
+            (error.stderr or b"").decode(errors="replace").strip().splitlines()[-1:]
+        )
+        print(f"LaTeX ({engine}) failed: {' '.join(detail)}; report.tex is kept.")
+        return 1
+    print(f"Compiled {pdf}")
+    return 0
 
 
 def _update(args: argparse.Namespace, storage: Storage) -> int:
@@ -190,6 +224,9 @@ def _parser() -> argparse.ArgumentParser:
     check.add_argument("--data-dir", type=Path, default=Path("data"))
     check.add_argument("--results-dir", type=Path, default=Path("results"))
     check.add_argument("--config", type=Path, default=Path("config/market_data.toml"))
+    check.add_argument(
+        "--report-text", type=Path, default=Path("config/report_market_analysis.toml")
+    )
     return parser
 
 

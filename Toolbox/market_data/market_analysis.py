@@ -3,10 +3,13 @@ market_data/market_analysis.py
 ------------------------------
 The named market plots: what each source and metric is shown as, with its titles and units.
 
-Each function takes a table from ``market_data`` and returns one matplotlib ``Figure``
-built with the generic layouts of ``skatkis.analysis``. The data checks
-(``market_data.checks``) call them, and so can the modelling tools in their own
-analysis, so a plot of the same thing looks the same everywhere.
+Each function takes tables from ``market_data`` and returns one matplotlib ``Figure``
+built with the generic layouts of ``skatkis.analysis``. The checks and report
+(``market_data.checks``) call them, and so can the modelling tools in their own analysis,
+so a plot of the same thing looks the same everywhere. Plots go from coarse to fine:
+sector summaries against the S&P 500, then the best and the worst sector of an analysis
+(``sectors_*``), then their best and worst companies (``companies_ranked``), where colour
+marks the company and line style the group or metric. No plot has more than 30 lines.
 
 Owns
 ----
@@ -15,46 +18,38 @@ of P/E and price changes.
 
 Must not
 --------
-Build plot layouts (``skatkis.analysis``); compute metrics (``market_data.metrics``) or
-clean data (``market_data.clean``); save files (callers, through ``skatkis.io``).
+Build plot layouts (``skatkis.analysis``); compute metrics or rankings
+(``market_data.metrics``); clean data (``market_data.clean``); save files.
 
 Public API
 ----------
-edgar_coverage(annual)
-    Number of companies with a first-reported annual value, per field and fiscal year.
-edgar_annual_series(annual, field)
-    One field's first-reported annual values per company.
-edgar_eps_check(wide)
-    Reported diluted EPS against net income / diluted shares.
-edgar_filing_lag(lag)
-    Days from period end to filing, per form.
-yahoo_total_return(prices)
-    Growth of 1 USD with dividends reinvested, against ``^SP500TR``.
-yahoo_relative_return(prices)
-    Total return of each company divided by that of ``^SP500TR``.
-yahoo_trading_days(prices)
-    Trading days per symbol and year.
-yahoo_dividends(dividends)
-    Dividends per symbol and year.
-fred_series(rates, series_id) / fred_coverage(rates, series_id)
-    A FRED series over time, and its observations per year.
-pe_over_time(pe, thresholds) / pe_eps(pe)
-    P/E per symbol (with optional rule cut-offs), and the EPS behind it.
-pe_sector_medians(pe) / pe_sector_spread(pe, sector, thresholds)
-    Median P/E per GICS sector; one sector's median with its percentile band.
-sector_relative(prices, members, *, sector, fund, market)
-    A sector's members relative to the sector fund (solid) and the market (dashed).
-sector_benchmarks(prices, sectors, market)
-    Each sector fund relative to the S&P 500.
-pe_vs_price(pe, symbol)
-    One symbol's P/E and close on two axes.
+sector_benchmarks(prices, sectors, market) / total_return_summary(prices, sectors, market)
+    Sector funds relative to the S&P 500; growth of 1 USD for funds and the S&P 500.
+fundamentals_sector_totals(annual, field)
+    Sum of a field over each sector's companies per fiscal year (USD millions).
+dividend_yield_summary(yields) / pe_sector_medians(pe)
+    Median dividend yield and median P/E per sector.
+sectors_total_return, sectors_fundamentals, sectors_spread, sector_pe_and_price
+    The best and the worst sector of an analysis side by side; a sector's median P/E and
+    price growth with their bands.
+ranked_series(prices, symbols, *, relative_to)
+    Growth of 1 USD per company, optionally over a benchmark, for ``companies_ranked``.
+companies_ranked(table, *, value, best, worst, ...)
+    The best companies (solid) against the worst (dashed), one colour per company.
+edgar_coverage, edgar_eps_check, edgar_filing_lag, yahoo_trading_days, fred_series,
+fred_coverage
+    Data checks.
+edgar_annual_series, yahoo_total_return, yahoo_relative_return, pe_over_time,
+pe_vs_price, pe_lead_lag
+    Single companies, for a small universe.
 pe_price_lead_lag(pe, max_lag)
     Correlation of monthly P/E changes with price changes shifted by each lag.
-pe_lead_lag(correlations)
-    The lead-lag profile per symbol.
 
 Computes
 --------
+growth of one dollar, relative growth : ranked_series
+    value(t) = S(t) / S(t0), or (S(t) / S(t0)) / (B(t) / B(t0)) over a benchmark B, from
+    the symbol's first date t0 (with the benchmark).
 monthly log change, lead-lag correlation of P/E and price : pe_price_lead_lag
     Per symbol, month-end P/E and close; d log P/E(t) and d log close(t) month on month;
     for each lag k, corr(d log P/E(t), d log close(t + k)). Positive k: P/E changes
@@ -81,17 +76,268 @@ from Toolbox.skatkis.analysis import (
     plot_scatter,
     plot_series,
     plot_spread,
+    plot_spread_pair,
 )
 
 BENCHMARK = "^SP500TR"
+MILLION = 1e6
+
+
+# ---------------------------------------------------------------- sector summaries
+
+
+def sector_benchmarks(
+    prices: pd.DataFrame, sectors: Mapping[str, str], market: str
+) -> Figure:
+    """Plot each sector fund's total return relative to the S&P 500's.
+
+    ``sectors`` maps a GICS sector name to its fund symbol.
+    """
+    part = prices[prices["symbol"].isin([*sectors.values(), market])]
+    return plot_relative(
+        part,
+        x="date",
+        y="adj_close",
+        group="symbol",
+        benchmark=market,
+        labels={fund: f"{name} ({fund})" for name, fund in sectors.items()},
+        title="GICS sector funds relative to the S&P 500",
+        ylabel="fund growth / S&P 500 growth (log)",
+    )
+
+
+def total_return_summary(
+    prices: pd.DataFrame, sectors: Mapping[str, str], market: str
+) -> Figure:
+    """Plot growth of 1 USD, dividends reinvested, for each sector fund and the S&P 500."""
+    part = prices[prices["symbol"].isin([*sectors.values(), market])]
+    return plot_normalised(
+        part,
+        x="date",
+        y="adj_close",
+        group="symbol",
+        highlight=market,
+        labels={fund: f"{name} ({fund})" for name, fund in sectors.items()},
+        title="GICS sector funds and the S&P 500 (black): growth of 1 USD",
+        ylabel="growth of 1 USD (log)",
+    )
+
+
+def fundamentals_sector_totals(annual: pd.DataFrame, field: str) -> Figure:
+    """Plot the sum of ``field`` over each GICS sector's companies per fiscal year.
+
+    ``annual`` has columns ``gics_sector``, ``field``, ``period_end``, ``value`` (USD).
+    The number of companies reporting can change between years, which moves the totals.
+    """
+    part = annual[annual["field"] == field]
+    totals = pd.DataFrame(
+        part.assign(year=part["period_end"].dt.year)
+        .groupby(["gics_sector", "year"], as_index=False)["value"]
+        .sum()
+    )
+    totals["value"] = totals["value"] / MILLION
+    totals["year"] = pd.to_datetime(totals["year"].astype(str), format="%Y")
+    return plot_series(
+        totals,
+        x="year",
+        y="value",
+        group="gics_sector",
+        markers=True,
+        title=f"{field.replace('_', ' ')}: sector totals (USD millions)",
+        ylabel="USD millions",
+    )
+
+
+def dividend_yield_summary(yields: pd.DataFrame) -> Figure:
+    """Plot the median trailing dividend yield of each GICS sector (percent)."""
+    return plot_spread(
+        yields.assign(dividend_yield=yields["dividend_yield"] * 100),
+        x="date",
+        y="dividend_yield",
+        group="gics_sector",
+        band=(0.5, 0.5),
+        title="Median trailing 12-month dividend yield per GICS sector",
+        ylabel="dividend yield (%)",
+    )
+
+
+def pe_sector_medians(pe: pd.DataFrame) -> Figure:
+    """Plot the median P/E of each GICS sector over time (``pe`` has ``gics_sector``)."""
+    return plot_spread(
+        pe,
+        x="date",
+        y="pe",
+        group="gics_sector",
+        band=(0.5, 0.5),
+        title="Median P/E per GICS sector",
+        ylabel="median P/E",
+    )
+
+
+# ---------------------------------------------------------------- best and worst sectors
+
+
+def sectors_total_return(
+    prices: pd.DataFrame, funds: Mapping[str, str], market: str, *, title: str
+) -> Figure:
+    """Plot growth of 1 USD for the given sector funds and the S&P 500 (black)."""
+    part = prices[prices["symbol"].isin([*funds.values(), market])]
+    return plot_normalised(
+        part,
+        x="date",
+        y="adj_close",
+        group="symbol",
+        highlight=market,
+        labels={fund: f"{name} ({fund})" for name, fund in funds.items()},
+        title=title,
+        ylabel="growth of 1 USD (log)",
+    )
+
+
+def sectors_fundamentals(
+    annual: pd.DataFrame, sectors: Sequence[str], *, title: str
+) -> Figure:
+    """Plot total revenue (solid) and net income (dashed) of the given sectors, USD millions."""
+    part = annual[
+        annual["gics_sector"].isin(sectors)
+        & annual["field"].isin(["revenue", "net_income"])
+    ]
+    totals = pd.DataFrame(
+        part.assign(year=part["period_end"].dt.year)
+        .groupby(["gics_sector", "field", "year"], as_index=False)["value"]
+        .sum()
+    )
+    totals["value"] = totals["value"] / MILLION
+    totals["year"] = pd.to_datetime(totals["year"].astype(str), format="%Y")
+    return plot_series(
+        totals,
+        x="year",
+        y="value",
+        group="gics_sector",
+        style="field",
+        style_order=["revenue", "net_income"],
+        markers=True,
+        title=title,
+        ylabel="USD millions",
+    )
+
+
+def sectors_spread(
+    table: pd.DataFrame, value: str, sectors: Sequence[str], *, title: str, ylabel: str
+) -> Figure:
+    """Plot the median and 25th to 75th percentile band of ``value`` for the given sectors."""
+    part = table[table["gics_sector"].isin(sectors)]
+    scale = 100.0 if value == "dividend_yield" else 1.0
+    return plot_spread(
+        part.assign(**{value: part[value] * scale}),
+        x="date",
+        y=value,
+        group="gics_sector",
+        title=title,
+        ylabel=ylabel,
+    )
+
+
+def sector_pe_and_price(pe: pd.DataFrame, sector: str, *, title: str) -> Figure:
+    """Plot a sector's median P/E and median price growth, each with its band, on two axes.
+
+    Price growth is each company's split-adjusted close divided by its first close in the
+    data, so the band shows how the sector's prices moved while its P/E moved.
+    """
+    part = pe[pe["gics_sector"] == sector].dropna(subset=["pe"]).sort_values("date")
+    first = part.groupby("symbol")["close"].transform("first")
+    return plot_spread_pair(
+        part.assign(growth=part["close"] / first),
+        x="date",
+        left="pe",
+        right="growth",
+        title=title,
+        left_label="P/E (log)",
+        right_label="price growth since first close (log)",
+        log_left=True,
+        log_right=True,
+    )
+
+
+# ---------------------------------------------------------------- best and worst companies
+
+
+def ranked_series(
+    prices: pd.DataFrame, symbols: Sequence[str], *, relative_to: str | None = None
+) -> pd.DataFrame:
+    """Return growth of 1 USD per symbol from its first date, optionally over a benchmark.
+
+    Columns ``symbol``, ``date``, ``value``; with ``relative_to``, the growth is divided by
+    the benchmark's growth since the same date.
+    """
+    wide = prices.pivot_table(
+        index="date", columns="symbol", values="adj_close"
+    ).sort_index()
+    frames: list[pd.DataFrame] = []
+    for symbol in symbols:
+        if symbol not in wide.columns:
+            continue
+        series = wide[symbol]
+        if relative_to is not None:
+            both = pd.concat([series, wide[relative_to]], axis=1).dropna()
+            own, bench = both.iloc[:, 0], both.iloc[:, 1]
+            growth = (own / float(own.iloc[0])) / (bench / float(bench.iloc[0]))
+        else:
+            values = series.dropna()
+            growth = values / float(values.iloc[0])
+        dates = pd.DatetimeIndex(growth.index)
+        frames.append(
+            pd.DataFrame({"symbol": symbol, "date": dates, "value": growth.to_numpy()})
+        )
+    return (
+        pd.concat(frames, ignore_index=True)
+        if frames
+        else pd.DataFrame(columns=["symbol", "date", "value"])
+    )
+
+
+def companies_ranked(
+    table: pd.DataFrame,
+    *,
+    value: str,
+    best: Sequence[str],
+    worst: Sequence[str],
+    x: str = "date",
+    title: str,
+    ylabel: str,
+    log: bool = False,
+    thresholds: Mapping[str, float] | None = None,
+) -> Figure:
+    """Plot the best companies (solid) against the worst (dashed), one colour per company.
+
+    ``table`` has a ``symbol`` column, ``x`` and ``value``; ``best`` and ``worst`` are
+    symbols. Together they must stay within the 30-line limit.
+    """
+    rank = {**{s: "best" for s in best}, **{s: "worst" for s in worst}}
+    part = table[table["symbol"].isin(list(rank))]
+    part = part.assign(rank=part["symbol"].map(rank))
+    if value == "dividend_yield":
+        part = part.assign(dividend_yield=part["dividend_yield"] * 100)
+    return plot_series(
+        part,
+        x=x,
+        y=value,
+        group="symbol",
+        style="rank",
+        style_order=["best", "worst"],
+        markers=x != "date",
+        log=log,
+        thresholds=thresholds,
+        title=title,
+        ylabel=ylabel,
+    )
+
+
+# ---------------------------------------------------------------- data checks
 
 
 def edgar_coverage(annual: pd.DataFrame) -> Figure:
-    """Plot the number of companies with a first-reported annual value, per field and year.
-
-    ``annual`` has columns ``cik``, ``field``, ``period_end``; a cell below the number of
-    companies shows a gap in the data.
-    """
+    """Plot the number of companies with a first-reported annual value, per field and year."""
     present = annual.assign(year=annual["period_end"].dt.year)
     present = present.drop_duplicates(["cik", "field", "year"])
     companies = annual["cik"].nunique()
@@ -99,34 +345,12 @@ def edgar_coverage(annual: pd.DataFrame) -> Figure:
     return plot_coverage(present, row="field", column="year", title=title)
 
 
-def edgar_annual_series(annual: pd.DataFrame, field: str) -> Figure:
-    """Plot one field's first-reported annual values per company.
-
-    ``annual`` has columns ``entity_name``, ``field``, ``period_end``, ``value``.
-    """
-    part = annual[annual["field"] == field]
-    title = f"{field}: first-reported annual values (per-share values on their filing basis)"
-    return plot_series(
-        part,
-        x="period_end",
-        y="value",
-        group="entity_name",
-        markers=True,
-        title=title,
-        ylabel=field,
-    )
-
-
 def edgar_eps_check(wide: pd.DataFrame) -> Figure:
-    """Plot reported diluted EPS against net income / diluted shares, per company.
-
-    ``wide`` has columns ``entity_name``, ``ni_per_share``, ``eps_diluted``.
-    """
+    """Plot reported diluted EPS against net income / diluted shares."""
     return plot_scatter(
         wide,
         x="ni_per_share",
         y="eps_diluted",
-        group="entity_name",
         diagonal=True,
         title="Reported diluted EPS against net income / diluted shares",
         xlabel="net income / weighted diluted shares (USD)",
@@ -135,19 +359,72 @@ def edgar_eps_check(wide: pd.DataFrame) -> Figure:
 
 
 def edgar_filing_lag(lag: pd.DataFrame) -> Figure:
-    """Plot the days from period end to filing, per form.
-
-    ``lag`` has columns ``period_end``, ``lag_days``, ``form``.
-    """
-    title = "Days from period end to filing (the point-in-time delay)"
-    return plot_series(
+    """Plot the days from period end to filing, per form."""
+    return plot_scatter(
         lag,
         x="period_end",
         y="lag_days",
         group="form",
-        markers=True,
-        title=title,
+        title="Days from period end to filing (the point-in-time delay)",
+        xlabel="period end",
         ylabel="days",
+    )
+
+
+def yahoo_trading_days(prices: pd.DataFrame) -> Figure:
+    """Plot the trading days per symbol and year, the youngest symbols at the top."""
+    traded = prices.dropna(subset=["close"])
+    traded = traded.assign(year=traded["date"].dt.year)
+    youngest_first = (
+        traded.groupby("symbol")["date"]
+        .min()
+        .sort_values(ascending=False)
+        .index.tolist()
+    )
+    return plot_coverage(
+        traded,
+        row="symbol",
+        column="year",
+        row_order=youngest_first,
+        title="Trading days per symbol and year, youngest first (about 252 expected)",
+    )
+
+
+def fred_series(rates: pd.DataFrame, series_id: str) -> Figure:
+    """Plot a FRED series over time (``DEXSFUS``: ZAR per USD)."""
+    part = rates[rates["series_id"] == series_id]
+    ylabel = "ZAR per USD" if series_id == "DEXSFUS" else series_id
+    return plot_series(
+        part, x="date", y="value", title=f"{series_id} (FRED)", ylabel=ylabel
+    )
+
+
+def fred_coverage(rates: pd.DataFrame, series_id: str) -> Figure:
+    """Plot a FRED series' observations per year (about 250 expected)."""
+    part = rates[rates["series_id"] == series_id]
+    part = part.assign(year=part["date"].dt.year)
+    title = f"{series_id}: observations per year (about 250 expected)"
+    return plot_coverage(part, row="series_id", column="year", title=title)
+
+
+# ---------------------------------------------------------------- single companies
+
+
+def edgar_annual_series(annual: pd.DataFrame, field: str) -> Figure:
+    """Plot one field's first-reported annual values per company (USD millions or per share)."""
+    part = annual[annual["field"] == field]
+    per_share = field.startswith(("eps", "dividends_per_share"))
+    if not per_share:
+        part = part.assign(value=part["value"] / MILLION)
+    unit = "USD per share" if per_share else "USD millions"
+    return plot_series(
+        part,
+        x="period_end",
+        y="value",
+        group="entity_name",
+        markers=True,
+        title=f"{field}: first-reported annual values ({unit})",
+        ylabel=unit,
     )
 
 
@@ -171,147 +448,30 @@ def yahoo_relative_return(prices: pd.DataFrame) -> Figure:
         y="adj_close",
         group="symbol",
         benchmark=BENCHMARK,
-        title="Total return relative to the S&P 500 (above 1: beat an index fund; log)",
-        ylabel="company growth / S&P 500 growth",
+        title="Total return relative to the S&P 500 (above 1: beat an index fund)",
+        ylabel="company growth / S&P 500 growth (log)",
     )
-
-
-def yahoo_trading_days(prices: pd.DataFrame) -> Figure:
-    """Plot the trading days per symbol and year (about 252 expected)."""
-    traded = prices.dropna(subset=["close"])
-    traded = traded.assign(year=traded["date"].dt.year)
-    title = "Trading days per symbol and year (about 252 expected)"
-    return plot_coverage(traded, row="symbol", column="year", title=title)
-
-
-def yahoo_dividends(dividends: pd.DataFrame) -> Figure:
-    """Plot the number of dividends per symbol and year."""
-    per_year = dividends.assign(year=dividends["ex_date"].dt.year)
-    return plot_coverage(
-        per_year,
-        row="symbol",
-        column="year",
-        title="Dividends per symbol and year",
-        annotate=False,
-    )
-
-
-def fred_series(rates: pd.DataFrame, series_id: str) -> Figure:
-    """Plot a FRED series over time (``DEXSFUS``: ZAR per USD)."""
-    part = rates[rates["series_id"] == series_id]
-    ylabel = "ZAR per USD" if series_id == "DEXSFUS" else series_id
-    return plot_series(
-        part, x="date", y="value", title=f"{series_id} (FRED)", ylabel=ylabel
-    )
-
-
-def fred_coverage(rates: pd.DataFrame, series_id: str) -> Figure:
-    """Plot a FRED series' observations per year (about 250 expected)."""
-    part = rates[rates["series_id"] == series_id]
-    part = part.assign(year=part["date"].dt.year)
-    title = f"{series_id}: observations per year (about 250 expected)"
-    return plot_coverage(part, row="series_id", column="year", title=title)
 
 
 def pe_over_time(
     pe: pd.DataFrame, thresholds: Mapping[str, float] | None = None
 ) -> Figure:
     """Plot the P/E per symbol over time, with optional rule cut-offs as lines."""
-    title = "P/E on the latest annual diluted EPS (filed before the day)"
     return plot_series(
         pe,
         x="date",
         y="pe",
         group="symbol",
-        title=title,
+        title="P/E on the latest annual diluted EPS (filed before the day)",
         ylabel="P/E",
         thresholds=thresholds,
-    )
-
-
-def pe_sector_medians(pe: pd.DataFrame) -> Figure:
-    """Plot the median P/E of each GICS sector over time (``pe`` has ``gics_sector``)."""
-    return plot_spread(
-        pe,
-        x="date",
-        y="pe",
-        group="gics_sector",
-        band=(0.5, 0.5),
-        title="Median P/E per GICS sector",
-        ylabel="median P/E",
-    )
-
-
-def pe_sector_spread(
-    pe: pd.DataFrame, sector: str, thresholds: Mapping[str, float] | None = None
-) -> Figure:
-    """Plot one sector's median P/E with its 25th to 75th percentile band, and cut-offs."""
-    part = pe[pe["gics_sector"] == sector]
-    return plot_spread(
-        part,
-        x="date",
-        y="pe",
-        thresholds=thresholds,
-        title=f"{sector}: median P/E with the 25th to 75th percentile band",
-        ylabel="P/E",
-    )
-
-
-def sector_relative(
-    prices: pd.DataFrame, members: Sequence[str], *, sector: str, fund: str, market: str
-) -> Figure:
-    """Plot a sector's members relative to the sector fund (solid) and the market (dashed).
-
-    Each member starts at 1 on its first common date with each benchmark; a member that
-    joined later starts later.
-    """
-    part = prices[prices["symbol"].isin([*members, fund, market])]
-    return plot_relative(
-        part,
-        x="date",
-        y="adj_close",
-        group="symbol",
-        benchmark=fund,
-        second_benchmark=market,
-        title=f"{sector}: total return relative to {fund} (solid) and the S&P 500 (dashed)",
-        ylabel="growth / benchmark growth (log)",
-    )
-
-
-def sector_benchmarks(
-    prices: pd.DataFrame, sectors: Mapping[str, str], market: str
-) -> Figure:
-    """Plot each sector fund's total return relative to the S&P 500's.
-
-    ``sectors`` maps a GICS sector name to its fund symbol.
-    """
-    funds = list(sectors.values())
-    part = prices[prices["symbol"].isin([*funds, market])]
-    return plot_relative(
-        part,
-        x="date",
-        y="adj_close",
-        group="symbol",
-        benchmark=market,
-        labels={fund: f"{name} ({fund})" for name, fund in sectors.items()},
-        title="GICS sectors: total return relative to the S&P 500 (above 1: beat the market)",
-        ylabel="sector growth / S&P 500 growth (log)",
-    )
-
-
-def pe_eps(pe: pd.DataFrame) -> Figure:
-    """Plot the annual diluted EPS behind the P/E, per symbol."""
-    title = "Annual diluted EPS behind the P/E (split-adjusted to the fetch date)"
-    return plot_series(
-        pe, x="date", y="eps", group="symbol", title=title, ylabel="EPS (USD)"
     )
 
 
 def pe_vs_price(pe: pd.DataFrame, symbol: str) -> Figure:
     """Plot one symbol's P/E (left axis) and close (right axis)."""
-    part = pe[pe["symbol"] == symbol]
     return plot_dual_axis(
-        part,
+        pe[pe["symbol"] == symbol],
         x="date",
         left="pe",
         right="close",

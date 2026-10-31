@@ -159,32 +159,59 @@ export FRED_API_KEY=...                       # optional
 - The command can be scheduled (macOS `launchd` or `cron`), for example weekly or after
   each earnings season.
 
-## Checking the data
+## Checking the data and the report
 
 ```
 .venv/bin/python -m Toolbox.market_data check --as-of 2026-10-31
 ```
 
-reads the tables written for that as-of date, prints numeric checks per source (missing
-values, duplicates, implausible values, filing delays, coverage) and writes plots to
-`results/market_analysis/<source>/<as_of>/`:
+reads the tables written for that as-of date, prints numeric checks (missing values,
+duplicates, implausible values, filing delays, coverage) and writes the plots and the
+report under `results/market_analysis/<as_of>/`, going from coarse to fine:
 
-| Folder | Plots |
-|---|---|
-| `edgar/` | Coverage: companies with a value per field and fiscal year, first-reported revenue, net income and diluted EPS, reported EPS against net income / diluted shares, days from period end to filing |
-| `yahoo/` | Growth of 1 USD with dividends reinvested against `^SP500TR`, each company's total return divided by the S&P 500's (above 1: it beat an index fund), trading days per year, dividends per year |
-| `fred/` | The exchange rate and its observations per year |
-| `sectors/` | Each GICS sector fund relative to the S&P 500; per sector, every member relative to its sector fund (solid) and to the S&P 500 (dashed, same colour) |
-| `metrics/` | P/E per company and the EPS behind it; P/E and price on two axes per company; the lead-lag profile of monthly P/E changes against price changes 12 months either side |
+1. **Introduction**: the GICS sectors analysed (a table with a description, the number
+   of companies and the sector fund).
+2. **Overview** (`overview/`): the sector funds against the S&P 500.
+3. **One section per analysis**, in the order fundamentals, total return, relative return,
+   P/E, dividend yield (`<analysis>/`): the all-sector summary, the best and the worst
+   sector by the analysis's measure, and the five best and five worst companies of each
+   of those two sectors. The P/E section shows each sector's median P/E with its median
+   price growth (bands from the 25th to the 75th percentile), for the sectors with the
+   best and worst P/E and for those with the best and worst return.
+4. **Data checks** (`data_checks/`): coverage per field and year, EPS cross-check, filing
+   delays, trading days (youngest first), USD/ZAR.
+5. **Appendix** (`appendix/<analysis>/`): every sector's ten best and ten worst companies.
 
-The P/E and lead-lag tables are also stored under `data/interim/metrics/<as_of>/`.
-`results/` is tracked in git, so new and changed plots show in the changes view; the
-raw and parsed data stay in the git-ignored `data/`.
+"Best" follows the analysis (`rankings.py`):
 
-The plots are named functions in `market_analysis.py` (`edgar_coverage`, `pe_vs_price`,
-`pe_lead_lag`, ...), one per thing shown, with its titles and units, so a plot looks the
-same wherever it is used; the modelling tools call them too. They are built on the
-generic layouts of `skatkis.analysis`, which know no source or metric.
+| Analysis | Company score | Sector score | Best |
+|---|---|---|---|
+| Fundamentals | annualised revenue growth (at least 3 years) | median of its companies | highest |
+| Total return | annualised total return (at least 1 year) | its fund's | highest |
+| Relative return | annualised return relative to the sector fund | its fund's against the S&P 500 | highest |
+| P/E | median P/E | median of its companies | lowest |
+| Dividend yield | mean trailing yield | median of its companies | highest |
+
+Growth and returns are annualised as $g = (V_T / V_0)^{1/Y} - 1$ over $Y$ years
+(`skatkis.financial_logic`). A line plot holds at most 30 lines and has its legend
+outside the plot; colour marks the company or sector, line style the group or metric
+(best solid, worst dashed).
+
+The fiscal year of the as-of date is left out of the fundamentals totals, as it is not
+over. The P/E, lead-lag and dividend-yield tables are stored under
+`data/interim/metrics/<as_of>/`. `results/` is tracked in git, so new and changed plots
+show in the changes view; the raw and parsed data stay in the git-ignored `data/`.
+
+The command then writes `report.tex` next to the plot folders: a LaTeX article with a
+title, an abstract, a table of contents, the sections above with numbered captions,
+clickable cross-references (`hyperref`) and the appendix. Its text comes from `config/report_market_analysis.toml`.
+When a LaTeX engine is installed (`tectonic`, `latexmk` or `pdflatex`; for example
+`brew install tectonic`), the command compiles it to `report.pdf`.
+
+The plots are named functions in `market_analysis.py` (`fundamentals_sector`,
+`sector_relative`, `dividend_yield_sector`, ...), one per thing shown, with its titles and
+units; the modelling tools call them too. They are built on the generic layouts of
+`skatkis.analysis`, which know no source or metric; `skatkis.report` writes the LaTeX.
 
 The lead-lag profile correlates the monthly log change of the P/E at month $t$ with the
 monthly log change of the price at month $t + k$, for $k$ from $-12$ to $12$; a positive
@@ -228,3 +255,9 @@ correlation within about $\pm 2 / \sqrt{n}$ is indistinguishable from chance.
   where $d_{\text{filed}}$ is the EPS's filing date. The P/E is missing where the EPS is
   zero or negative. It uses annual EPS, so it steps once a year; a P/E on trailing
   twelve-month EPS follows once quarterly values are cleaned.
+- **Dividend yield** (`metrics.dividend_yield`): dividends with an ex-date in the past
+  365 days divided by the close,
+  $$y_t = \frac{\sum D}{P^{\text{close}}_t},$$
+  both split-adjusted to the fetch date, so the ratio is consistent; 0 when no dividend
+  fell in the window. Amounts from EDGAR (revenue, net income) are in USD; plots show
+  them in USD millions.

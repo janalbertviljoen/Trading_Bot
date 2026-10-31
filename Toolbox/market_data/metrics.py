@@ -24,6 +24,12 @@ split_factor(splits, symbol, dates)
     Product of the split ratios after each date, per symbol.
 price_earnings(prices, eps, splits)
     Daily P/E per symbol on the latest annual EPS filed before the day.
+dividend_yield(prices, dividends, *, window_days)
+    Daily trailing dividend yield per symbol.
+relative_performance(prices, gics, *, min_years)
+    Each company's annualised return relative to its sector fund.
+sector_performers(performance, n)
+    The ``n`` best and ``n`` worst companies of each GICS sector.
 
 Computes
 --------
@@ -33,14 +39,19 @@ split factor : split_factor
 price-to-earnings ratio, P/E : price_earnings
     P/E(t) = close(t) / (EPS / F(filed)), where EPS is the latest first-reported annual
     diluted EPS filed before day t; missing when that EPS is zero or negative.
+trailing dividend yield : dividend_yield
+    y(t) = (sum of dividends with ex-date in (t - window, t]) / close(t); dividends and
+    close are both split-adjusted to the fetch date; 0 when no dividend fell in the window.
 
 Dependency rule
 ---------------
-numpy and pandas.
+numpy, pandas and ``skatkis.financial_logic``.
 """
 
 import numpy as np
 import pandas as pd
+
+from Toolbox.skatkis.financial_logic import annualised_relative_return
 
 
 def split_factor(splits: pd.DataFrame, symbol: str, dates: pd.Series) -> np.ndarray:
@@ -123,3 +134,137 @@ def price_earnings(
     merged["pe"] = (merged["close"] / merged["eps"]).where(merged["eps"] > 0)
     columns = ["symbol", "date", "close", "eps", "eps_period_end", "pe"]
     return merged[columns].sort_values(["symbol", "date"]).reset_index(drop=True)
+
+
+def dividend_yield(
+    prices: pd.DataFrame, dividends: pd.DataFrame, *, window_days: int = 365
+) -> pd.DataFrame:
+    """Return the daily trailing dividend yield per symbol.
+
+    Parameters
+    ----------
+    prices : pd.DataFrame
+        Columns ``symbol``, ``date``, ``close`` (split-adjusted to the fetch date).
+    dividends : pd.DataFrame
+        Columns ``symbol``, ``ex_date``, ``amount`` (per share, split-adjusted to the
+        fetch date).
+    window_days : int
+        Length of the trailing window; 365 days by default.
+
+    Returns
+    -------
+    pd.DataFrame
+        Columns ``symbol``, ``date``, ``close``, ``dividends`` (paid in the window, USD
+        per share), ``dividend_yield`` (fraction); one row per price row with a close.
+
+    Notes
+    -----
+    A dividend counts from its ex-date, the first day the share trades without it. Both
+    series are on the same split basis, so their ratio needs no further adjustment.
+    """
+    frames: list[pd.DataFrame] = []
+    window = np.timedelta64(window_days, "D")
+    for symbol, part in prices.dropna(subset=["close"]).groupby("symbol"):
+        own = dividends[dividends["symbol"] == symbol].sort_values("ex_date")
+        ex_dates = np.asarray(own["ex_date"], dtype="datetime64[ns]")
+        paid = np.append(0.0, np.cumsum(np.asarray(own["amount"], dtype=float)))
+        days = np.asarray(part["date"], dtype="datetime64[ns]")
+        upto = np.searchsorted(ex_dates, days, side="right")
+        since = np.searchsorted(ex_dates, days - window, side="right")
+        in_window = paid[upto] - paid[since]
+        frames.append(
+            pd.DataFrame(
+                {
+                    "symbol": str(symbol),
+                    "date": part["date"].to_numpy(),
+                    "close": part["close"].to_numpy(dtype=float),
+                    "dividends": in_window,
+                }
+            )
+        )
+    if not frames:
+        return pd.DataFrame(
+            columns=["symbol", "date", "close", "dividends", "dividend_yield"]
+        )
+    result = pd.concat(frames, ignore_index=True)
+    result["dividend_yield"] = result["dividends"] / result["close"]
+    return result.astype({"symbol": "string"}).sort_values(
+        ["symbol", "date"], ignore_index=True
+    )
+
+
+def relative_performance(
+    prices: pd.DataFrame, gics: pd.DataFrame, *, min_years: float = 1.0
+) -> pd.DataFrame:
+    """Return each company's annualised total return relative to its sector fund.
+
+    Parameters
+    ----------
+    prices : pd.DataFrame
+        Columns ``symbol``, ``date``, ``adj_close`` (total-return levels), including the
+        sector funds.
+    gics : pd.DataFrame
+        The GICS map (``symbol``, ``gics_sector``, ``sector_fund``).
+    min_years : float
+        Companies with less common history with their fund get no value.
+
+    Returns
+    -------
+    pd.DataFrame
+        Columns ``symbol``, ``gics_sector``, ``sector_fund``, ``relative_return``
+        (fraction per year, from ``annualised_relative_return`` over the company's and
+        fund's common dates); companies without a value are left out.
+    """
+    wide = prices.pivot_table(index="date", columns="symbol", values="adj_close")
+    rows: list[dict[str, object]] = []
+    triples = zip(gics["symbol"], gics["gics_sector"], gics["sector_fund"], strict=True)
+    for symbol, sector, fund in ((str(a), str(b), str(c)) for a, b, c in triples):
+        if symbol not in wide.columns or fund not in wide.columns:
+            continue
+        value = annualised_relative_return(
+            wide[symbol], wide[fund], min_years=min_years
+        )
+        if not np.isnan(value):
+            rows.append(
+                {
+                    "symbol": symbol,
+                    "gics_sector": sector,
+                    "sector_fund": fund,
+                    "relative_return": value,
+                }
+            )
+    return pd.DataFrame(
+        rows, columns=["symbol", "gics_sector", "sector_fund", "relative_return"]
+    )
+
+
+def sector_performers(performance: pd.DataFrame, n: int = 10) -> pd.DataFrame:
+    """Return the ``n`` best and ``n`` worst companies of each GICS sector.
+
+    Parameters
+    ----------
+    performance : pd.DataFrame
+        From ``relative_performance``.
+    n : int
+        Companies per end of the ranking.
+
+    Returns
+    -------
+    pd.DataFrame
+        The rows of ``performance`` with ``group`` (``"top"`` or ``"bottom"``) and
+        ``rank`` (1 = best for the top, 1 = worst for the bottom). In a sector with fewer
+        than ``2 * n`` companies a company can be in both groups.
+    """
+    ranked = performance.sort_values(
+        ["gics_sector", "relative_return"], ascending=[True, False]
+    )
+    top = ranked.groupby("gics_sector").head(n).assign(group="top")
+    bottom = (
+        ranked.sort_values(["gics_sector", "relative_return"])
+        .groupby("gics_sector")
+        .head(n)
+        .assign(group="bottom")
+    )
+    both = pd.concat([top, bottom], ignore_index=True)
+    both["rank"] = both.groupby(["gics_sector", "group"]).cumcount() + 1
+    return both

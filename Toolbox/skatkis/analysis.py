@@ -4,7 +4,9 @@ skatkis/analysis.py
 Generic analysis: plot layouts and statistics for any table, with no market knowledge.
 
 Every plot function takes a long table (one row per observation) and the names of its
-columns, and returns a matplotlib ``Figure`` without showing or saving it. The functions
+columns, and returns a matplotlib ``Figure`` without showing or saving it. A line plot
+holds at most ``MAX_LINES`` (30) lines and refuses more; larger sets belong in a heat map
+or a selection. Colours mark groups (companies, sectors), line styles mark metrics. The functions
 know nothing about any metric or source: the named market plots, with their titles and
 formatting per source, are in ``market_data.market_analysis``, which calls these.
 
@@ -36,6 +38,8 @@ plot_relative(df, *, x, y, group, benchmark, second_benchmark, ...)
     (dashed, same colour), each from its own first common date.
 plot_spread(df, *, x, y, group, band, thresholds, ...)
     Median and percentile band of a value across rows over time, per group.
+plot_spread_pair(df, *, x, left, right, band, ...)
+    Median and band of two values across rows, each on its own axis.
 plot_lag_profile(df, *, lag, value, group, ...)
     A statistic per lag, one line per group, with the zero lag marked.
 lagged_correlation(a, b, lags)
@@ -44,7 +48,7 @@ lagged_correlation(a, b, lags)
 Computes
 --------
 growth of one unit, normalised series : plot_normalised
-    Each group's value divided by its value on the first date all groups have a value.
+    Each group's value divided by its own first value.
 relative growth, relative performance : plot_relative
     Growth of one unit of each group divided by growth of one unit of the benchmark, both
     from the first date the two have a value; above 1 the group did better.
@@ -63,15 +67,21 @@ matplotlib, numpy, pandas and the standard library.
 # reports on every call; the arguments passed here are all typed.
 # pyright: reportUnknownMemberType=false
 
-from collections.abc import Iterator, Mapping
+from collections.abc import Iterator, Mapping, Sequence
 
 import numpy as np
 import pandas as pd
+from matplotlib import colormaps
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+from matplotlib.ticker import StrMethodFormatter
 
 WIDE = (10.0, 4.5)
-MAX_LEGEND = 15
+MAX_LINES = 30
+MAX_LEGEND = MAX_LINES
+LINE_STYLES = ("-", "--", ":", "-.")
+DENSE_ROWS = 30
+THOUSANDS = 10_000
 
 
 def plot_series(
@@ -80,13 +90,16 @@ def plot_series(
     x: str,
     y: str,
     group: str | None = None,
+    style: str | None = None,
+    style_order: Sequence[object] | None = None,
+    highlight: str | None = None,
     title: str = "",
     ylabel: str = "",
     log: bool = False,
     markers: bool = False,
     thresholds: Mapping[str, float] | None = None,
 ) -> Figure:
-    """Plot ``y`` against ``x``, one line per value of ``group``.
+    """Plot ``y`` against ``x``: one colour per ``group``, one line style per ``style``.
 
     Parameters
     ----------
@@ -95,7 +108,14 @@ def plot_series(
     x, y : str
         Columns for the horizontal axis (usually a date) and the value.
     group : str, optional
-        Column whose values get one line each.
+        Column whose values get one colour each (e.g. a company).
+    style : str, optional
+        Column whose values get one line style each in the group's colour (e.g. two
+        metrics of one company: solid and dashed).
+    style_order : Sequence, optional
+        ``style`` values in the order solid, dashed, dotted, dash-dot; sorted otherwise.
+    highlight : str, optional
+        A ``group`` value drawn thick and black, such as a sector median.
     title, ylabel : str
         Labels.
     log : bool
@@ -104,15 +124,48 @@ def plot_series(
         Mark each point on the line (for sparse data such as annual values).
     thresholds : Mapping[str, float], optional
         Named horizontal lines, such as a rule's cut-off (``{"G6: P/E 15": 15.0}``).
+
+    Raises
+    ------
+    ValueError
+        If the plot would have more than ``MAX_LINES`` lines.
     """
+    groups = list(_groups(df, group))
+    present: list[object] = list(df[style].dropna().unique()) if style else []
+    if not style:
+        styles: list[object] = [None]
+    elif style_order is not None:
+        styles = [v for v in style_order if v in present]
+    else:
+        styles = sorted(present, key=str)
+    drawn = sum(
+        1
+        for _, part in groups
+        for value in styles
+        if value is None or bool((part[style] == value).any())
+    )
+    _check_lines(drawn)
+    colours = _palette(len(groups))
     figure = Figure(figsize=WIDE)
     axes = figure.add_subplot()
-    for name, unsorted in _groups(df, group):
-        part = unsorted.sort_values(x)
-        if markers:
-            axes.plot(part[x], part[y], label=name, lw=1, marker="o", ms=3)
-        else:
-            axes.plot(part[x], part[y], label=name, lw=1.2)
+    for (name, part), colour in zip(groups, colours, strict=True):
+        thick = highlight is not None and name == highlight
+        for index, value in enumerate(styles):
+            line = part if value is None else part[part[style] == value]
+            line = line.sort_values(x)
+            label = name if value is None or index == 0 else None
+            axes.plot(
+                line[x],
+                line[y],
+                label=label,
+                color="black" if thick else colour,
+                lw=2.4 if thick else 1.2,
+                ls=LINE_STYLES[index % len(LINE_STYLES)],
+                marker="o" if markers else None,
+                ms=3,
+            )
+    if style:
+        _style_key(axes, [str(v) for v in styles])
     _thresholds(axes, thresholds)
     _finish(axes, title=title, ylabel=ylabel, legend=group is not None, log=log)
     figure.tight_layout()
@@ -126,10 +179,13 @@ def plot_coverage(
     column: str,
     title: str = "",
     annotate: bool = True,
+    row_order: Sequence[object] | None = None,
 ) -> Figure:
     """Plot the number of rows of ``df`` per ``row`` and ``column`` value as a heat map.
 
-    Empty cells (no observation) show as gaps. Rows and columns are sorted.
+    Empty cells (no observation) show as gaps. Columns are sorted; rows are sorted, or in
+    ``row_order`` (top to bottom) when given. Above ``DENSE_ROWS`` rows the cells are not
+    annotated and the row labels are small.
 
     Parameters
     ----------
@@ -141,13 +197,22 @@ def plot_coverage(
         Title.
     annotate : bool
         Write the count in each cell.
+    row_order : Sequence, optional
+        Row values from top to bottom.
     """
     counts = df.pivot_table(
         index=row, columns=column, aggfunc="size", fill_value=0
     ).sort_index()
     counts = counts.reindex(sorted(counts.columns), axis=1)
+    if row_order is not None:
+        counts = counts.reindex([r for r in row_order if r in counts.index])
     values = counts.to_numpy(dtype=float)
-    height = max(2.5, 0.3 * len(counts.index) + 1.5)
+    dense = len(counts.index) > DENSE_ROWS
+    height = (
+        0.06 * len(counts.index) + 2
+        if dense
+        else max(2.5, 0.3 * len(counts.index) + 1.5)
+    )
     figure = Figure(figsize=(max(6.0, 0.45 * len(counts.columns) + 3), height))
     axes = figure.add_subplot()
     image = axes.imshow(
@@ -156,8 +221,12 @@ def plot_coverage(
     axes.set_xticks(
         range(len(counts.columns)), [str(c) for c in counts.columns], rotation=90
     )
-    axes.set_yticks(range(len(counts.index)), [str(i) for i in counts.index])
-    if annotate:
+    axes.set_yticks(
+        range(len(counts.index)),
+        [str(i) for i in counts.index],
+        fontsize=3 if dense else None,
+    )
+    if annotate and not dense:
         for i, j in zip(*np.nonzero(values), strict=True):
             axes.text(j, i, f"{values[i, j]:.0f}", ha="center", va="center", fontsize=6)
     figure.colorbar(image, ax=axes, label="observations")
@@ -173,6 +242,7 @@ def plot_normalised(
     y: str,
     group: str,
     highlight: str | None = None,
+    labels: Mapping[str, str] | None = None,
     title: str = "",
     ylabel: str = "Growth of one unit",
     log: bool = True,
@@ -187,6 +257,8 @@ def plot_normalised(
         Date, value and group columns.
     highlight : str, optional
         A group drawn thick and black, such as a benchmark.
+    labels : Mapping[str, str], optional
+        Display names per group value.
     title, ylabel : str
         Labels.
     log : bool
@@ -194,28 +266,32 @@ def plot_normalised(
 
     Notes
     -----
-    Only dates on which every group has a value are kept, so all lines start at 1 on
-    the same date.
+    Each group starts at 1 on its own first date, so a series that begins later (a
+    company listed after the start, a younger fund) still shows from its start. The
+    legend is left out above ``MAX_LEGEND`` groups.
     """
-    wide = df.pivot_table(index=x, columns=group, values=y).dropna()
-    growth = wide / wide.iloc[0]
+    wide = df.pivot_table(index=x, columns=group, values=y).sort_index()
+    _check_lines(len(wide.columns))
+    colours = _palette(len(wide.columns))
     figure = Figure(figsize=WIDE)
     axes = figure.add_subplot()
-    for name in growth.columns:
+    for name, colour in zip(wide.columns, colours, strict=True):
+        series = wide[name].dropna()
+        if series.empty:
+            continue
         thick = name == highlight
         axes.plot(
-            growth.index,
-            growth[name],
-            label=str(name),
+            series.index,
+            series / series.iloc[0],
+            label=(labels or {}).get(str(name), str(name)),
             lw=2.5 if thick else 1.2,
-            color="black" if thick else None,
+            color="black" if thick else colour,
         )
-    start = pd.Timestamp(growth.index[0]).date() if len(growth) else "-"
     _finish(
         axes,
-        title=title or f"Growth since {start}",
+        title=title or "Growth of one unit from each series' first date",
         ylabel=ylabel,
-        legend=True,
+        legend=len(wide.columns) <= MAX_LEGEND,
         log=log,
     )
     figure.tight_layout()
@@ -337,16 +413,21 @@ def plot_relative(
     """
     wide = df.pivot_table(index=x, columns=group, values=y).sort_index()
     names = [n for n in wide.columns if n not in (benchmark, second_benchmark)]
+    _check_lines(len(names) * (2 if second_benchmark else 1))
     figure = Figure(figsize=WIDE)
     axes = figure.add_subplot()
-    for name in names:
+    for name, colour in zip(names, _palette(len(names)), strict=True):
         solid = _relative_growth(wide[name], wide[benchmark])
         label = (labels or {}).get(str(name), str(name))
-        (line,) = axes.plot(solid.index, solid, label=label, lw=1.2)
+        (line,) = axes.plot(solid.index, solid, label=label, lw=1.2, color=colour)
         if second_benchmark is not None:
             dashed = _relative_growth(wide[name], wide[second_benchmark])
             axes.plot(dashed.index, dashed, color=line.get_color(), lw=1, ls="--")
     axes.axhline(1, color="black", lw=1)
+    if second_benchmark is not None:
+        _style_key(
+            axes, [f"relative to {benchmark}", f"relative to {second_benchmark}"]
+        )
     if not title:
         title = f"Relative to {benchmark}" + (
             f" (solid) and {second_benchmark} (dashed)" if second_benchmark else ""
@@ -384,16 +465,81 @@ def plot_spread(
     title, ylabel : str
         Labels.
     """
+    groups = list(_groups(df, group))
+    _check_lines(len(groups))
     figure = Figure(figsize=WIDE)
     axes = figure.add_subplot()
-    for name, part in _groups(df, group):
+    for (name, part), colour in zip(groups, _palette(len(groups)), strict=True):
         values = part.groupby(x)[y]
         low, high = values.quantile(band[0]), values.quantile(band[1])
         median = values.median()
-        (line,) = axes.plot(median.index, median, lw=1.4, label=name)
+        (line,) = axes.plot(median.index, median, lw=1.4, label=name, color=colour)
         axes.fill_between(median.index, low, high, color=line.get_color(), alpha=0.15)
     _thresholds(axes, thresholds)
     _finish(axes, title=title, ylabel=ylabel, legend=group is not None)
+    figure.tight_layout()
+    return figure
+
+
+def plot_spread_pair(
+    df: pd.DataFrame,
+    *,
+    x: str,
+    left: str,
+    right: str,
+    band: tuple[float, float] = (0.25, 0.75),
+    title: str = "",
+    left_label: str = "",
+    right_label: str = "",
+    log_left: bool = False,
+    log_right: bool = False,
+) -> Figure:
+    """Plot the median and band of ``left`` and of ``right`` across rows, on two axes.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Long table, many rows per ``x`` (e.g. one per company and date); not modified.
+    x : str
+        Horizontal axis.
+    left, right : str
+        Values summarised on the left and right axes, in two colours.
+    band : tuple[float, float]
+        Lower and upper quantile of the shaded bands.
+    title, left_label, right_label : str
+        Labels; an empty axis label falls back to the column name.
+    log_left, log_right : bool
+        Logarithmic axes, for values spanning orders of magnitude (P/E, growth).
+    """
+    figure = Figure(figsize=WIDE)
+    axes = figure.add_subplot()
+    twin = axes.twinx()
+    for target, column, colour, label in (
+        (axes, left, "tab:blue", left_label or left),
+        (twin, right, "tab:orange", right_label or right),
+    ):
+        values = df.groupby(x)[column]
+        low, high = values.quantile(band[0]), values.quantile(band[1])
+        median = values.median()
+        target.plot(median.index, median, color=colour, lw=1.4, label=f"median {label}")
+        target.fill_between(median.index, low, high, color=colour, alpha=0.15)
+        target.set_ylabel(label, color=colour)
+    if log_left:
+        axes.set_yscale("log")
+    if log_right:
+        twin.set_yscale("log")
+    handles = axes.get_legend_handles_labels()[0] + twin.get_legend_handles_labels()[0]
+    labels = axes.get_legend_handles_labels()[1] + twin.get_legend_handles_labels()[1]
+    axes.legend(
+        handles,
+        labels,
+        fontsize=7,
+        loc="upper left",
+        bbox_to_anchor=(1.08, 1.0),
+        frameon=False,
+    )
+    axes.set_title(title)
+    axes.grid(alpha=0.3)
     figure.tight_layout()
     return figure
 
@@ -412,11 +558,15 @@ def plot_lag_profile(
 
     A vertical line marks lag 0 and a horizontal line the value 0.
     """
+    groups = list(_groups(df, group))
+    _check_lines(len(groups))
     figure = Figure(figsize=WIDE)
     axes = figure.add_subplot()
-    for name, unsorted in _groups(df, group):
+    for (name, unsorted), colour in zip(groups, _palette(len(groups)), strict=True):
         part = unsorted.sort_values(lag)
-        axes.plot(part[lag], part[value], marker="o", ms=3, lw=1.2, label=name)
+        axes.plot(
+            part[lag], part[value], marker="o", ms=3, lw=1.2, label=name, color=colour
+        )
     axes.axvline(0, color="grey", lw=1, ls="--")
     axes.axhline(0, color="grey", lw=1)
     axes.set_xlabel(xlabel)
@@ -448,6 +598,38 @@ def lagged_correlation(a: pd.Series, b: pd.Series, lags: range) -> pd.Series:
     """
     values = {k: a.corr(b.shift(-k), min_periods=3) for k in lags}
     return pd.Series(values, name="correlation", dtype="float64").rename_axis("lag")
+
+
+def _style_key(axes: Axes, names: Sequence[str]) -> None:
+    """Add legend entries explaining the line styles (solid, dashed, ...) in black."""
+    for index, name in enumerate(names):
+        style = LINE_STYLES[index % len(LINE_STYLES)]
+        axes.plot(
+            [],
+            [],
+            color="black",
+            ls=style,
+            lw=1.2,
+            label=f"{_STYLE_NAMES[style]}: {name}",
+        )
+
+
+_STYLE_NAMES = {"-": "solid", "--": "dashed", ":": "dotted", "-.": "dash-dot"}
+
+
+def _check_lines(count: int) -> None:
+    """Refuse a plot with more than ``MAX_LINES`` lines (the readability rule)."""
+    if count > MAX_LINES:
+        raise ValueError(
+            f"{count} lines in one plot; at most {MAX_LINES}: select fewer series or use a heat map"
+        )
+
+
+def _palette(count: int) -> list[tuple[float, float, float, float]]:
+    """Return ``count`` distinct colours: tab10 up to 10, tab20 up to 20, then repeated."""
+    name = "tab10" if count <= 10 else "tab20"  # noqa: PLR2004  palette sizes
+    colours = colormaps[name].colors  # type: ignore[attr-defined]  # ListedColormap
+    return [tuple(colours[i % len(colours)]) for i in range(count)]  # type: ignore[misc]
 
 
 def _relative_growth(series: pd.Series, benchmark: pd.Series) -> pd.Series:
@@ -488,11 +670,18 @@ def _groups(
 def _finish(
     axes: Axes, *, title: str, ylabel: str, legend: bool, log: bool = False
 ) -> None:
-    """Apply the title, axis label, log scale, legend and grid shared by all plots."""
+    """Apply the title, axis label, scale, legend and grid shared by all plots.
+
+    Large values (from ``THOUSANDS``) get thousands separators instead of an offset.
+    """
     axes.set_title(title)
     axes.set_ylabel(ylabel)
     if log:
         axes.set_yscale("log")
+    elif max((abs(v) for v in axes.get_ylim()), default=0.0) >= THOUSANDS:
+        axes.yaxis.set_major_formatter(StrMethodFormatter("{x:,.0f}"))
     if legend:
-        axes.legend(fontsize=8)
+        axes.legend(
+            fontsize=7, loc="upper left", bbox_to_anchor=(1.01, 1.0), frameon=False
+        )
     axes.grid(alpha=0.3)

@@ -48,3 +48,16 @@ dated a few days before filing) and from the balance sheet
 share counts with different dates. The point-in-time stage must pick one convention
 (the cover-page count is the latest known at filing).
 
+### One field in another unit drops the whole company (2026-10-31, open)
+
+The full pull lost two companies (CIK 32604 and 864749) because one mapped field,
+`dividends_per_share`, is reported in `pure` or `EUR`; the parser stops at a unit
+mismatch, so all their fields are lost. Option: drop only the field's values in the
+wrong unit and report it, keeping the company. This changes the "fail fast on unit
+mismatch" rule in `.claude/rules/sources.md`, so it is the user's decision.
+
+### Large daily moves (2026-10-31, open)
+
+931 daily total-return moves above 20% across 409 symbols since 2006; plausible (earnings
+and 2008/2020), but not yet inspected for data errors such as unadjusted splits.
+

@@ -1,0 +1,591 @@
+**
+(report.tex
+LaTeX2e <2021-11-15> patch level 1
+L3 programming layer <2022-02-24> (article.cls
+Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
+(size11.clo
+File: size11.clo 2021/10/04 v1.4n Standard LaTeX file (size option)
+)
+\c@part=\count181
+\c@section=\count182
+\c@subsection=\count183
+\c@subsubsection=\count184
+\c@paragraph=\count185
+\c@subparagraph=\count186
+\c@figure=\count187
+\c@table=\count188
+\abovecaptionskip=\skip47
+\belowcaptionskip=\skip48
+\bibindent=\dimen138
+) (fontenc.sty
+Package: fontenc 2021/04/29 v2.0v Standard LaTeX package
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 11
+2.
+ (t1lmr.fd
+File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)) (lmodern.sty
+Package: lmodern 2015/05/01 v1.6.1 Latin Modern Fonts
+LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
+(Font)                  OT1/cmr/m/n --> OT1/lmr/m/n on input line 22.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `normal'
+(Font)                  OML/cmm/m/it --> OML/lmm/m/it on input line 23.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `normal'
+(Font)                  OMS/cmsy/m/n --> OMS/lmsy/m/n on input line 24.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `normal'
+(Font)                  OMX/cmex/m/n --> OMX/lmex/m/n on input line 25.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/lmr/bx/n on input line 26.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `bold'
+(Font)                  OML/cmm/b/it --> OML/lmm/b/it on input line 27.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `bold'
+(Font)                  OMS/cmsy/b/n --> OMS/lmsy/b/n on input line 28.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `bold'
+(Font)                  OMX/cmex/m/n --> OMX/lmex/m/n on input line 29.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
+(Font)                  OT1/cmr/bx/n --> OT1/lmr/bx/n on input line 31.
+LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
+(Font)                  OT1/cmss/m/n --> OT1/lmss/m/n on input line 32.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
+(Font)                  OT1/cmr/m/it --> OT1/lmr/m/it on input line 33.
+LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
+(Font)                  OT1/cmtt/m/n --> OT1/lmtt/m/n on input line 34.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/lmr/bx/n on input line 35.
+LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
+(Font)                  OT1/cmss/bx/n --> OT1/lmss/bx/n on input line 36.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
+(Font)                  OT1/cmr/bx/it --> OT1/lmr/bx/it on input line 37.
+LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
+(Font)                  OT1/cmtt/m/n --> OT1/lmtt/m/n on input line 38.
+) (geometry.sty
+Package: geometry 2020/01/02 v5.9 Page Geometry
+ (keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks16
+) (ifvtex.sty
+Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
+ (iftex.sty
+Package: iftex 2022/02/03 v1.0f TeX engine tests
+))
+\Gm@cnth=\count189
+\Gm@cntv=\count190
+\c@Gm@tempcnt=\count191
+\Gm@bindingoffset=\dimen139
+\Gm@wd@mp=\dimen140
+\Gm@odd@mp=\dimen141
+\Gm@even@mp=\dimen142
+\Gm@layoutwidth=\dimen143
+\Gm@layoutheight=\dimen144
+\Gm@layouthoffset=\dimen145
+\Gm@layoutvoffset=\dimen146
+\Gm@dimlist=\toks17
+) (graphicx.sty
+Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
+ (graphics.sty
+Package: graphics 2021/03/04 v1.4d Standard LaTeX Graphics (DPC,SPQR)
+ (trig.sty
+Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
+) (graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: xetex.def on input line 107.
+ (xetex.def
+File: xetex.def 2021/03/18 v5.0k Graphics/color driver for xetex
+))
+\Gin@req@height=\dimen147
+\Gin@req@width=\dimen148
+) (float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count192
+\float@exts=\toks18
+\float@box=\box50
+\@float@everytoks=\toks19
+\@floatcapt=\box51
+) (caption.sty
+Package: caption 2022/03/01 v3.6b Customizing captions (AR)
+ (caption3.sty
+Package: caption3 2022/03/17 v2.3b caption3 kernel (AR)
+\caption@tempdima=\dimen149
+\captionmargin=\dimen150
+\caption@leftmargin=\dimen151
+\caption@rightmargin=\dimen152
+\caption@width=\dimen153
+\caption@indent=\dimen154
+\caption@parindent=\dimen155
+\caption@hangindent=\dimen156
+Package caption Info: Standard document class detected.
+)
+\c@caption@flags=\count193
+\c@continuedfloat=\count194
+Package caption Info: float package is loaded.
+) (hyperref.sty
+Package: hyperref 2022-02-21 v7.00n Hypertext links for LaTeX
+
+(ltxcmds.sty
+Package: ltxcmds 2020-05-10 v1.25 LaTeX kernel commands for general use (HO)
+) (pdftexcmds.sty
+Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO
+)
+ (infwarerr.sty
+Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
+)
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode not found.
+) (kvsetkeys.sty
+Package: kvsetkeys 2019/12/15 v1.18 Key value parser (HO)
+)
+(kvdefinekeys.sty
+Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
+) (pdfescape.sty
+Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
+) (hycolor.sty
+Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
+) (letltxmacro.sty
+Package: letltxmacro 2019/12/03 v1.6 Let assignment for LaTeX macros (HO)
+) (auxhook.sty
+Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
+) (kvoptions.sty
+Package: kvoptions 2020-10-07 v3.14 Key value format for package options (HO)
+)
+\@linkdim=\dimen157
+\Hy@linkcounter=\count195
+\Hy@pagecounter=\count196
+ (pd1enc.def
+File: pd1enc.def 2022-02-21 v7.00n Hyperref: PDFDocEncoding definition (HO)
+) (intcalc.sty
+Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
+) (etexcmds.sty
+Package: etexcmds 2019/12/15 v1.7 Avoid name clashes with e-TeX commands (HO)
+)
+\Hy@SavedSpaceFactor=\count197
+ (puenc.def
+File: puenc.def 2022-02-21 v7.00n Hyperref: PDF Unicode definition (HO)
+)
+Package hyperref Info: Option `bookmarksnumbered' set `true' on input line 4018
+.
+Package hyperref Info: Hyper figures OFF on input line 4137.
+Package hyperref Info: Link nesting OFF on input line 4142.
+Package hyperref Info: Hyper index ON on input line 4145.
+Package hyperref Info: Plain pages OFF on input line 4152.
+Package hyperref Info: Backreferencing OFF on input line 4157.
+Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
+Package hyperref Info: Bookmarks ON on input line 4390.
+\c@Hy@tempcnt=\count198
+
+(url.sty
+\Urlmuskip=\muskip16
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+LaTeX Info: Redefining \url on input line 4749.
+\XeTeXLinkMargin=\dimen158
+ (bitset.sty
+Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
+ (bigintcalc.sty
+Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
+)
+))
+\Fld@menulength=\count199
+\Field@Width=\dimen159
+\Fld@charsize=\dimen160
+Package hyperref Info: Hyper figures OFF on input line 6027.
+Package hyperref Info: Link nesting OFF on input line 6032.
+Package hyperref Info: Hyper index ON on input line 6035.
+Package hyperref Info: backreferencing OFF on input line 6042.
+Package hyperref Info: Link coloring OFF on input line 6047.
+Package hyperref Info: Link coloring with OCG OFF on input line 6052.
+Package hyperref Info: PDF/A mode OFF on input line 6057.
+LaTeX Info: Redefining \ref on input line 6097.
+LaTeX Info: Redefining \pageref on input line 6101.
+ (atbegshi-ltx.sty
+Package: atbegshi-ltx 2021/01/10 v1.0c Emulation of the original atbegshi
+package with kernel methods
+)
+\Hy@abspage=\count266
+\c@Item=\count267
+\c@Hfootnote=\count268
+)
+Package hyperref Info: Driver (autodetected): hxetex.
+ (hxetex.def
+File: hxetex.def 2022-02-21 v7.00n Hyperref driver for XeTeX
+
+(stringenc.sty
+Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO
+)
+)
+\pdfm@box=\box52
+\c@Hy@AnnotLevel=\count269
+\HyField@AnnotCount=\count270
+\Fld@listcount=\count271
+\c@bookmark@seq@number=\count272
+ (rerunfilecheck.sty
+Package: rerunfilecheck 2019/12/05 v1.9 Rerun checks for auxiliary files (HO)
+ (atveryend-ltx.sty
+Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atveryend pac
+kage
+with kernel methods
+) (uniquecounter.sty
+Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
+)
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
+86.
+)
+\Hy@SectionHShift=\skip49
+)
+(l3backend-xetex.def
+File: l3backend-xetex.def 2022-02-07 L3 backend support: XeTeX
+\c__kernel_sys_dvipdfmx_version_int=\count273
+\l__color_backend_stack_int=\count274
+\g__color_backend_stack_int=\count275
+\g__graphics_track_int=\count276
+\l__pdf_internal_box=\box53
+\g__pdf_backend_object_int=\count277
+\g__pdf_backend_annotation_int=\count278
+\g__pdf_backend_link_int=\count279
+) (report.aux)
+\openout1 = `report.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 16.
+LaTeX Font Info:    Trying to load font information for TS1+cmr on input line 1
+6.
+ (ts1cmr.fd
+File: ts1cmr.fd 2019/12/16 v2.5j Standard LaTeX font definitions
+)
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 16.
+LaTeX Font Info:    ... okay on input line 16.
+
+*geometry* driver: auto-detecting
+*geometry* detected driver: xetex
+*geometry* verbose mode - [ preamble ] result:
+* driver: xetex
+* paper: a4paper
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: 
+* h-part:(L,W,R)=(62.59596pt, 472.31595pt, 62.59596pt)
+* v-part:(T,H,B)=(62.59596pt, 719.85492pt, 62.59596pt)
+* \paperwidth=597.50787pt
+* \paperheight=845.04684pt
+* \textwidth=472.31595pt
+* \textheight=719.85492pt
+* \oddsidemargin=-9.67403pt
+* \evensidemargin=-9.67403pt
+* \topmargin=-46.67403pt
+* \headheight=12.0pt
+* \headsep=25.0pt
+* \topskip=11.0pt
+* \footskip=30.0pt
+* \marginparwidth=50.0pt
+* \marginparsep=10.0pt
+* \columnsep=10.0pt
+* \skip\footins=10.0pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidefalse
+* \@mparswitchfalse
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: hyperref package is loaded.
+Package caption Info: End \AtBeginDocument code.
+Package hyperref Info: Link coloring OFF on input line 16.
+(nameref.sty
+Package: nameref 2021-04-02 v2.47 Cross-referencing by name of section
+ (refcount.sty
+Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
+) (gettitlestring.sty
+Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
+)
+\c@section@level=\count280
+)
+LaTeX Info: Redefining \ref on input line 16.
+LaTeX Info: Redefining \pageref on input line 16.
+LaTeX Info: Redefining \nameref on input line 16.
+ (report.out) (report.out)
+\@outlinefile=\write3
+\openout3 = `report.out'.
+
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 1
+8.
+
+(ot1lmr.fd
+File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 1
+8.
+ (omllmm.fd
+File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
+18.
+ (omslmsy.fd
+File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
+18.
+ (omxlmex.fd
+File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <12> on input line 18.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <8> on input line 18.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <6> on input line 18.
+ (report.toc
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10.95> on input line 4.
+ [1
+
+] [2])
+\tf@toc=\write4
+\openout4 = `report.toc'.
+
+ [3]
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10> on input line 27.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <7> on input line 27.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <5> on input line 27.
+
+Underfull \hbox (badness 7362) in paragraph at lines 31--31
+[]\T1/lmr/m/n/10 Communication Ser-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 32--32
+[]\T1/lmr/m/n/10 Consumer Dis-cre-
+ []
+
+
+Underfull \hbox (badness 1953) in paragraph at lines 37--37
+[]\T1/lmr/m/n/10 Information Tech-nol-
+ []
+
+File: overview/relative.png Graphic file (type bmp)
+<overview/relative.png>
+File: overview/total.png Graphic file (type bmp)
+<overview/total.png>
+[4]
+File: fundamentals/revenue.png Graphic file (type bmp)
+<fundamentals/revenue.png>
+File: fundamentals/net_income.png Graphic file (type bmp)
+<fundamentals/net_income.png>
+ [5]
+File: fundamentals/sectors.png Graphic file (type bmp)
+<fundamentals/sectors.png>
+File: fundamentals/companies_best.png Graphic file (type bmp)
+<fundamentals/companies_best.png>
+File: fundamentals/companies_worst.png Graphic file (type bmp)
+<fundamentals/companies_worst.png>
+ [6]
+File: total_return/sectors.png Graphic file (type bmp)
+<total_return/sectors.png>
+ [7]
+File: total_return/companies_best.png Graphic file (type bmp)
+<total_return/companies_best.png>
+File: total_return/companies_worst.png Graphic file (type bmp)
+<total_return/companies_worst.png>
+ [8]
+File: relative_return/sectors.png Graphic file (type bmp)
+<relative_return/sectors.png>
+File: relative_return/companies_best.png Graphic file (type bmp)
+<relative_return/companies_best.png>
+ [9]
+File: relative_return/companies_worst.png Graphic file (type bmp)
+<relative_return/companies_worst.png>
+File: pe/summary.png Graphic file (type bmp)
+<pe/summary.png>
+ [10]
+File: pe/lead_lag.png Graphic file (type bmp)
+<pe/lead_lag.png>
+File: pe/sector_best.png Graphic file (type bmp)
+<pe/sector_best.png>
+File: pe/sector_worst.png Graphic file (type bmp)
+<pe/sector_worst.png>
+ [11]
+File: pe/value_best.png Graphic file (type bmp)
+<pe/value_best.png>
+File: pe/value_worst.png Graphic file (type bmp)
+<pe/value_worst.png>
+ [12]
+File: pe/companies_best.png Graphic file (type bmp)
+<pe/companies_best.png>
+File: pe/companies_worst.png Graphic file (type bmp)
+<pe/companies_worst.png>
+ [13]
+File: dividend_yield/summary.png Graphic file (type bmp)
+<dividend_yield/summary.png>
+ [14]
+File: dividend_yield/sectors.png Graphic file (type bmp)
+<dividend_yield/sectors.png>
+File: dividend_yield/companies_best.png Graphic file (type bmp)
+<dividend_yield/companies_best.png>
+File: dividend_yield/companies_worst.png Graphic file (type bmp)
+<dividend_yield/companies_worst.png>
+ [15]
+File: data_checks/coverage.png Graphic file (type bmp)
+<data_checks/coverage.png>
+File: data_checks/eps_check.png Graphic file (type bmp)
+<data_checks/eps_check.png>
+ [16]
+File: data_checks/filing_lag.png Graphic file (type bmp)
+<data_checks/filing_lag.png>
+ [17]
+File: data_checks/trading_days.png Graphic file (type bmp)
+<data_checks/trading_days.png>
+ [18]
+File: data_checks/DEXSFUS.png Graphic file (type bmp)
+<data_checks/DEXSFUS.png>
+ [19]
+Overfull \vbox (329.34961pt too high) has occurred while \output is active []
+
+
+[20]
+File: data_checks/DEXSFUS_coverage.png Graphic file (type bmp)
+<data_checks/DEXSFUS_coverage.png>
+ [21]
+File: appendix/fundamentals/communication_services.png Graphic file (type bmp)
+<appendix/fundamentals/communication_services.png>
+File: appendix/fundamentals/consumer_discretionary.png Graphic file (type bmp)
+<appendix/fundamentals/consumer_discretionary.png>
+File: appendix/fundamentals/consumer_staples.png Graphic file (type bmp)
+<appendix/fundamentals/consumer_staples.png>
+ [22]
+File: appendix/fundamentals/energy.png Graphic file (type bmp)
+<appendix/fundamentals/energy.png>
+File: appendix/fundamentals/health_care.png Graphic file (type bmp)
+<appendix/fundamentals/health_care.png>
+ [23]
+File: appendix/fundamentals/industrials.png Graphic file (type bmp)
+<appendix/fundamentals/industrials.png>
+File: appendix/fundamentals/information_technology.png Graphic file (type bmp)
+<appendix/fundamentals/information_technology.png>
+ [24]
+File: appendix/fundamentals/materials.png Graphic file (type bmp)
+<appendix/fundamentals/materials.png>
+File: appendix/fundamentals/utilities.png Graphic file (type bmp)
+<appendix/fundamentals/utilities.png>
+ [25]
+File: appendix/total_return/communication_services.png Graphic file (type bmp)
+<appendix/total_return/communication_services.png>
+File: appendix/total_return/consumer_discretionary.png Graphic file (type bmp)
+<appendix/total_return/consumer_discretionary.png>
+ [26]
+File: appendix/total_return/consumer_staples.png Graphic file (type bmp)
+<appendix/total_return/consumer_staples.png>
+File: appendix/total_return/energy.png Graphic file (type bmp)
+<appendix/total_return/energy.png>
+ [27]
+File: appendix/total_return/health_care.png Graphic file (type bmp)
+<appendix/total_return/health_care.png>
+File: appendix/total_return/industrials.png Graphic file (type bmp)
+<appendix/total_return/industrials.png>
+ [28]
+File: appendix/total_return/information_technology.png Graphic file (type bmp)
+<appendix/total_return/information_technology.png>
+File: appendix/total_return/materials.png Graphic file (type bmp)
+<appendix/total_return/materials.png>
+ [29]
+File: appendix/total_return/utilities.png Graphic file (type bmp)
+<appendix/total_return/utilities.png>
+File: appendix/relative_return/communication_services.png Graphic file (type bm
+p)
+<appendix/relative_return/communication_services.png>
+ [30]
+File: appendix/relative_return/consumer_discretionary.png Graphic file (type bm
+p)
+<appendix/relative_return/consumer_discretionary.png>
+File: appendix/relative_return/consumer_staples.png Graphic file (type bmp)
+<appendix/relative_return/consumer_staples.png>
+ [31]
+File: appendix/relative_return/energy.png Graphic file (type bmp)
+<appendix/relative_return/energy.png>
+File: appendix/relative_return/health_care.png Graphic file (type bmp)
+<appendix/relative_return/health_care.png>
+ [32]
+File: appendix/relative_return/industrials.png Graphic file (type bmp)
+<appendix/relative_return/industrials.png>
+File: appendix/relative_return/information_technology.png Graphic file (type bm
+p)
+<appendix/relative_return/information_technology.png>
+ [33]
+File: appendix/relative_return/materials.png Graphic file (type bmp)
+<appendix/relative_return/materials.png>
+File: appendix/relative_return/utilities.png Graphic file (type bmp)
+<appendix/relative_return/utilities.png>
+ [34]
+File: appendix/pe/communication_services.png Graphic file (type bmp)
+<appendix/pe/communication_services.png>
+File: appendix/pe/consumer_discretionary.png Graphic file (type bmp)
+<appendix/pe/consumer_discretionary.png>
+
+[35]
+File: appendix/pe/consumer_staples.png Graphic file (type bmp)
+<appendix/pe/consumer_staples.png>
+File: appendix/pe/energy.png Graphic file (type bmp)
+<appendix/pe/energy.png>
+ [36]
+File: appendix/pe/health_care.png Graphic file (type bmp)
+<appendix/pe/health_care.png>
+File: appendix/pe/industrials.png Graphic file (type bmp)
+<appendix/pe/industrials.png>
+ [37]
+File: appendix/pe/information_technology.png Graphic file (type bmp)
+<appendix/pe/information_technology.png>
+File: appendix/pe/materials.png Graphic file (type bmp)
+<appendix/pe/materials.png>
+ [38]
+File: appendix/pe/utilities.png Graphic file (type bmp)
+<appendix/pe/utilities.png>
+File: appendix/dividend_yield/communication_services.png Graphic file (type bmp
+)
+<appendix/dividend_yield/communication_services.png>
+ [39]
+File: appendix/dividend_yield/consumer_discretionary.png Graphic file (type bmp
+)
+<appendix/dividend_yield/consumer_discretionary.png>
+File: appendix/dividend_yield/consumer_staples.png Graphic file (type bmp)
+<appendix/dividend_yield/consumer_staples.png>
+ [40]
+File: appendix/dividend_yield/energy.png Graphic file (type bmp)
+<appendix/dividend_yield/energy.png>
+File: appendix/dividend_yield/health_care.png Graphic file (type bmp)
+<appendix/dividend_yield/health_care.png>
+ [41]
+File: appendix/dividend_yield/industrials.png Graphic file (type bmp)
+<appendix/dividend_yield/industrials.png>
+File: appendix/dividend_yield/information_technology.png Graphic file (type bmp
+)
+<appendix/dividend_yield/information_technology.png>
+ [42]
+File: appendix/dividend_yield/materials.png Graphic file (type bmp)
+<appendix/dividend_yield/materials.png>
+File: appendix/dividend_yield/utilities.png Graphic file (type bmp)
+<appendix/dividend_yield/utilities.png>
+ [43] [44] (report.aux)
+Package rerunfilecheck Info: File `report.out' has not changed.
+(rerunfilecheck)             Checksum: C35C49D6CD1969413DBC34966472AFE0;12672.
+ )
+Output written on report.xdv (44 pages, 100652 bytes).
