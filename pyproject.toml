@@ -14,6 +14,7 @@ core = [
     "matplotlib>=3.8",
     "requests>=2.31",
     "pyarrow>=17.0",
+    "scipy>=1.14",
 ]
 mcp = ["fastmcp>=2.0"]
 notebooks = ["ipykernel>=6.29"]
