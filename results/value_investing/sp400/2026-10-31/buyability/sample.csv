@@ -1,21 +1,21 @@
 group,symbol,gics_sector,mean_score
-best,WSO,Industrials,0.88
-best,KBH,Consumer Discretionary,0.84
-best,MOG-A,Industrials,0.83
-best,WTS,Industrials,0.77
-best,MLI,Industrials,0.75
-best,AIT,Industrials,0.75
-best,GATX,Industrials,0.73
-best,UFPI,Industrials,0.72
-best,DKS,Consumer Discretionary,0.71
+best,MOG-A,Industrials,0.86
+best,WSO,Industrials,0.84
+best,WTS,Industrials,0.82
+best,UFPI,Industrials,0.80
+best,MLI,Industrials,0.71
 best,MSM,Industrials,0.71
-worst,VIAV,Information Technology,0.08
-worst,KD,Information Technology,0.08
-worst,SOLS,Materials,0.10
-worst,ULS,Industrials,0.10
-worst,GXO,Industrials,0.11
-worst,USFD,Consumer Staples,0.12
-worst,TLN,Utilities,0.13
-worst,AAL,Industrials,0.14
-worst,ACM,Industrials,0.14
-worst,ALK,Industrials,0.15
+best,AIT,Industrials,0.70
+best,AVT,Information Technology,0.69
+best,RS,Materials,0.69
+best,CMC,Materials,0.67
+worst,OKTA,Information Technology,0.00
+worst,DOCU,Information Technology,0.00
+worst,DOCN,Information Technology,0.00
+worst,CHWY,Consumer Discretionary,0.00
+worst,BROS,Consumer Discretionary,0.00
+worst,GXO,Industrials,0.02
+worst,KD,Information Technology,0.03
+worst,APG,Industrials,0.06
+worst,AAL,Industrials,0.06
+worst,XPO,Industrials,0.08
