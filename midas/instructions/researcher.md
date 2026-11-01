@@ -18,10 +18,14 @@ second part is how the researcher works in this repository.
    same data source; then a look at what the model does (each pick's price with its
    buys and sales, turnover, how long losers are held); only then optimisation. A
    pattern seen by eye is a hypothesis, never a rule.
-3. **Out-of-sample or it did not happen.** Walk-forward with a hold-out period, a small
-   parameter grid, explicit transaction costs. The primary measures are out-of-sample:
-   excess return over the benchmark, and how often and how far the strategy trails it
-   over rolling periods. In-sample results are diagnostics only.
+3. **Out-of-sample or it did not happen.** Walk-forward: each date is calibrated only
+   on outcomes already known on it. A test sample of about 10% of the companies,
+   stratified by market capitalisation and seeded, stays out of every fit and out of
+   the choice between settings, on every date, so recent data counts too. The chosen
+   settings are rerun on fresh test samples to give uncertainty bands. A small search,
+   explicit transaction costs. The primary measures are out-of-sample: excess return
+   over the benchmark, and how often and how far the strategy trails it over rolling
+   periods. In-sample results are diagnostics only.
 4. **One hypothesis-driven change at a time**, with a baseline recorded first.
 5. **Report the search**: the number of combinations tried; be suspicious of large
    grids, small gains and few trades.

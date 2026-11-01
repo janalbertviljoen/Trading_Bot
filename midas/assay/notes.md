@@ -141,6 +141,16 @@ the proposal v2, section "Investment philosophy".
 
 - The founder is happy to share his portfolio approach (user, 2026-11-01); amounts and
   account details stay out of committed files, the statement in `data/private/`.
+- The founder's split (user, 2026-11-01) is now the reference for starting investors with
+  a long horizon: `docs/investor/starting_investor_profile.md`, under the investor hat
+  (S_202611_002). Its weights are a guideline, not actual values; worldwide
+  diversification, tax-free account first, regular averaging, buy and hold (never sold).
+  General questions reference Graham ("I only read the book; he wrote it"). The workbook
+  is in the git-ignored `data/private/`.
+- Disclosed (user, 2026-11-01): most of the founder's wealth is property, through his
+  own Cape Town asset-management business (residential property and short-term
+  rentals), set up as a company; its returns move into the listed split over time. In
+  the proposal (Investment philosophy, Appendix A) and the profile.
 - **The Midas portfolio split** (user, 2026-11-01): Plus members enter their core holdings
   beside their satellite picks; Midas shows the split and how the satellite shifts
   exposure by sector, country and company. The founder's split is the first worked
@@ -280,6 +290,21 @@ MCP server and develop the way the user does here, inside a controlled structure
   instead of the local process Claude Code starts today, one workspace per tester, and
   limits on how much each may run.
 
+### Later paid sources: short picks and real estate (2026-11-01, open)
+
+Once the current version is stable and used as a platform, and only if members ask for
+it in their portfolio split: short picks and real estate as additional sources behind
+the paywall (user, 2026-11-01). Not before.
+
+- **Short picks** tie to the spec's open decision on the bottom ten (sell or avoid,
+  against short). In the proof of concept, most short-book variants trailed the S&P 500
+  in the 2022–2026 period (`model_comparison.csv`); retail platforms such as EasyEquities
+  may not offer short selling; a short position can lose more than its stake. Each needs
+  checking before it is offered.
+- **Real estate** on the platform means listed REIT companies. The founder's business is
+  private, with a few properties, so there is no conflict (user, 2026-11-01); the general
+  disclosure in the proposal is enough.
+
 ### Concept (2026-11-01, open)
 
 - **Information to the masses.** Screening on Graham's rules is cheap to run, so the
@@ -309,6 +334,12 @@ MCP server and develop the way the user does here, inside a controlled structure
 Paid tiers start once there are users. Ballpark prices (user, 2026-11-01), to revisit
 later: $1 to $15 a month across the tiers, with about 90% of members expected on a $4
 option. Entry costs almost nothing; costs and prices grow with revenue.
+
+Calibration by tier (user, 2026-11-01, to decide): the free tier gets the quick
+calibration, 10 sampled runs and 10 validation reruns with uncertainty bands; paid
+tiers may raise the number of samples and reruns, and add the refined search. A member
+who knows what they want fixes those settings and the rest are sampled
+(S_202611_003).
 
 ### Brand (2026-11-01, open)
 

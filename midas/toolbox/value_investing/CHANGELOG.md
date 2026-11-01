@@ -16,6 +16,7 @@ Naming and workflow: `midas/instructions/secretary.md`. The methodology is in
 | [VI_202610_007](changes/VI_202610_007-pick-price-history.md) | Price history of the picks in the value report | new capability | in progress | high | VI_202610_006 |
 | [VI_202610_008](changes/VI_202610_008-conservative-and-unicorn-hunter.md) | Two strategies: the conservative picker (S&P 500 top 5, twice a year) and the unicorn hunter (top 20 of all companies, quarterly) | methodology | in discussion | high | MD_202610_004, S_202610_008 |
 | [VI_202610_009](changes/VI_202610_009-unit-tests.md) | Unit tests for the value tool and the market data it reads | tests | ready | high | VI_202610_002 to 007, MD_202610_004 |
+| [VI_202611_001](changes/VI_202611_001-model-calibration.md) | Model calibration: signed rule weights, point curves per rule, fitted cut-offs, sampled studies | methodology | agreed | high | S_202611_003 |
 
 ## Done
 

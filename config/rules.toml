@@ -115,9 +115,6 @@ max_debt_to_equity = 0.5
 # last `window` rebalance dates whose window had closed; negative means give 0.
 months = 12
 window = 12
-# score_ic_static: one frozen set of weights from every window closed by this date
-# (the end of the in-sample period), used on every date; decisions after it are a test.
-static_until = 2021-12-31
 
 [diagnostics]
 # The casual sample: companies with the highest and lowest mean score from this date.
@@ -154,7 +151,6 @@ score_columns = [
     "score_binned",
     "score_binned_weighted",
     "score_ic",
-    "score_ic_static",
 ]
 weightings = ["score"]
 

@@ -27,12 +27,6 @@ on_date,"top 5, score_ic, score weights",held-out,4,2022-01-03,2026-01-02,1.4751
 on_date,"top 5, score_ic, score weights",all,4,2022-01-03,2026-01-02,1.4751,1.0878,0.0792,0.5983
 on_date,"top 5, score_ic, score weights, short book",held-out,4,2022-01-03,2026-01-02,0.8460,1.0878,-0.0609,0.5235
 on_date,"top 5, score_ic, score weights, short book",all,4,2022-01-03,2026-01-02,0.8460,1.0878,-0.0609,0.5235
-on_date,"top 5, score_ic_static, score weights",in-sample,2,2020-01-02,2022-01-04,1.8173,1.4479,0.1199,0.7045
-on_date,"top 5, score_ic_static, score weights",held-out,4,2022-01-03,2026-01-02,1.3878,1.0878,0.0628,0.5514
-on_date,"top 5, score_ic_static, score weights",all,6,2020-01-02,2026-01-02,2.5220,1.5750,0.0816,0.6024
-on_date,"top 5, score_ic_static, score weights, short book",in-sample,2,2020-01-02,2022-01-04,1.4257,1.4479,-0.0077,0.5875
-on_date,"top 5, score_ic_static, score weights, short book",held-out,4,2022-01-03,2026-01-02,0.8678,1.0878,-0.0550,0.5308
-on_date,"top 5, score_ic_static, score weights, short book",all,6,2020-01-02,2026-01-02,1.2371,1.5750,-0.0394,0.5497
 current,"buy score >= 0.6, equal",in-sample,5,2017-01-03,2022-01-04,2.0342,1.8303,0.0213,0.4704
 current,"buy score >= 0.6, equal",held-out,4,2022-01-03,2026-01-02,1.3293,1.0878,0.0514,0.4885
 current,"buy score >= 0.6, equal",all,9,2017-01-03,2026-01-02,2.7042,1.9909,0.0346,0.4784
@@ -63,9 +57,3 @@ current,"top 5, score_ic, score weights",all,9,2017-01-03,2026-01-02,1.6295,1.99
 current,"top 5, score_ic, score weights, short book",in-sample,5,2017-01-03,2022-01-04,1.5470,1.8303,-0.0331,0.5488
 current,"top 5, score_ic, score weights, short book",held-out,4,2022-01-03,2026-01-02,0.6866,1.0878,-0.1087,0.4681
 current,"top 5, score_ic, score weights, short book",all,9,2017-01-03,2026-01-02,1.0622,1.9909,-0.0674,0.5129
-current,"top 5, score_ic_static, score weights",in-sample,5,2017-01-03,2022-01-04,1.4620,1.8303,-0.0439,0.3604
-current,"top 5, score_ic_static, score weights",held-out,4,2022-01-03,2026-01-02,1.7106,1.0878,0.1199,0.5208
-current,"top 5, score_ic_static, score weights",all,9,2017-01-03,2026-01-02,2.5009,1.9909,0.0257,0.4317
-current,"top 5, score_ic_static, score weights, short book",in-sample,5,2017-01-03,2022-01-04,1.8500,1.8303,0.0021,0.5409
-current,"top 5, score_ic_static, score weights, short book",held-out,4,2022-01-03,2026-01-02,0.5564,1.0878,-0.1544,0.4240
-current,"top 5, score_ic_static, score weights, short book",all,9,2017-01-03,2026-01-02,1.0294,1.9909,-0.0707,0.4889

@@ -14,11 +14,6 @@ quarterly grades of March 2021 to December 2023 and their returns up to December
 everything used was known at t. The weights still depend on the universe: with today's members on
 past dates they learn from companies that later joined the index.
 
-``static_weights`` freezes one set of weights instead: each rule's
-mean correlation over every window closed by ``until`` (the end of the in-sample
-period), used unchanged on every date. Decisions before ``until`` then use weights
-fitted partly on their own outcomes and are in-sample; decisions after it are a test.
-
 Owns
 ----
 The rule correlations per date and the correlation weights.
@@ -35,8 +30,6 @@ rule_correlations(points, excess, *, min_companies)
     Per date and rule, the rank correlation of points and forward excess.
 correlation_weights(correlations, ends, *, window)
     Per date, each rule's mean correlation over the last closed windows, floored at 0.
-static_weights(correlations, ends, *, until)
-    One frozen weight per rule from every window closed by a date, on every date.
 
 Computes
 --------
@@ -47,9 +40,6 @@ rule information coefficient, rank IC : rule_correlations
 correlation weight, learned rule weight : correlation_weights
     w_r(t) = max(0, mean of IC_r(s) over the last ``window`` dates s with end(s) <= t);
     missing when no window has closed.
-static correlation weight, frozen rule weight : static_weights
-    w_r = max(0, mean of IC_r(s) over every s with end(s) <= until), the same on every
-    date.
 
 Dependency rule
 ---------------
@@ -126,32 +116,3 @@ def correlation_weights(
             recent.mean().clip(lower=0.0) if len(recent) else recent.mean()
         )
     return pd.DataFrame.from_dict(weights, orient="index").rename_axis(index="date")
-
-
-def static_weights(
-    correlations: pd.DataFrame, ends: pd.Series, *, until: pd.Timestamp
-) -> pd.DataFrame:
-    """Return one frozen weight per rule, repeated on every date.
-
-    Parameters
-    ----------
-    correlations : pd.DataFrame
-        ``rule_correlations`` output, one row per date s.
-    ends : pd.Series
-        The end of each date's return window, indexed by date s.
-    until : pd.Timestamp
-        Last day a window may end to be used (the end of the in-sample period).
-
-    Returns
-    -------
-    pd.DataFrame
-        Same shape as ``correlations``: every row the mean correlation over the dates s
-        with ends(s) <= ``until``, floored at 0.
-    """
-    closed = ends[ends <= until].index
-    frozen = correlations.loc[correlations.index.isin(closed)].mean().clip(lower=0.0)
-    return pd.DataFrame(
-        [frozen.to_numpy()] * len(correlations),
-        index=correlations.index,
-        columns=correlations.columns,
-    )

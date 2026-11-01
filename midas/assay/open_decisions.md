@@ -23,6 +23,7 @@ or only before a later stage. Changes from v1 are in
 | Midas line | *Turning everyday labour into wealth* offered | Approve or not | Must not imply promised returns | Founder decision | public launch |
 | Slogan | Decided (user, 2026-11-01): *Pick like a Pro. Old-world value, with a quant in your pocket.* The Buffett line is dropped | Trademark availability of "Pick like a Pro" | Public use | Trademark search | public launch |
 | Studio datasets | Cleaned, standardised datasets for Studio members; developing economies later | Which datasets may be offered, and in what form (raw, derived, member's own key) | Reshaping data does not by itself allow resale; the vendor contract decides | Lawyer reading each vendor and exchange contract; redistribution quotes | marketplace |
+| Short picks and real estate | Later paid sources, if members ask, after the platform is stable | Evidence for short books; platform support for shorting (real estate means listed REITs; no conflict with the founder's private business) | Paid add-ons beyond the core | Research and member demand | later stage |
 | Developing-economy data | Aim | Which markets first; local exchange or regional vendor terms and costs | Testing strategies outside the US | Market and vendor survey | later stage |
 
 ## Creators

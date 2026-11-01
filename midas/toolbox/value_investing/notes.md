@@ -52,7 +52,7 @@ The statement is kept out of the repository, in the git-ignored `data/private/`.
   for when the user moves money into individual firms reachable in the TFSA on the JSE.
   A JSE universe may follow as a later change.
 
-### From buyability score to a quarterly selection (2026-10-31, open)
+### From buyability score to a quarterly selection (2026-10-31, → S_202611_003, VI_202611_001)
 
 The user's plan after VI_202610_002, in order:
 
