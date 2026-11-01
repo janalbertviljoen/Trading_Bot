@@ -9,6 +9,11 @@ The business proposal written from these notes (2026-11-01) is a Claude doc:
 [Assay: Business Proposal](https://claude.ai/artifact/4kpNDqC84SmaSHJkaN7xuW). It
 names the tiers Standard, Plus and Premium.
 
+Proposal v2 (2026-11-01) supersedes the tiers and the unit economics below: Standard is
+free with the Midas chat, Plus (about $4) carries the Einsteinian models and wallet
+tracking, Studio (up to $15; less with own AI) is the Midas creator platform. See [Assay: Business Proposal v2](https://claude.ai/artifact/AWWfiFyyGtQBdXGreymHvV),
+[proposal_v2_changes.md](proposal_v2_changes.md) and [open_decisions.md](open_decisions.md).
+
 ## Planning (preliminary)
 
 ### Product first (2026-11-01, open)
@@ -124,6 +129,65 @@ so the member's choice is informed. For a member's own strategy, the report answ
 - the Sharpe ratio corrected for the number of variants tried (the deflated Sharpe
   ratio, Bailey and López de Prado, 2014);
 - the S&P 500 total return as the benchmark throughout.
+
+### Investment philosophy: core and satellite (2026-11-01, decided)
+
+Midas complements a diversified portfolio rather than replacing it (user, 2026-11-01).
+The founder keeps most capital in diversified indices across several countries and about
+5 to 10% in higher-risk opportunities researched with Midas; that share is an
+illustration, never a recommended allocation. Assay should help members tell apart a
+credible method, attractive past returns, out-of-sample evidence and luck. Recorded in
+the proposal v2, section "Investment philosophy".
+
+- The founder is happy to share his portfolio approach (user, 2026-11-01); amounts and
+  account details stay out of committed files, the statement in `data/private/`.
+- **The Midas portfolio split** (user, 2026-11-01): Plus members enter their core holdings
+  beside their satellite picks; Midas shows the split and how the satellite shifts
+  exposure by sector, country and company. The founder's split is the first worked
+  example; the member sets the split, Midas never prescribes it. Ties to the
+  value_investing note "The user's existing portfolio as a comparison".
+
+### Studio data platform and reselling data (2026-11-01, open)
+
+Studio members get the cleaned and standardised datasets, aiming at one of the most
+thorough market-data platforms, later with developing economies so strategies can be
+tested in different environments (user, 2026-11-01). Legal position from a web search on
+2026-11-01, not legal advice: reshaping licensed data does not by itself permit resale;
+the vendor contract decides, and most plans forbid redistribution (Tiingo requires a
+separate agreement, but allows apps where users bring their own key). In the US facts
+are not copyrighted (Feist, 1991); the EU adds a database right. Routes: public sources
+(SEC EDGAR), a redistribution licence, derived data that cannot be reversed, or the
+member's own key. In the proposal v2, "Product layers" and "Risks".
+
+### Scope and infrastructure cost (2026-11-01, open)
+
+The user's worry: too many services in one product (content, data warehouse, AI chat,
+creator platform) against specialised competitors. Answer drafted: one engine, many
+windows; build in phases; buy auth, payments and hosting rather than build them; never
+host video (link to YouTube); keep creator strategies declarative so Studio needs no
+per-member code sandboxes.
+
+Rough yearly cost at about 2,000 paying and 80,000 free members, from general
+knowledge, not quotes: hosting, database, storage, scheduled jobs, auth, email and
+monitoring about $2,000 to $7,000; the free Midas chat on Claude Haiku 5.5 ($0.10 / $0.50
+per million tokens) a few hundred dollars, less if each pick's explanation is written
+once a quarter and shared; payment fees about $3,000 (annual billing) to $9,000 (monthly
+at $4, where the fixed fee per charge takes about a tenth); a licensed price-data feed,
+once paid sources replace the free ones, the largest and least known line, to be quoted.
+The model's illustrative chat cost (2 to 10 cents per free user a year) is higher than
+this estimate (under 1 cent with Haiku).
+
+### Slogan (2026-11-01, decided)
+
+Decided (user, 2026-11-01): *Pick like a Pro. Old-world value, with a quant in your pocket.*
+The Buffett candidate below is dropped.
+
+#### Dropped candidate
+
+*Invest like Buffett, if he was born in 2015* (user's choice: tried and tested value
+investing). Needs legal review before public use: a living person's name in advertising
+risks right-of-publicity and false-endorsement claims, and Buffett has said he endorses
+no investment products. Alternative without the name: *Value investing, born digital*.
 
 ### Origin: the user's own sleeve (2026-11-01, open)
 

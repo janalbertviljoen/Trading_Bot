@@ -14,10 +14,10 @@ repository setup. Prefix `S`. Naming and workflow: `midas/instructions/secretary
 | [S_202610_007](changes/S_202610_007-market-analysis-plots.md) | Market analysis plots: metrics over time, coverage and spread, generic on any column | new capability | in progress | high | MD_202610_001 |
 | [S_202610_006](changes/S_202610_006-portfolio-backtest-engine.md) | Multi-asset portfolio backtest engine (wallet) | new capability | in discussion | high | S_202610_001, spec §9.4 |
 | [S_202610_008](changes/S_202610_008-midas-wrath-scenario-testing.md) | Midas's wrath: scenario testing of a model (survivorship experiment and input tests; market scenarios later) | new capability | agreed | high | MD_202610_004 |
-| [S_202611_001](changes/S_202611_001-agent-instructions-slimmed.md) | Agent instructions slimmed and roles split (inspector, scribe, tester) | tooling | in progress | high | none |
 
 ## Done
 
 | ID | Title | Done |
 |---|---|---|
 | [S_202610_001](changes/done/S_202610_001-repository-layout.md) | Repository layout: `Toolbox/`, `skatkis`, sandbox, notebooks | 2026-10-31 |
+| [S_202611_001](changes/done/S_202611_001-agent-instructions-slimmed.md) | Agent instructions slimmed and roles split (inspector, scribe, tester) | 2026-11-01 |

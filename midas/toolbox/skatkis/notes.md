@@ -13,6 +13,13 @@ folders, the Tutor role, accreditation sign-off documents, Word reports, Teams h
 Single asset, row-by-row loop, no costs, mutates its input, needs a `RangeIndex` from
 0. Documented in its docstrings on 2026-10-31; known defects listed in S_202610_003.
 
+### Column names in the member-facing data rules (2026-11-01, open)
+
+The data rules in `midas/instructions/quant.md` name this repository's columns
+(`period_start`, `period_end`, `fiscal_year`, `fiscal_period`, `adj_close`, the splits
+table). They are fine for members if the member engine exposes the same schema; decide
+when the member profile is built (S_202610_002). Raised by the warden on S_202611_001.
+
 ## Sandbox and test infrastructure
 
 ### Notebook defects found when moving them (2026-10-31, open)

@@ -30,7 +30,7 @@ separated by what they may write. Each record has one owner.
 |---|---|---|---|---|
 | **Developer** | Designs the change with the user, builds the code | code, `.claude/` rules and agents, the root pointers | main session | [developer.md](developer.md) |
 | **Secretary** | Keeps notes, change logs, change files, designs, decisions, outcome minutes and the agent instructions | `midas/`, the only hat that writes there | main session | [secretary.md](secretary.md) |
-| **Researcher** | Improves strategies and proves them out-of-sample | strategy code, config and tests on its branch | subagent | [researcher.md](researcher.md) |
+| **Researcher** | Improves strategies and proves them out-of-sample | strategy code and config on its branch | subagent | [researcher.md](researcher.md) |
 | **Inspector** | Reviews the code of a big branch at milestones during the build | nothing | subagent (Sonnet) | [inspector.md](inspector.md) |
 | **Warden** | Reviews a branch once, before its pull request | nothing | subagent (Opus) | [warden.md](warden.md) |
 | **Scribe** | Writes the official documentation after the warden, the PDF report text and documents for members | docstrings, READMEs, `docs/`, `config/report_*.toml` | subagent | [scribe.md](scribe.md) |

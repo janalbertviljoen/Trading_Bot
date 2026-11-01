@@ -17,5 +17,5 @@ paths:
   shared contract type in `skatkis.pipelines`; a generic need is added there, with
   tests.
 - Register contracts in DAG dependency order, consistent with `pipeline.py`.
-- Renaming a canonical column touches code, contracts, tests, config, notebooks and
-  documentation together.
+- Renaming a canonical column: `developer.md`, "Coding conventions", and `writing.md`,
+  "Renames and the trail".

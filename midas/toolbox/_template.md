@@ -4,7 +4,7 @@
 |---|---|
 | Status | ready / in discussion / agreed / in progress / done |
 | Priority | high / medium / low |
-| Kind | refactor / methodology / tooling / new capability |
+| Kind | refactor / methodology / tooling / new capability / documentation / tests |
 | Depends on | <IDs or none> |
 | Branch | <branch, if it has its own> |
 | Raised | YYYY-MM-DD |
@@ -36,6 +36,11 @@ One line per inspector run, on a big branch (`inspector.md`).
 
 | Date | Commits | Findings | Open |
 |---|---|---|---|
+
+## Warden report
+
+The warden's report, unchanged, headed with its date and the commit reviewed
+(`secretary.md`).
 
 ## Kickoff prompt
 

@@ -28,9 +28,9 @@ or approve.
   (and ruff `--fix` and pyright once configured) on the edited `.py` file when it is
   outside `notebooks/` and `Toolbox/SandBox/`, and reports what it found.
 
-Old agent files to remove at the same time (superseded by the Midas hats):
-`.claude/agents/code-improver.md`, `strategy-researcher.md`, `reviewer.md`,
-`midas.md`, `midas-builder.md`, `midas-improver.md`, `midas-reviewer.md`. (The old
+The old agent files (`.claude/agents/code-improver.md`, `strategy-researcher.md`,
+`reviewer.md`, `midas.md`, `midas-builder.md`, `midas-improver.md`,
+`midas-reviewer.md`) were removed on 2026-11-01 under S_202611_001. (The old
 `midas/README.md` and `midas/hats/` were removed on 2026-10-31.)
 
 ## Open decisions (user)

@@ -25,7 +25,7 @@ it. This file holds only what is specific to Claude Code.
 - **MCP.** The server is registered in `.mcp.json` (today as `trading-bot`, from
   `Toolbox/skatkis/midas/server.py`; it becomes `midas` with change S_202610_002). Edits
   to its code reach the running server only after Claude Code restarts it.
-- **Commands.** Use `.venv/bin/python -m …` for pytest, Black, ruff and pyright.
+- **Commands** for pytest, Black, ruff and pyright: `developer.md`, "Commands".
 - **Data updates and the report run outside the sandbox** (user, 2026-10-31): when the
   user asks to run an update, `python -m Toolbox.market_data update` and `check` and
   `tectonic` may run, with their hosts (SEC, Yahoo, FRED, Wikipedia, tectonic's package

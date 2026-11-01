@@ -12,7 +12,8 @@ end reviews less. It writes nothing and runs no commands.
 
 - After a build step that touches financial logic (sources, metrics, ranking,
   strategies, the wallet), before plots are shown to the user, or when the user asks.
-- Never on records in `midas/`, pure renames, tests only or documentation only.
+- Never on the branches [AGENTS.md](AGENTS.md), "Change lifecycle", exempts, nor on
+  commits that change only documentation.
 - Each run covers only the commits since the last one logged in the change file's
   `## Inspections`.
 

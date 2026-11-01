@@ -9,8 +9,8 @@ of new investments in a value-investing sleeve that beats the S&P 500 total-retu
 index by about 2% a year; not doing worse than the index is the minimum (user,
 2026-11-01). Trades are quarterly, across S&P 500 companies; the wallet tracks
 combinations of strategies, judged out-of-sample on excess return over the index and on
-how often and how far they trail it over rolling periods. Results may also be reported
-as CPI + x% (which CPI, US or South African, is open). The API matters because
+how often and how far they trail it over rolling periods. Reporting as CPI + x% was
+dropped (user, 2026-11-01). The API matters because
 backtesting and optimising the metrics needs point-in-time fundamentals over many years.
 
 - Hypothesis (user, 2026-11-01): the sleeve leads the index more often than it trails
@@ -138,7 +138,9 @@ report":
 ### Spec §1.3 docstring style (2026-10-31, → S_202610_003)
 
 Spec §1.3 prescribes Google style; the user chose the numpydoc structure of
-`.claude/rules/docstrings.md`. The spec is updated in S_202610_003.
+`.claude/rules/docstrings.md`. The spec is updated in S_202610_003. §1.4 also still
+asks for `ruff format --check`, where the repository uses Black (warden, S_202611_001,
+2026-11-01); a spec decision for the scribe.
 
 ## Open methodology questions
 

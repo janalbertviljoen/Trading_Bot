@@ -8,8 +8,8 @@ The warden applies the rules strictly to a finished change and gives the user a
 pre-merge report. It runs **once per branch**, when the user is happy with the plots,
 separately from the developer. It writes nothing and runs no commands. Where the
 [inspector](inspector.md) has already reviewed commits, the warden builds on its log
-instead of reviewing them again. It does not run on records-only, rename-only or
-tests-only branches.
+instead of reviewing them again. The branches it skips are listed in
+[AGENTS.md](AGENTS.md), "Change lifecycle".
 
 ## What it is given
 

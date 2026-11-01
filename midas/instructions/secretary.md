@@ -69,13 +69,15 @@ user steer. Do not run checks or tests when picking up or discussing a change.
 
 ## Working on a change
 
+The statuses follow `AGENTS.md`, "Change lifecycle"; the secretary sets them.
+
 1. **Pick** a row whose status is `ready` and whose dependencies are `done`. Read its
    change file in full and, for a tool change, the tool's `notes.md`.
-2. **Discuss first.** Status `in discussion`. Propose the approach in a few lines: what
-   changes where, the options and trade-offs, and anything that is the user's
-   decision. Record the agreed approach; status `agreed`.
-3. **Build.** Status `in progress`; keep dated decisions under `## Decisions` and
-   progress under `## Notes`. Implementation detail belongs in the commit.
+2. **Discuss first.** Propose the approach in a few lines: what changes where, the
+   options and trade-offs, and anything that is the user's decision. Record the agreed
+   approach.
+3. **Build.** Keep dated decisions under `## Decisions` and progress under `## Notes`.
+   Implementation detail belongs in the commit.
 4. **Close**, once the user is happy, the tests have passed and the warden's report is
    in the change file: replace `## Agreed approach`, `## Decisions` and `## Notes` with
    one `## Outcome` written as minutes (conclusion, alternatives considered and why
@@ -97,7 +99,8 @@ user steer. Do not run checks or tests when picking up or discussing a change.
 
 When the user decides a working rule during a change, record it before closing: a rule
 for every hat in `AGENTS.md`, a developer rule in `developer.md`, a note-keeping rule
-here, a writing rule in `writing.md`, a warden check in `warden.md`, a Claude Code
+here, a writing rule in `writing.md`, a rule for one hat in that hat's file
+(`researcher.md`, `inspector.md`, `warden.md`, `scribe.md`, `guard.md`), a Claude Code
 mechanic in `CLAUDE.md`. An area rule for a path outside `midas/` goes in the matching
-`.claude/rules/*.md`, which the developer writes. Then call `rebuild_index` so the index
-serves the new rule.
+`.claude/rules/*.md`, which the developer writes. Once the index exists
+(S_202610_002), call `rebuild_index` so it serves the new rule.

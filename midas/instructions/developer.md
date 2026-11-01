@@ -52,8 +52,8 @@ Agreed on 2026-10-31 and put in place by
   first and point out notes that bear on it.
 - **State the change** before more than a few lines in `Toolbox/`: owning module,
   methodology or refactor, and the expected effect on the baselines.
-- **Financial logic.** A refactor must keep `regression_check` at `unchanged` and the
-  hand-computed reference tests passing; record the baseline before starting. A
+- **Financial logic.** A refactor (`AGENTS.md`, "Methodology vs refactor") also keeps
+  the hand-computed reference tests passing; record the baseline before starting. A
   methodology change states which outputs should move and in which direction, then
   records what moved; a difference is investigated first. A baseline is rewritten
   (`update_baseline`) only with the user's approval, recorded in the change file.
@@ -82,8 +82,8 @@ dependency, regenerate the pins with `.venv/bin/python -m pip freeze --exclude-e
 ```
 .venv/bin/python -m pytest                # all tests
 .venv/bin/python -m black --check .       # formatter (Black)
-.venv/bin/ruff check                      # lint (scoped to Toolbox/ and tests/)
-.venv/bin/pyright                         # strict type check (scoped to Toolbox/)
+.venv/bin/python -m ruff check            # lint (scoped to Toolbox/ and tests/)
+.venv/bin/python -m pyright               # strict type check (scoped to Toolbox/)
 ```
 
 The MCP tool `run_checks` runs Black and pytest; `regression_check` compares the
@@ -103,7 +103,7 @@ reading many files: `find_calculation(concept)` before writing a calculation;
 - Keep changes inside the owning module; a new or changed output column needs schema,
   contract, validation, tests and documentation updated together.
 - Full type hints; pure calculation functions; IO only in sources and `skatkis.io`;
-  thresholds, windows and weights in `config/*.toml` (spec §1.1–1.2).
+  parameters in config, as `AGENTS.md`, "Determinism", says.
 - Docstrings follow `.claude/rules/docstrings.md`; a short docstring while building is
   enough, the scribe completes it.
 - After editing Python outside `notebooks/` and `Toolbox/SandBox/`, run Black, ruff and

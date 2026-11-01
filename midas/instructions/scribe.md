@@ -12,9 +12,8 @@ the scribe reports the contradiction; it never edits code to match a document.
 
 ## Sources and the reference chain
 
-- The value-investing methodology lives in `docs/value_investing_bot_spec.md`, which
-  becomes `Toolbox/value_investing/README.md` once the code is final;
-  `docs/trading_rules.md` is an extract. Shared data sources are in
+- The value-investing methodology lives where `developer.md`, "Sources of truth",
+  says. Shared data sources are in
   `Toolbox/market_data/README.md`, "Data sources".
 - Every rule definition cites its source: Graham, *The Intelligent Investor* (rev. ed.,
   chapter 14 for G1–G7, chapter 15 for E1–E6); Piotroski (2000) for Q2; Greenblatt,
