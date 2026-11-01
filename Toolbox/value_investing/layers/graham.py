@@ -40,15 +40,17 @@ debt to net current assets, debt cover : g2b_debt_cover, e2_debt_cover
     (G2b k = 1.0, E2 k = 1.10); value LTD / NCA, missing when NCA <= 0. The rule then
     fails, except at NCA = 0 with no long-term debt, which passes.
 earnings stability : g3_earnings_stability, e3_earnings_stability
-    Pass when diluted EPS > 0 in each of the last n fiscal years (G3 10, E3 5); value
+    Pass when diluted EPS > 0 in each of the last n fiscal years (G3 3 as configured,
+    Graham's 10; E3 5); value
     the number of those years with EPS > 0; not evaluable until n consecutive years are
     filed.
 dividend record : g4_dividend_record
-    Count of the n calendar years before the rebalance year (G4 n = 20) with at least
-    one dividend ex-date; pass when it equals n.
+    Count of the n calendar years before the rebalance year (G4 n = 3 as configured,
+    Graham's 20) with at least one dividend ex-date; pass when it equals n.
 earnings growth (Graham) : g5_earnings_growth
-    g = mean EPS of lags 0 to a-1 / mean EPS of lags n-a to n-1 (a = 3, n = 13); pass
-    when the older mean is > 0 and g >= 1.33.
+    g = mean EPS of lags 0 to a-1 / mean EPS of lags n-a to n-1 (a = 3, n = 6 as
+    configured, Graham's 13); pass when the older mean is > 0 and g >= 1.33. Over 3
+    years apart 1.33 is about 10% a year, over Graham's 10 about 2.9% a year.
 current dividend : e4_current_dividend
     Trailing dividend yield over ``window_days``; pass when > 0.
 earnings growth (enterprising) : e5_earnings_growth
@@ -122,14 +124,19 @@ def g2b_debt_cover(
 def g3_earnings_stability(
     inputs: RuleInputs, ratios: pd.DataFrame, *, years: int
 ) -> pd.DataFrame:
-    """G3, spec §2.1: positive diluted EPS in each of the last ``years`` (10) years."""
+    """G3, spec §2.1: positive diluted EPS in each of the last ``years`` years.
+
+    Configured at 3 years (Graham: 10); off by default.
+    """
     return _earnings_stability(inputs, years)
 
 
 def g4_dividend_record(
     inputs: RuleInputs, ratios: pd.DataFrame, *, years: int
 ) -> pd.DataFrame:
-    """G4, spec §2.1: a dividend in each of the ``years`` (20) calendar years before.
+    """G4, spec §2.1: a dividend in each of the ``years`` calendar years before.
+
+    Configured at 3 years (Graham: 20); off by default.
 
     Parameters
     ----------
@@ -187,11 +194,13 @@ def g5_earnings_growth(
     average_years: int,
     min_growth: float,
 ) -> pd.DataFrame:
-    """G5, spec §2.1: recent average EPS at least ``min_growth`` * the one 10 years before.
+    """G5, spec §2.1: recent average EPS at least ``min_growth`` * the earlier average.
 
-    The recent average covers lags 0 to ``average_years - 1``, the old one the last
-    ``average_years`` of ``years`` (lags 10 to 12 by default). Fails when the old average
-    is zero or negative; not evaluable until all ``years`` years are filed.
+    The recent average covers lags 0 to ``average_years - 1``, the earlier one the last
+    ``average_years`` of ``years`` (lags ``years - average_years`` to ``years - 1``: 3 to 5
+    with the configured 6 years and 3-year averages; Graham's 13 years give lags 10 to 12).
+    Fails when the earlier average is zero or negative; not evaluable until all ``years``
+    years are filed.
     """
     eps = inputs.history("eps_diluted", years)
     recent = eps.iloc[:, :average_years].mean(axis=1)

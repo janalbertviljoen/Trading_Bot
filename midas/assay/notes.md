@@ -192,6 +192,10 @@ this estimate (under 1 cent with Haiku).
 Decided (user, 2026-11-01): *Pick like a Pro. Old-world value, with a quant in your pocket.*
 The Buffett candidate below is dropped.
 
+The wording stays (user, 2026-11-01): "quant" rings better than a wider word such as
+"desk" or "office". The team behind it (quant, investor, secretary) is described in the
+body, under Brand, "Positioning".
+
 #### Dropped candidate
 
 *Invest like Buffett, if he was born in 2015* (user's choice: tried and tested value
@@ -313,7 +317,9 @@ the paywall (user, 2026-11-01). Not before.
 - **Do it yourself, at your own risk.** The user sets their own preferences and takes
   the risk, as with the crypto fad, but the app shows why the picks have given
   reasonable returns. The framing is counting cards, not a lottery: a measurable edge,
-  shown openly.
+  shown openly. Until the signal is shown (the rule-by-rule rank correlations lie between
+  -0.018 and +0.012, VI_202611_001, and the S&P 500 edge is concentrated in a few names,
+  `accreditation.md`), the promise is the openness, not the edge.
 - **The chat steers the user's settings.** Midas, the chatbot, helps the user express a
   risk appetite and turns it into the screen's parameters; the user makes the picks.
 - **No money handled.** Assay manages subscriptions and member portfolios only; it
@@ -325,9 +331,12 @@ the paywall (user, 2026-11-01). Not before.
 
 ### Tiers (2026-11-01, open)
 
+Superseded by proposal v2 (Standard, Plus, Studio; see the top of this file). The table below
+is kept as history. Picks per report: 10 for now, in every tier (user, 2026-11-01).
+
 | Tier | Price | Offers |
 |---|---|---|
-| Standard | free or almost free | about 3 picks; a few adjustable parameters |
+| Standard | free or almost free | about 3 picks (now 10); a few adjustable parameters |
 | Paid | small | more room to change risk parameters; an investment plan with more picks; the full report |
 | Premium | small | tracks the picks the member says they bought and prints the full portfolio report |
 
@@ -335,11 +344,79 @@ Paid tiers start once there are users. Ballpark prices (user, 2026-11-01), to re
 later: $1 to $15 a month across the tiers, with about 90% of members expected on a $4
 option. Entry costs almost nothing; costs and prices grow with revenue.
 
-Calibration by tier (user, 2026-11-01, to decide): the free tier gets the quick
+Calibration by tier (user, 2026-11-01; the engine side is settled in S_202611_003, the
+member-facing limits stay a founder decision): the free tier gets the quick
 calibration, 10 sampled runs and 10 validation reruns with uncertainty bands; paid
 tiers may raise the number of samples and reruns, and add the refined search. A member
-who knows what they want fixes those settings and the rest are sampled
-(S_202611_003).
+who knows what they want fixes those settings and the rest are sampled. The compute per
+member and the storage of each frozen specification are not in the cost model yet; not
+important yet (user, 2026-11-01).
+
+### Picks come from the full set; near-tied candidates as an unlock (2026-11-01, open)
+
+User, 2026-11-01. (1) The test split is for validation only. A client's picks are always scored
+on the full set of companies, so a best pick that sits in a test sample is still offered.
+(2) When candidates score about the same as the last pick, the app can say that x more
+candidates are within a margin of it and offer them as an unlock (the user's comparison: an
+annoying fintech teaser; that is the gamified framing "Advice or tool" says draws regulators'
+attention, and it sits badly with Midas's character, so decide before it enters a tier). "Similar" is a margin of the score at the cut-off, a parameter; the
+exact-n rule of the wallet (a tie at the cut-off is broken by symbol, VI_202611_001) makes the
+shown picks well defined and the near-tied ones a separate list. Open: the margin; which tier
+unlocks them; whether showing them breaks the promise of a short, clean list.
+
+### Rule switches by company type (2026-11-01, open)
+
+User, 2026-11-01: an avid user should be able to switch rules on and off to personalise the
+report, with the switches tied to the company types each rule excludes. From the pass rates
+(VI_202611_001, check 26): the dividend rules exclude companies without a dividend; the price
+rules (P/E, price to assets) exclude health care and growth; the debt and liquidity rules
+exclude utilities and energy; the 3-year return on equity excludes utilities, materials and
+communication services. A switch therefore reads as a preference ("allow companies that pay no
+dividend", "allow utilities"), not a rule name. Open: which switches the free tier gets;
+whether a switched-off rule leaves the score comparable (the pass-rate weights adjust by
+themselves); the accreditation test of a personalised score.
+
+Switches that add a feature (not a rule on or off), off by default, user 2026-11-01: a
+growth-aware price test (PEG where the quality gate passes, P/E elsewhere; VI_202611_001,
+check 30; small gain, more complexity); segment-selected rule sets; later, the S&P-based
+information once the Einsteinian line exists.
+
+### Strategy literature by risk profile (2026-11-01, open)
+
+User, 2026-11-01: in the report's section on the approach, a reader can download the kind of
+portfolio-strategy literature they like, so that Midas can work from that data base; we
+recommend a few (the Berkshire letters and the book), and start looking at alternative sources
+grouped by risk profile. Constraints: the Berkshire letters are free to read; Graham's book is
+copyrighted, so a member brings their own copy and Midas reads it locally, nothing is
+redistributed (`S_202611_002`); papers only where the authors make them open. If the server
+is remote, a member's upload to Assay's server is itself a copy: settle it by the terms, or
+by reading local-only. The list links to the sources and does not host them. How it works:
+the member names a style and its literature, Midas indexes the documents they provide
+(`document` and `search` of the index, S_202610_002), and answers from them with the source
+cited, as the investor hat does.
+
+Candidates by profile, written from the founder's and Midas's general knowledge, not yet
+checked against the sources, to verify before any is offered:
+
+| Profile | Idea | Candidate reading |
+|---|---|---|
+| Defensive (preserve capital) | Diversified, cheap, boring; index funds | Graham, *The Intelligent Investor* (defensive investor); Bogle, *The Little Book of Common Sense Investing* |
+| Core (balanced) | A wonderful company at a fair price, held | Berkshire Hathaway shareholder letters; Dorsey, *The Little Book That Builds Wealth* (moats) |
+| Value with a margin of safety | Deep discount to value | Graham (enterprising investor); Klarman, *Margin of Safety* |
+| Quality growth | Growth at a reasonable price, quality of management | Fisher, *Common Stocks and Uncommon Profits*; Lynch, *One Up on Wall Street* |
+| Systematic value | Rules, ranked | Greenblatt, *The Little Book That Beats the Market*; Piotroski (2000), the F-score; Novy-Marx (2013), gross profitability |
+| Risk awareness, any profile | Cycles and what can go wrong | Marks, *The Most Important Thing*; Lakonishok, Shleifer and Vishny (1994), contrarian investment |
+
+Fetched 2026-11-01 (user: the list looks fine, the choice is up to the user; download the files into the git-ignored
+folder): `data/private/literature/` (manifest in its README): the Berkshire letters (48, already in
+`data/interim/berkshire_letters/`), Piotroski (2000) from the Chicago Booth host, the Novy-Marx
+NBER working paper 15940 and the Lakonishok, Shleifer and Vishny NBER working paper 4360. Not
+fetched: the books (copyrighted; a member brings their own copy), Novy-Marx's own page and the
+EconStor copy (blocked or not a PDF), the paywalled Journal of Finance article. The papers are
+not yet read.
+
+Open: who verifies and curates the list; which are free to share; whether a profile changes
+the rule switches (see "Rule switches by company type") or the number of picks.
 
 ### Brand (2026-11-01, open)
 
@@ -369,7 +446,12 @@ who knows what they want fixes those settings and the rest are sampled
 - **Motto, proposed:** Seneca's *Ignis aurum probat*, "fire tests gold" (*De
   Providentia* 5.10): testing every strategy under stress before it is trusted.
 - **Positioning:** a quant in your pocket; measurable value against crypto's hype,
-  keeping the spirit of adventure.
+  keeping the spirit of adventure. The slogan keeps "quant" because it rings best; the
+  body says what stands behind it (user, 2026-11-01): a quant who tests every rule and
+  strategy, an investor who answers from Berkshire's published letters, cited by year,
+  with Graham as the reference (no endorsement by either is implied; the report says so), and
+  a secretary who keeps the holdings and progress and says what to sell, when and how
+  much. All three are Midas, one character.
 - **Image prompt for Midas** (drafted 2026-11-01): King Midas as a 1960s test pilot and
   coachbuilder, a crown of watch gears and an altimeter bezel, a leather flight jacket
   with gold-leaf stitching, in the cockpit of a sculpted hypercar with aluminium,
@@ -492,4 +574,19 @@ lawyer before launch.
 
 SEC EDGAR may be used commercially. Yahoo price data (`yfinance`) may not be
 redistributed in a product, free or paid; a public app needs a licensed price vendor.
-Using the name "S&P 500" commercially may need a licence from S&P Dow Jones Indices.
+Using the name "S&P 500" commercially may need a licence from S&P Dow Jones Indices; the
+same holds for the S&P 400 and 600 and for the funds named as benchmarks (IJH, IJR).
+Index membership comes from Wikipedia's lists (CC BY-SA: attribution and share-alike apply),
+and S&P Dow Jones Indices may hold rights in constituent data (MD_202611_001).
+
+### Wording (2026-11-01, decided by the user for the beta)
+
+- **Tests, not accreditation.** `midas/accreditation.md` is the internal register of the
+  model's tests (AT-1 to AT-9). The word suggests a regulator's approval, and v2 also uses
+  "accreditation" for the creators' certification (`open_decisions.md`, "Creators"). In
+  member-facing text call the register "tests"; the list is the starting point for the
+  creators' criteria.
+- **No claim of "out-of-sample"** without the qualifier that the bands cover company sampling
+  only, not multiple testing or time.
+- **The worst list** is shown in Green, Amber and Red with "not a recommendation"; never
+  "avoid" or "start thinking about selling" (VI_202611_002).

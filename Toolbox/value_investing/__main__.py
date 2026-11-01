@@ -46,6 +46,8 @@ The standard library, pandas, ``skatkis.io``, ``market_data`` and ``value_invest
 """
 
 import argparse
+import hashlib
+import json
 import shutil
 import subprocess
 import sys
@@ -504,13 +506,14 @@ def _report(args: argparse.Namespace) -> int:
         start_years=start_years,
         end=end,
     )
-    upcoming = evaluation.ranked_positions(table, [end], model)
-    upcoming = upcoming[upcoming["side"] == "buy"].merge(
+    now = evaluation.ranked_positions(table, [end], model)
+    now = now.merge(
         table[["symbol", "date", "gics_sector", str(settings["share_column"])]],
         left_on=["symbol", "score_date"],
         right_on=["symbol", "date"],
-    )
-    upcoming = upcoming.rename(columns={str(settings["share_column"]): "score_share"})
+    ).rename(columns={str(settings["share_column"]): "score_share"})
+    upcoming = now[now["side"] == "buy"]
+    worst = now[now["side"] == "sell"].sort_values(["score", "symbol"])
     changes = read_table(index.members / "changes.parquet")
     paths = pd.concat([held.paths, managed.paths], ignore_index=True)
 
@@ -556,10 +559,15 @@ def _report(args: argparse.Namespace) -> int:
     managed.holdings.to_csv(folder / "holdings.csv", index=False, float_format="%.4f")
     weighting.to_csv(folder / "weighting.csv", index=False, float_format="%.4f")
     upcoming.to_csv(folder / "next_picks.csv", index=False, float_format="%.4f")
+    worst[["symbol", "gics_sector", "score", "score_share", "score_date"]].to_csv(
+        folder / "worst_stocks.csv", index=False, float_format="%.4f"
+    )
+    report_text = load_config(args.report_text)
     inputs = report.ReportInputs(
         held=held,
         managed=managed,
         next_picks=upcoming,
+        worst=worst,
         profile=profile,
         weighting=weighting,
         peers=peer_view,
@@ -584,11 +592,13 @@ def _report(args: argparse.Namespace) -> int:
         picks=model.names,
         end=end,
         threshold=float(settings["sell_threshold"]),
+        tier_ratio=float(settings["tier_ratio"]),
         verdict_band=float(settings["verdict_band"]),
+        static_note=_static_note(rules, report_text, as_of),
     )
     tex = report.build_report(
         inputs,
-        load_config(args.report_text),
+        report_text,
         folder=folder,
         subtitle=f"{index.label}, data as of {as_of}",
     )
@@ -596,6 +606,35 @@ def _report(args: argparse.Namespace) -> int:
     print("Next picks:")
     print(upcoming[["symbol", "score", "score_share", "weight"]].to_string(index=False))
     return _compile(tex, args.data_dir)
+
+
+def model_fingerprint(rules: dict[str, Any]) -> str:
+    """Return a short hash of the model's settings (rules, score, valuation, schedule, picks).
+
+    The report's text states figures written out by hand; this hash says which model
+    configuration they were produced with.
+    """
+    spec = {k: rules[k] for k in ("rules", "score", "valuation", "schedule")}
+    spec["names"] = rules["wallet"]["names"]
+    return hashlib.sha256(
+        json.dumps(spec, sort_keys=True, default=str).encode()
+    ).hexdigest()[:12]
+
+
+def _static_note(rules: dict[str, Any], text: dict[str, Any], as_of: str) -> str:
+    """Return a notice when the text's written-out figures are not for this model and data."""
+    stamp = text["static_figures"]
+    if stamp["model_fingerprint"] == model_fingerprint(rules) and str(
+        stamp["data_as_of"]
+    ) == str(as_of):
+        return ""
+    notice = (
+        "Note: the figures in this section were produced on "
+        f"{stamp['produced']} with an earlier model configuration or data date "
+        f"({stamp['data_as_of']}) and have not been refreshed."
+    )
+    print(f"WARNING: {notice}")
+    return notice
 
 
 def _price_figures(

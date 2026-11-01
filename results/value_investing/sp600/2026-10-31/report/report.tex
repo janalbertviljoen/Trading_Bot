@@ -7,6 +7,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{longtable}
+\usepackage[table]{xcolor}
 \captionsetup{font=small,labelfont=bf}
 \setlength{\parskip}{0.5em}
 \setlength{\parindent}{0pt}
@@ -18,14 +19,16 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-Each January and July since 2020, a rule-based value score picks 5 S\&P SmallCap 600 companies, and 100 USD is invested in them, weighted by score and never sold. Investors who started in 2016, 2020, 2023 and 2025 (an earlier start buys from 2020) are followed to 30 October 2026, each against the same money in the iShares Core S\&P Small-Cap fund (IJR), dividends reinvested, net of its 0.05\% yearly fee, and in Berkshire Hathaway. The reference is the investor who started in 2020: the data hold only today's index members, and by the index's list of changes, which starts in December 2019, 487 companies have left the index since then against 491 since 2016, so fewer failed companies are missing. That investor's 1,400 USD is worth 1,928 USD, against 2,052 USD in the benchmark and 2,415 USD in Berkshire Hathaway; a second wallet that also sells holdings whose score has fallen is worth 1,887 USD. The report closes with the next picks: Lindsay Corporation (LNN), Innoviva, Inc. (INVA), Boise Cascade (BCC), Alamo Group (ALG) and Stride, Inc. (LRN). The result rests on few decisions and few companies, with 15\% of the value in one company; it is a research result, not evidence of a lasting edge.
+Each January and July since 2020, a rule-based value score picks 10 S\&P SmallCap 600 companies, and 100 USD is invested in them, weighted by score and never sold. Investors who started in 2016, 2020, 2023 and 2025 (an earlier start buys from 2020) are followed to 30 October 2026, each against the same money in the iShares Core S\&P Small-Cap fund (IJR), dividends reinvested, net of its 0.05\% yearly fee, and in Berkshire Hathaway. The reference is the investor who started in 2020: the data hold only today's index members, and by the index's list of changes, which starts in December 2019, 487 companies have left the index since then against 491 since 2016, so fewer failed companies are missing. That investor's 1,400 USD is worth 2,576 USD, against 2,052 USD in the benchmark and 2,415 USD in Berkshire Hathaway; a second wallet that also sells holdings whose score has fallen is worth 2,504 USD. The report closes with the next picks: Stride, Inc. (LRN), G-III Apparel Group, Ltd. (GIII), Harmony Biosciences Holdings, Inc. (HRMY), Lindsay Corporation (LNN), Innoviva, Inc. (INVA), Boise Cascade (BCC), Alamo Group (ALG), Universal Corporation (UVV), Photronics, Inc. (PLAB) and United States Lime \& Minerals, Inc. (USLM). The result rests on few decisions and few companies, with 13\% of the value in one company; it is a research result, not evidence of a lasting edge.
 \end{abstract}
 \section{Method}
 Company fundamentals are the values first reported in each annual report (10-K) to the SEC, used from the day they were filed. When a company reports an item under more than one label, the label it used most recently by the date is taken, so later filings never decide it (Appendix \ref{app:lookahead}). Prices and dividends are from Yahoo Finance; returns include reinvested dividends and are in US dollars. On each date, only companies already in the S\&P SmallCap 600 are considered, outside the Financials and Real Estate sectors.
 
-Sixteen rules from Graham, Buffett and a net income growth test grade every company. For each rule, the companies are ranked by the rule's value and placed in six equal groups, from 5 points for the best sixth to 0 for the worst; each rule's points are multiplied by its weight, one less the share of companies that pass the rule's threshold, so rules few companies pass count more. The score is the sum. On the first trading day of January and of July, the 5 highest-scoring companies are bought for 100 USD, each in proportion to its score.
+Ten rules from Graham and Buffett grade every company: G6 and G7 (price against earnings and book value), G2a and E1 (current ratio), G2b and E2 (debt), NN (net-net), G5 (earnings growth), B1 (return on equity) and E4 (current dividend). Six more (G3, G4, E3, E5, E6 and NI1) are switched off and can be switched on. The ten are eight concepts, because G2a and E1 (current ratio) and G2b and E2 (debt cover) measure the same thing and so count twice. For each rule, the companies are ranked by the rule's value and placed in equal-sized groups, from the most points for the best group to none for the worst; each rule's points are multiplied by its weight, one less the share of companies that pass the rule's threshold, so rules few companies pass count more. The score is the sum. On the first trading day of January and of July, the 10 highest-scoring companies are bought for 100 USD, each in proportion to its score.
 
-Three limits apply to every number in this report. Companies that left the index are missing from the data, which flatters the results. The score's design and every setting of this report (the rules' weighting, the five picks, the decision months, the sell threshold, the start years) were chosen while looking at the whole period from 2016, so no period here is out of sample: the results describe how these rules would have done, not evidence that they will do so. There are no trading costs or taxes.
+Three limits apply to every number in this report. Companies that left the index are missing from the data, which flatters the results. The score's design and every setting of this report (the rules and their weighting, the number of picks, the decision months, the sell threshold, the start years) were chosen while looking at the whole period from 2009, so no period here is out of sample: the results describe how these rules would have done, not evidence that they will do so. There are no trading costs or taxes.
+
+Neither Benjamin Graham nor Berkshire Hathaway or Warren Buffett has endorsed, reviewed or approved this score or this report. The rules are our reading of Graham's books; the quotations from Berkshire's published letters to shareholders are cited by year and show where a question was taken, not what any of them would say about these results.
 
 \section{Picks per half-year}
 \begin{table}[H]
@@ -36,24 +39,24 @@ Three limits apply to every number in this report. Companies that left the index
 \hline
 Bought & Picks and weights & Wallet & S\&P SmallCap 600 & Berkshire \\
 \hline
-2020-01 & UVV 21\%, GVA 20\%, LZB 20\%, CALM 20\%, SCSC 19\% & 213 & 185 & 238 \\
-2020-07 & UVV 22\%, SMP 20\%, GVA 20\%, SCSC 19\%, SCL 19\% & 267 & 229 & 305 \\
-2021-01 & UVV 23\%, SMP 21\%, IOSP 19\%, MTRN 19\%, SCL 18\% & 157 & 168 & 237 \\
-2021-07 & UVV 24\%, SMP 20\%, SCL 19\%, FELE 18\%, MATX 18\% & 149 & 134 & 194 \\
-2022-01 & UVV 24\%, SMP 20\%, HCSG 19\%, WGO 19\%, SCL 19\% & 90 & 130 & 180 \\
-2022-07 & UVV 22\%, GIII 20\%, SMP 20\%, WGO 19\%, BCC 19\% & 115 & 161 & 195 \\
-2023-01 & UVV 21\%, SMP 20\%, HZO 20\%, GIII 20\%, AOSL 19\% & 140 & 157 & 175 \\
-2023-07 & UVV 21\%, BCC 20\%, HZO 20\%, AOSL 19\%, MATX 19\% & 142 & 147 & 159 \\
-2024-01 & UVV 22\%, LNN 20\%, BCC 20\%, WOR 20\%, SMP 19\% & 91 & 136 & 150 \\
-2024-07 & UVV 21\%, SMP 20\%, LNN 20\%, WOR 20\%, BCC 20\% & 117 & 138 & 134 \\
-2025-01 & UVV 21\%, LNN 20\%, SMP 20\%, BCC 20\%, DIOD 20\% & 105 & 125 & 120 \\
-2025-07 & BCC 21\%, AEO 20\%, UVV 20\%, DIOD 19\%, BHE 19\% & 137 & 129 & 111 \\
-2026-01 & BCC 21\%, LRN 20\%, LNN 20\%, UVV 19\%, CALM 19\% & 97 & 117 & 109 \\
-2026-07 & LNN 20\%, INVA 20\%, EPAM 20\%, LRN 20\%, ALG 20\% & 106 & 95 & 109 \\
+2020-01 & UVV 11\%, GVA 11\%, SIG 10\%, HZO 10\%, CALY 10\%, LCII 10\%, SCSC 10\%, NSIT 10\%, NPO 10\%, LZB 9\% & 275 & 185 & 238 \\
+2020-07 & UVV 12\%, GVA 12\%, SCSC 10\%, HZO 10\%, IPAR 10\%, LZB 9\%, RES 9\%, TILE 9\%, HCC 9\%, AIR 9\% & 364 & 229 & 305 \\
+2021-01 & UVV 12\%, HZO 12\%, POWL 10\%, PLAB 10\%, RES 10\%, GFF 10\%, HCC 9\%, SMP 9\%, PATK 9\%, INVA 9\% & 397 & 168 & 237 \\
+2021-07 & UVV 12\%, HZO 11\%, PLAB 10\%, SMP 10\%, GIII 10\%, INVA 10\%, BCC 10\%, FORM 9\%, GFF 9\%, NSIT 9\% & 181 & 134 & 194 \\
+2022-01 & UVV 12\%, HZO 11\%, GIII 10\%, INVA 10\%, SMP 10\%, WGO 10\%, PLAB 10\%, BCC 10\%, POWL 9\%, BHE 9\% & 269 & 130 & 180 \\
+2022-07 & BCC 12\%, HZO 11\%, WGO 10\%, UVV 10\%, SMP 10\%, GIII 10\%, COHU 9\%, ASTE 9\%, BHE 9\%, SIG 9\% & 156 & 161 & 195 \\
+2023-01 & BCC 12\%, HZO 11\%, AOSL 11\%, UVV 10\%, SMP 10\%, GIII 10\%, ASTE 9\%, WGO 9\%, COHU 9\%, SIG 9\% & 134 & 157 & 175 \\
+2023-07 & BCC 12\%, HCC 11\%, HZO 11\%, AOSL 10\%, UVV 10\%, SMP 9\%, BHE 9\%, LCII 9\%, PLAB 9\%, DIOD 9\% & 133 & 147 & 159 \\
+2024-01 & BCC 12\%, AOSL 11\%, HCC 10\%, UVV 10\%, SMP 10\%, LNN 10\%, WOR 10\%, DIOD 9\%, BHE 9\%, AMR 9\% & 108 & 136 & 150 \\
+2024-07 & BCC 12\%, HCC 11\%, AOSL 10\%, DIOD 10\%, SMP 10\%, PLAB 10\%, LNN 10\%, UVV 10\%, WOR 9\%, MTUS 9\% & 109 & 138 & 134 \\
+2025-01 & BCC 12\%, HCC 11\%, DIOD 10\%, PLAB 10\%, LNN 10\%, AOSL 10\%, SMP 10\%, UVV 9\%, COHU 9\%, ANDE 9\% & 121 & 125 & 120 \\
+2025-07 & BCC 11\%, HCC 11\%, PLAB 11\%, AOSL 10\%, UVV 10\%, AMR 10\%, DIOD 10\%, BHE 10\%, LNN 9\%, WS 9\% & 128 & 129 & 111 \\
+2026-01 & BCC 12\%, LRN 11\%, HCC 10\%, IPAR 10\%, DIOD 10\%, PLAB 10\%, UVV 10\%, LNN 10\%, ALG 9\%, CNR 9\% & 107 & 117 & 109 \\
+2026-07 & HRMY 11\%, LRN 11\%, GIII 10\%, INVA 10\%, BCC 10\%, ALG 10\%, LNN 10\%, IPAR 10\%, UVV 9\%, PLAB 9\% & 94 & 95 & 109 \\
 \hline
 \end{tabular}
 \end{table}
-Table \ref{tab:picks} lists the companies bought each January and July, with their weights, and what each 100 USD is worth on 30 October 2026, next to the same money in the S\&P SmallCap 600 and in Berkshire Hathaway. Figure \ref{fig:yearly} shows the same values. Most of the money went to Consumer Discretionary, Consumer Staples and Industrials; the best single purchase is GVA in July 2020, now worth 7 times its cost. The purchases of January 2021, January 2022, July 2022, January 2023, July 2023, January 2024, July 2024, January 2025 and January 2026 are worth less today than the same money in the S\&P SmallCap 600. Appendix \ref{app:purchases} lists every purchase of the wallet with sells of the investor who started in 2020, with its price at purchase and today, what later sales took from it, what it keeps today and its total return with dividends.
+Table \ref{tab:picks} lists the companies bought each January and July, with their weights, and what each 100 USD is worth on 30 October 2026, next to the same money in the S\&P SmallCap 600 and in Berkshire Hathaway. Figure \ref{fig:yearly} shows the same values. Most of the money went to Consumer Discretionary, Information Technology and Industrials; the best single purchase is POWL in January 2021, now worth 18 times its cost. The purchases of July 2022, January 2023, July 2023, January 2024, July 2024, January 2025, July 2025, January 2026 and July 2026 are worth less today than the same money in the S\&P SmallCap 600. Appendix \ref{app:purchases} lists every purchase of the wallet with sells of the investor who started in 2020, with its price at purchase and today, what later sales took from it, what it keeps today and its total return with dividends.
 
 \begin{figure}[H]
 \centering
@@ -70,23 +73,23 @@ Table \ref{tab:picks} lists the companies bought each January and July, with the
 \hline
 Start & Holder & Put in & Value & Multiple & A year \\
 \hline
-2016 & Value wallet & 1,400 & 1,928 & 1.38 & 8.9\% \\
- & Value wallet with sells & 1,400 & 1,887 & 1.35 & 8.3\% \\
+2016 & Value wallet & 1,400 & 2,576 & 1.84 & 17.0\% \\
+ & Value wallet with sells & 1,400 & 2,504 & 1.79 & 16.2\% \\
  & S\&P SmallCap 600 & 1,400 & 2,052 & 1.47 & 10.6\% \\
  & Berkshire Hathaway & 1,400 & 2,415 & 1.73 & 15.2\% \\
 \hline
-2020 & Value wallet & 1,400 & 1,928 & 1.38 & 8.9\% \\
- & Value wallet with sells & 1,400 & 1,887 & 1.35 & 8.3\% \\
+2020 & Value wallet & 1,400 & 2,576 & 1.84 & 17.0\% \\
+ & Value wallet with sells & 1,400 & 2,504 & 1.79 & 16.2\% \\
  & S\&P SmallCap 600 & 1,400 & 2,052 & 1.47 & 10.6\% \\
  & Berkshire Hathaway & 1,400 & 2,415 & 1.73 & 15.2\% \\
 \hline
-2023 & Value wallet & 800 & 936 & 1.17 & 7.7\% \\
- & Value wallet with sells & 800 & 936 & 1.17 & 7.7\% \\
+2023 & Value wallet & 800 & 934 & 1.17 & 7.5\% \\
+ & Value wallet with sells & 800 & 930 & 1.16 & 7.3\% \\
  & S\&P SmallCap 600 & 800 & 1,044 & 1.30 & 13.1\% \\
  & Berkshire Hathaway & 800 & 1,066 & 1.33 & 14.2\% \\
 \hline
-2025 & Value wallet & 400 & 446 & 1.11 & 10.4\% \\
- & Value wallet with sells & 400 & 446 & 1.11 & 10.4\% \\
+2025 & Value wallet & 400 & 450 & 1.12 & 11.3\% \\
+ & Value wallet with sells & 400 & 450 & 1.12 & 11.3\% \\
  & S\&P SmallCap 600 & 400 & 465 & 1.16 & 14.8\% \\
  & Berkshire Hathaway & 400 & 449 & 1.12 & 11.1\% \\
 \hline
@@ -94,9 +97,9 @@ Start & Holder & Put in & Value & Multiple & A year \\
 \end{table}
 Table \ref{tab:value} and Figure \ref{fig:value} follow the four investors. Each puts in 100 USD every January and July from the start year; the value wallet never sells. The return a year is money-weighted: the constant yearly rate that turns the payments into today's value.
 
-The investor who started in 2016 earns 8.9\% a year against 10.6\% in the S\&P SmallCap 600 and 15.2\% in Berkshire Hathaway. From 2020 the rates are 8.9\%, 10.6\% and 15.2\%; from 2023 7.7\%, 13.1\% and 14.2\%; from 2025, over less than two years, 10.4\%, 14.8\% and 11.1\%. The wallet's value swings more than either comparison, because five companies of a few industries are far less diversified than the index or Berkshire.
+The investor who started in 2016 earns 17.0\% a year against 10.6\% in the S\&P SmallCap 600 and 15.2\% in Berkshire Hathaway. From 2020 the rates are 17.0\%, 10.6\% and 15.2\%; from 2023 7.5\%, 13.1\% and 14.2\%; from 2025, over less than two years, 11.3\%, 14.8\% and 11.1\%. The wallet's value swings more than either comparison, because 10 companies of a few industries are far less diversified than the index or Berkshire.
 
-The value wallet with sells buys the same picks with the same money, but at each decision it also sells part of any holding whose score has fallen; Section \ref{sec:selling} describes the rule. From 2016 it is worth 1,887 USD (8.3\% a year), from 2020 1,887 USD (8.3\%) and from 2025 446 USD (10.4\%).
+The value wallet with sells buys the same picks with the same money, but at each decision it also sells part of any holding whose score has fallen; Section \ref{sec:selling} describes the rule. From 2016 it is worth 2,504 USD (16.2\% a year), from 2020 2,504 USD (16.2\%) and from 2025 450 USD (11.3\%).
 
 \begin{figure}[H]
 \centering
@@ -126,6 +129,9 @@ The value wallet with sells buys the same picks with the same money, but at each
 \end{figure}
 \section{Selling below the threshold}
 \label{sec:selling}
+Each January and July, before buying, the wallet with sells checks every company it holds. The score is put on a scale from 0 to 1, the share of the most the company could score on the rules it is measured on. A holding scoring 0.4 or less is sold in part: the share sold is (0.4 less the score) divided by 0.4, so all of it at a score of 0 and almost none just under 0.4. Holdings are sold, never sold short. The proceeds are added to the decision's 100 USD and buy its picks.
+
+\subsection{Sold in the wallet}
 \begin{table}[H]
 \centering
 \small
@@ -134,17 +140,49 @@ The value wallet with sells buys the same picks with the same money, but at each
 \hline
 Year & Sold: share of the holding (score) & Proceeds, USD \\
 \hline
-2021-01 & SCSC 9\% (score 0.37) & 3.13 \\
-2021-07 & GVA 13\% (score 0.35), SCSC 12\% (score 0.35) & 14.18 \\
-2022-01 & GVA 13\% (score 0.35) & 8.38 \\
-2024-01 & GIII 8\% (score 0.37) & 6.51 \\
-2025-01 & GVA 5\% (score 0.38) & 6.36 \\
-2026-01 & MTRN 2\% (score 0.39) & 0.74 \\
-2026-07 & GVA 4\% (score 0.39), MTRN 1\% (score 0.40) & 8.92 \\
+2020-07 & SIG 4\% (score 0.38), CALY 38\% (score 0.25) & 3.43 \\
+2021-01 & SIG 10\% (score 0.36), CALY 37\% (score 0.25), SCSC 10\% (score 0.36) & 6.11 \\
+2021-07 & GVA 37\% (score 0.25), SIG 29\% (score 0.28), CALY 50\% (score 0.20), SCSC 5\% (score 0.38), RES 14\% (score 0.35), TILE 12\% (score 0.35) & 39.15 \\
+2022-01 & GVA 36\% (score 0.26), SIG 20\% (score 0.32), CALY 49\% (score 0.21), SCSC 5\% (score 0.38), RES 1\% (score 0.40), TILE 12\% (score 0.35) & 20.64 \\
+2022-07 & CALY 59\% (score 0.17), SCSC 1\% (score 0.40), RES 18\% (score 0.33) & 7.25 \\
+2023-01 & CALY 47\% (score 0.21), RES 4\% (score 0.39), GFF 40\% (score 0.24) & 17.32 \\
+2023-07 & GVA 7\% (score 0.37), CALY 47\% (score 0.21), TILE 25\% (score 0.30), GFF 31\% (score 0.28) & 12.64 \\
+2024-01 & GVA 12\% (score 0.35), CALY 35\% (score 0.26), TILE 25\% (score 0.30), GFF 18\% (score 0.33) & 10.14 \\
+2024-07 & GVA 33\% (score 0.27), NPO 1\% (score 0.40), POWL 3\% (score 0.39), GFF 33\% (score 0.27) & 20.15 \\
+2025-01 & GVA 38\% (score 0.25), NPO 1\% (score 0.40), GFF 33\% (score 0.27) & 14.98 \\
+2025-07 & GVA 33\% (score 0.27), CALY 57\% (score 0.17), NPO 21\% (score 0.32), GFF 21\% (score 0.32) & 13.55 \\
+2026-01 & GVA 39\% (score 0.24), HZO 16\% (score 0.33), CALY 57\% (score 0.17), NPO 21\% (score 0.32), AIR 15\% (score 0.34), GFF 14\% (score 0.35) & 29.11 \\
+2026-07 & GVA 46\% (score 0.21), HZO 15\% (score 0.34), CALY 16\% (score 0.33), NPO 48\% (score 0.21), AIR 20\% (score 0.32), POWL 5\% (score 0.38), GFF 15\% (score 0.34), PATK 4\% (score 0.38), COHU 5\% (score 0.38) & 84.66 \\
 \hline
 \end{tabular}
 \end{table}
-Each January and July, before buying, the wallet with sells checks every company it holds. The score is put on a scale from 0 to 1, the share of the most the company could score on the rules it is measured on. A holding scoring 0.4 or less is sold in part: the share sold is (0.4 less the score) divided by 0.4, so all of it at a score of 0 and almost none just under 0.4. Holdings are sold, never sold short. The proceeds are added to the decision's 100 USD and buy its picks. Table \ref{tab:sales} lists the 9 sales of the investor who started in 2020, worth 48 USD in all.
+Table \ref{tab:sales} lists the 57 sales of the investor who started in 2020, worth 279 USD in all. They are the wallet's own cash flows; the list below does not depend on what anyone holds.
+
+\subsection{Lowest scores in the index}
+\begin{table}[H]
+\centering
+\small
+\caption{The 10 lowest-scoring of the companies scored on the latest score date: sector, score, score on the 0-to-1 scale and colour (Green, Amber or Red; not a recommendation).}\label{tab:worst}
+\begin{tabular}{p{4.4cm} p{3cm} r r p{3cm}}
+\hline
+Company & Sector & Score & Score 0 to 1 & Colour \\
+\hline
+Six Flags (FUN) & Consumer Discretionary & 0.5 & 0.02 & \cellcolor[HTML]{F4B6B6}Red \\
+LegalZoom.com, Inc. (LZ) & Industrials & 0.5 & 0.02 & \cellcolor[HTML]{F4B6B6}Red \\
+Q2 Holdings, Inc. (QTWO) & Information Technology & 0.5 & 0.02 & \cellcolor[HTML]{F4B6B6}Red \\
+Sonos, Inc. (SONO) & Consumer Discretionary & 1.4 & 0.06 & \cellcolor[HTML]{F4B6B6}Red \\
+Sphere Entertainment (SPHR) & Communication Services & 1.4 & 0.10 & \cellcolor[HTML]{F4B6B6}Red \\
+AdaptHealth Corp. (AHCO) & Health Care & 1.4 & 0.04 & \cellcolor[HTML]{F4B6B6}Red \\
+Allegiant Travel Company (ALGT) & Industrials & 1.4 & 0.04 & \cellcolor[HTML]{F4B6B6}Red \\
+Coty (COTY) & Consumer Staples & 1.4 & 0.04 & \cellcolor[HTML]{F4B6B6}Red \\
+National Vision Holdings (EYE) & Consumer Discretionary & 1.4 & 0.04 & \cellcolor[HTML]{F4B6B6}Red \\
+Fortrea (FTRE) & Health Care & 1.4 & 0.05 & \cellcolor[HTML]{F4B6B6}Red \\
+\hline
+\end{tabular}
+\end{table}
+These are the 10 lowest scores, as many as the picks, among the companies of the S\&P SmallCap 600 that are scored on 18 September 2026, whether or not anyone holds them: Six Flags (FUN), LegalZoom.com, Inc. (LZ), Q2 Holdings, Inc. (QTWO), Sonos, Inc. (SONO), Sphere Entertainment (SPHR), AdaptHealth Corp. (AHCO), Allegiant Travel Company (ALGT), Coty (COTY), National Vision Holdings (EYE) and Fortrea (FTRE) (Table \ref{tab:worst}). Financials, Real Estate and companies with too few rules to score are not scored and so cannot appear. Companies with the same score are ordered by symbol, so when several share the last place, the alphabetically first are shown. The list shows where the score ranks these companies today; it is not a recommendation to buy, sell or sell short anything. A score of 0 means only that no rule awarded the company any points; it says nothing about what the company is worth.
+
+The last column colours each score on the 0-to-1 scale against the sell threshold of 0.4. Green is a score above 0.4. Amber is a score from 0.2 up to and including 0.4: a company one would not buy, and would hold only if already owned. Red is a score below 0.2: a company one might start to think about selling. The colours are not the rule of the wallet with sells. That rule is mechanical: at or below 0.4 it sells part of a holding, the more the lower the score, and at 0 all of it, whatever the colour. The sell signal on these companies has not been tested: no test has measured what the lowest scores did afterwards. The cut-offs are those the score uses today and are not fixed. The wallet never sells short; a short position on these companies is a later step and has not been tested.
 
 \section{Wallet contents}
 Figure \ref{fig:contents} follows every company in the wallet with sells of the investor who started in 2020, month by month. A line starts or steps up when the company is bought, steps down when part of it is sold, and rises or falls with the price in between. The dashed lines follow the same money in the S\&P SmallCap 600 and in Berkshire Hathaway, divided by the number of companies the wallet holds on the date, so they show what one holding would be worth in the index or in Berkshire. Appendix \ref{app:contents} gives each holding's value after every January's trades, the money put in and the proceeds of sales.
@@ -164,25 +202,25 @@ Figure \ref{fig:contents} follows every company in the wallet with sells of the 
 \hline
 Picks & Number & USD ahead, total & Average & Median \\
 \hline
-Beat the S\&P SmallCap 600 & 21 & +348 & +16.6 & +4.5 \\
-Lagged the S\&P SmallCap 600 & 49 & -472 & -9.6 & -9.2 \\
+Beat the S\&P SmallCap 600 & 62 & +858 & +13.8 & +3.9 \\
+Lagged the S\&P SmallCap 600 & 78 & -334 & -4.3 & -3.8 \\
 \hline
-All picks & 70 & -124 & -1.8 & -6.2 \\
+All picks & 140 & +524 & +3.7 & -0.9 \\
 \hline
 \end{tabular}
 \end{table}
-Of the picks, 21 have done better than the S\&P SmallCap 600 since their purchase and 49 have not, but a count treats a large win and a small loss alike. Table \ref{tab:dollars} weighs them in dollars: each pick's value today less what the same money would be worth in the S\&P SmallCap 600. The winners are 348 USD ahead of the index and the laggards 472 USD behind, a net -124 USD, the wallet's whole lead over the index. The median winner is 4 USD ahead and the median laggard 9 USD behind; the average win is 1.7 times the average loss. The wins are concentrated: the 5 largest, GVA Jul 2020, GVA Jan 2020, MATX Jul 2021, MTRN Jan 2021 and MATX Jul 2023, make up 77\% of the winners' total.
+Of the picks, 62 have done better than the S\&P SmallCap 600 since their purchase and 78 have not, but a count treats a large win and a small loss alike. Table \ref{tab:dollars} weighs them in dollars: each pick's value today less what the same money would be worth in the S\&P SmallCap 600. The winners are 858 USD ahead of the index and the laggards 334 USD behind, a net 524 USD, the wallet's whole lead over the index. The median winner is 4 USD ahead and the median laggard 4 USD behind; the average win is 3.2 times the average loss. The wins are concentrated: the 5 largest, POWL Jan 2021, POWL Jan 2022, GVA Jul 2020, SIG Jan 2020 and GFF Jan 2021, make up 53\% of the winners' total.
 
-Figure \ref{fig:rules} compares the mean points per rule of the winners and of the laggards on the day they were picked, each pick weighted by its dollars ahead or behind the index, so the large wins and losses count most; the rules are ordered by how much more the winners scored. The winners scored most above the others on 10-year earnings growth (G5), P/E times P/B (G7), price to tangible assets (E6) and 4-year earnings growth (E5); the picks that lagged scored higher on current ratio (lenient) (E1) and current ratio (G2a). With so few picks, these differences describe this sample; they do not establish which rules work. Appendix \ref{app:rules} explains each rule, and Appendix \ref{app:weighting} tests whether the rule weights favour the rules that told winners from losers.
+Figure \ref{fig:rules} compares the mean points per rule of the winners and of the laggards on the day they were picked, each pick weighted by its dollars ahead or behind the index, so the large wins and losses count most; the rules are ordered by how much more the winners scored. The winners scored most above the others on current dividend (E4), net-net (NN), P/E times P/B (G7) and debt to working capital (G2b); the picks that lagged scored higher on P/E (G6) and 6-year earnings growth (G5). With so few picks, these differences describe this sample; they do not establish which rules work. Appendix \ref{app:rules} explains each rule, and Appendix \ref{app:weighting} tests whether the rule weights favour the rules that told winners from losers.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\textwidth]{rules.png}
-\caption{Mean points per rule (0 to 5) of the picks that beat the S\&P SmallCap 600 since purchase and of those that did not, each pick weighted by its dollars ahead or behind the index.}
+\caption{Mean points per rule of the picks that beat the S\&P SmallCap 600 since purchase and of those that did not, each pick weighted by its dollars ahead or behind the index.}
 \label{fig:rules}
 \end{figure}
 \section{Price history of the picks}
-Figure \ref{fig:pick-prices} shows the share price of every company the investor who started in 2023 bought or sold, and of the next picks, over the last 5 years. The price is split-adjusted and excludes dividends, as a price chart shows it; the companies run from the best to the worst price change over the 5 years, given beside each name; when they do not fit on one page, only the 5 best and the 5 worst are shown. Each purchase is marked in green and each sale in red, at the price on the decision date; a larger marker means more money. Figure \ref{fig:trade-amounts} gives the same trades in USD per company and decision date.
+Figure \ref{fig:pick-prices} shows the share price of every company the investor who started in 2023 bought or sold, and of the next picks, over the last 5 years. The price is split-adjusted and excludes dividends, as a price chart shows it; the companies run from the best to the worst price change over the 5 years, given beside each name; when they do not fit on one page, only the 6 best and the 6 worst are shown. Each purchase is marked in green and each sale in red, at the price on the decision date; a larger marker means more money. Figure \ref{fig:trade-amounts} gives the same trades in USD per company and decision date.
 
 \begin{figure}[H]
 \centering
@@ -205,15 +243,20 @@ Figure \ref{fig:pick-prices} shows the share price of every company the investor
 \hline
 Company & Sector & Score & Score 0 to 1 & Weight & USD \\
 \hline
-Lindsay Corporation (LNN) & Materials & 41.8 & 0.80 & 20.7\% & 20.65 \\
-Innoviva, Inc. (INVA) & Health care & 41.5 & 0.84 & 20.5\% & 20.47 \\
-Boise Cascade (BCC) & Industrials & 39.9 & 0.82 & 19.7\% & 19.70 \\
-Alamo Group (ALG) & Industrials & 39.7 & 0.76 & 19.6\% & 19.60 \\
-Stride, Inc. (LRN) & Discretionary & 39.6 & 0.81 & 19.6\% & 19.58 \\
+Stride, Inc. (LRN) & Discretionary & 30.6 & 0.89 & 10.9\% & 10.95 \\
+G-III Apparel Group, Ltd. (GIII) & Discretionary & 29.3 & 0.85 & 10.5\% & 10.46 \\
+Harmony Biosciences Holdings, Inc. (HRMY) & Health care & 28.9 & 0.85 & 10.3\% & 10.35 \\
+Lindsay Corporation (LNN) & Materials & 28.9 & 0.84 & 10.3\% & 10.33 \\
+Innoviva, Inc. (INVA) & Health care & 28.0 & 0.82 & 10.0\% & 10.01 \\
+Boise Cascade (BCC) & Industrials & 28.0 & 0.82 & 10.0\% & 10.00 \\
+Alamo Group (ALG) & Industrials & 27.4 & 0.80 & 9.8\% & 9.79 \\
+Universal Corporation (UVV) & Staples & 26.3 & 0.77 & 9.4\% & 9.41 \\
+Photronics, Inc. (PLAB) & Technology & 26.3 & 0.77 & 9.4\% & 9.41 \\
+United States Lime \& Minerals, Inc. (USLM) & Materials & 26.0 & 0.76 & 9.3\% & 9.30 \\
 \hline
 \end{tabular}
 \end{table}
-On the latest score date, 18 September 2026, the five highest-scoring companies are Lindsay Corporation (LNN), Innoviva, Inc. (INVA), Boise Cascade (BCC), Alamo Group (ALG) and Stride, Inc. (LRN) (Table \ref{tab:next}). Each would receive its share of the next decision's 100 USD and of any proceeds from sales. The decision is taken on the first trading day of January with the scores known then, which include the annual reports filed until that day; these picks are a preview and may change. Figure \ref{fig:next-prices} shows each pick's share price over the last 5 years, with the earlier purchases of the investor who started in 2023 and the potential purchase at today's price.
+On the latest score date, 18 September 2026, the 10 highest-scoring companies are Stride, Inc. (LRN), G-III Apparel Group, Ltd. (GIII), Harmony Biosciences Holdings, Inc. (HRMY), Lindsay Corporation (LNN), Innoviva, Inc. (INVA), Boise Cascade (BCC), Alamo Group (ALG), Universal Corporation (UVV), Photronics, Inc. (PLAB) and United States Lime \& Minerals, Inc. (USLM) (Table \ref{tab:next}). Each would receive its share of the next decision's 100 USD and of any proceeds from sales. The decision is taken on the first trading day of January with the scores known then, which include the annual reports filed until that day; these picks are a preview and may change. Figure \ref{fig:next-prices} shows each pick's share price over the last 5 years, with the earlier purchases of the investor who started in 2023 and the potential purchase at today's price.
 
 \begin{figure}[H]
 \centering
@@ -221,23 +264,108 @@ On the latest score date, 18 September 2026, the five highest-scoring companies 
 \caption{Share price of each next pick (USD, split-adjusted, dividends excluded) over the last 5 years: earlier purchases of the investor who started in 2023 in green, the potential purchase at the latest price in orange.}
 \label{fig:next-prices}
 \end{figure}
-\subsection{Sell check}
+\section{Winning picks we missed}
+\label{sec:missed}
 \begin{table}[H]
 \centering
 \small
-\caption{Holdings the rule would sell in part: value today, score on the 0-to-1 scale, share to sell and amount.}\label{tab:sell}
-\begin{tabular}{l r r r r}
+\caption{Winners over the next 36 months that the score missed, by index: the share of winners held (by chance), their mean score and examples with their score on a scale from 0 to 1.}\label{tab:missed}
+\begin{tabular}{l l l p{5.9cm}}
 \hline
-Company & Holding, USD & Score 0 to 1 & Sell & Sell, USD \\
+Index & Winners held (by chance) & Winners' mean score & Missed winners and their score \\
 \hline
-MarineMax, Inc. (HZO) & 64.21 & 0.37 & 7\% & 4.28 \\
+S\&P 500 & 10\% (4\%) & 0.55 & Amazon 0.08, Netflix 0.23, Constellation Brands 0.32, Adobe 0.48 \\
+S\&P 400 & 5\% (9\%) & 0.42 & Paylocity 0.03, Repligen 0.16, Tenet 0.17, Qualys 0.20, Chemed 0.34 \\
+S\&P 600 & 9\% (5\%) & 0.51 & Archrock 0.14, Brinker 0.16, SM Energy 0.19 \\
 \hline
 \end{tabular}
 \end{table}
-The investor who started in 2020 holds 26 companies. With the scores of 18 September 2026, the rule would sell part of MarineMax, Inc. (HZO), 7\%, and keep the other 25 as they are (Table \ref{tab:sell}).
+No score picks every winner, and a winner is only known afterwards. Here the winners are the ten companies with the highest return above their index over the next 36 months, found with hindsight on every date. A book of ten companies that knew nothing would hold about 4\% of them on the S\&P 500, 9\% on the S\&P 400 and 5\% on the S\&P 600 (Table \ref{tab:missed}). They are shown as a check on the rules, not as advice.
+
+On the S\&P 500 the score holds 10\% of the winners and ranks them slightly above the median (0.55 on a scale from 0 to 1). It found the chip makers (Nvidia 0.91, Lam Research 0.96, Micron 0.91) and missed the growth platforms: Amazon 0.08, Netflix 0.23 and Constellation Brands 0.32. On the S\&P 400 the winners score below the median (0.42): Paylocity 0.03, Repligen 0.16, Tenet 0.17 and Qualys 0.20. Health care is 17\% of the winners there and 3\% of our picks. On the S\&P 600 energy companies are 24\% of the winners and 2\% of our picks.
+
+A possible cause is in the rules. They are Graham's and Buffett's, and they reward cheap, low-debt, asset-rich companies. Many winners of the period were growth and quality companies that pay no dividend and trade at higher multiples. On the S\&P 400 they score 0.7 points lower than the average company on the dividend rule and 0.4 lower on debt cover, while our picks score 4.4 on debt cover against 2.1 for the average company. On the earlier sixteen-rule score, dropping the dividend rules made no measurable difference on the S\&P 500 and the S\&P 400, so they are not what holds the score back there; on the S\&P 600 the bands excluded zero (+0.72 and -0.93). The price rules are one more possible cause: dropping them raised the best ten on the S\&P 500, but that held on the S\&P 500 only, showed nothing on the S\&P 400 and was contradicted on the S\&P 600, so it was not adopted (Section \ref{sec:dialogue}). Companies that S\&P later added to the S\&P 500 scored lower than its existing members before they joined (0.42 against 0.51 on a scale from 0 to 1), which fits the hypothesis that the score undervalues growth; it is a hypothesis, not a tested result.
+
+\section{How the model was tested}
+\label{sec:testing}
+\begin{table}[H]
+\centering
+\small
+\caption{The tests the model must pass before launch, and where each stands.}\label{tab:testing}
+\begin{tabular}{l p{3.6cm} p{4.6cm} p{2.3cm}}
+\hline
+Test & What is checked & Result & Status \\
+\hline
+Winners removed & The wallet still beats its index with the 3 largest winners removed & S\&P 500: yes, by 1.9 to 3.7 points (2016 to 2023 starts). S\&P 400: no. S\&P 600: mixed & S\&P 500 passed in-sample; others not \\
+Company samples & Repeated samples, each leaving out a random part of the companies & S\&P 500: ahead of the index in every sample (the samples share most of their companies) & Passed on the S\&P 500, in-sample \\
+Unseen companies & The score frozen, then run once on a part of the companies never used & Positive, but two companies gave 99\% of the gain (earlier sixteen-rule score) & To rerun \\
+Other indices & The score beats random picks of its own index on the S\&P 400 and 600 & Not reproduced & Open \\
+Two periods & The edge appears before and after 2017 & Yes on the S\&P 500 (earlier sixteen-rule score) & To rerun \\
+Missed winners & Which winners the score missed, and why & Section \ref{sec:missed} & Done \\
+Survivorship & The effect of companies that left the index & Not yet measured & Open \\
+Real-world check & Results compared with market events and institutional logic & Not yet done & Open \\
+\hline
+\end{tabular}
+\end{table}
+This is a prototype, "first light": the first version of the model that is frozen and dated, with nothing earlier to compare it with. The figures below are in-sample stress and sampling diagnostics, compared with the index and not with random books of the same size, on a configuration that was chosen on this data after more than 100 designs were tried. The bands cover the sampling of companies only: they do not allow for the number of designs tried (multiple testing) or for the period, which the designs were chosen while looking at, so no result here is out of sample. The one held-out test, on companies the score never used, is on the earlier sixteen-rule score and is marked to rerun. The tests follow a written protocol, and a test that failed is shown as failed. The model has not cleared them: the tests below are open or failed in part. The numbers are from runs on 1 November 2026 on the ten default rules, with data as of 31 October 2026.
+
+On the S\&P 500 the picks beat the index in every one of a set of repeated samples that each left out a random part of the companies (the samples share most of their companies, so this is not independent confirmation), by 9 to 15 points a year on average depending on the start year, and by about 5 points in the worst sample. The investor who started in 2020 earns 27.7\% a year against 15.9\% in the index. The gain is concentrated: Micron makes up 24\% and Lam Research 16\% of the 2016 investor's gain. They still beat it with the three largest winners removed as if they had never existed (Applied Materials, Lam Research and Micron): by 3.7, 1.9 and 2.1 points a year for the investors who started in 2016, 2020 and 2023, and by 8.9 for 2025. With five removed (adding Nucor and Nvidia) the margin shrinks to 0.3 to 2.3 points for the first three. The edge is present in this sample of the index but thin, and concentrated in chip and materials companies that did well in a long bull market after 2009.
+
+The other two indices do not confirm it. On the S\&P 400 the picks beat their fund by 2 to 5 points a year for the 2016 to 2023 starts, and with the three largest winners removed the margin is gone (0.4, -0.4 and -0.1). On the S\&P 600 the investors who started in 2016 and 2020 are ahead by about 6 points, which survives the removal of the three largest winners, while those who started in 2023 and 2025 trail the fund. The lists of the S\&P 400 and 600 give no entry dates and lose the companies that grew into a larger index, so these two tests are biased and not yet a verdict on the rules. Companies that left the index are missing from every test, which flatters the results.
+
+\section{Midas and the Investor}
+\label{sec:dialogue}
+Every result in this report was questioned before it was believed. When something looked wrong, too good, different between indices or against what a long-term investor would say, Midas, who reads the numbers, put the question to the Investor. The Investor answers only from Berkshire Hathaway's published letters to shareholders and names the year; the quotations imply no endorsement by Berkshire or Mr Buffett. Midas then tested the answer and reported back. Three of the exchanges follow. The figures in them are in-sample stress and sampling diagnostics, compared with the index and not with random books, on a configuration chosen on this data (Section \ref{sec:testing}).
+
+\textbf{Is the dividend rule holding the score back?}
+
+\textbf{Midas:} The winners we missed mostly pay no dividend, and they score low on the dividend rules. Should we drop them?
+
+\textbf{The Investor:} (1984) "Berkshire has earned well over market rates on retained earnings, thereby creating over one dollar of market value for every dollar retained. Under such circumstances, any distribution would have been contrary to the financial interest of shareholders, large or small."
+
+\textbf{Midas:} I dropped the two dividend rules from the sixteen-rule score and compared. On the S\&P 500 the best ten changed by -0.03 points a year, with a 99\% band from -1.05 to +0.41; on the S\&P 400 by -0.26. There is no measurable difference on those two indices; on the S\&P 600 the bands excluded zero (+0.72 and -0.93). The default now keeps only one dividend rule, the current dividend, and the other is a switch.
+
+\textbf{Should a cheap price be the test of value?}
+
+\textbf{Midas:} Dropping the P/E and price-to-book rules raised the best ten on the S\&P 500 but lowered the broad ranking, and the missed winners were growth companies. That held on the S\&P 500 only, and I did not adopt it.
+
+\textbf{The Investor:} (1992) "Growth is always a component in the calculation of value." A low ratio of price to book value, a low price-earnings ratio or a high dividend yield are "far from determinative as to whether an investor is indeed buying something for what it is worth", and the opposite characteristics "are in no way inconsistent with a 'value' purchase". Yet "business growth, per se, tells us little about value". (2013, Graham's adage, which Buffett quotes as "Ben's adage") "Price is what you pay, value is what you get."
+
+\textbf{Midas:} I tested a price-to-earnings-growth measure. On all three indices it widened the broad ranking a little and left the best ten slightly lower, within the noise. Used only for companies that pass the quality rule, return on equity, both rose on the S\&P 500 and the S\&P 400, by 0.3 to 1 point a year. That is small and adds complexity, so it is a switch and not the default.
+
+\textbf{Is it too good to be true?}
+
+\textbf{Midas:} The picks beat the index in every one of a set of repeated samples that each left out a random part of the companies. The samples share most of their companies, so that is not independent confirmation, and it still looks too good, so I removed the biggest winners as if they had never existed.
+
+\textbf{The Investor:} (1987) "When shortages exist, however, even commodity businesses flourish", and "whenever shortages appear, the typical manager simply can't wait to expand capacity". (1989) "Time is the friend of the wonderful business, the enemy of the mediocre."
+
+\textbf{Midas:} The 1987 passage is about insurance; I apply it to chip makers by analogy. With the three largest winners removed (Applied Materials, Lam Research and Micron) the wallet still beat the index by 3.7, 1.9 and 2.1 points a year for the investors who started in 2016, 2020 and 2023; with five removed, by 0.3 to 2.3 points. The edge is present in this sample of the S\&P 500 but thin, and it sits in chip and materials companies after 2009. On the S\&P 400 it disappears without its three largest winners. Treat it with care.
+
+\textbf{What the tests showed.} The results are for holding over years, not months: the picks are bought twice a year and not sold. The concentration is the main risk, and one or two big winners carry much of the gain, so they are treated as luck until tested the same way. The book holds ten companies, not five: ten was chosen for plausibility and diversification, although the five-company book scored higher in the tests. The tests cover the default ten rules; other switches were not tested as a set. This is what the tests showed, not advice; read the tests in Section \ref{sec:testing} before relying on a number.
+
+\section{Where to read more}
+\label{sec:reading}
+\begin{table}[H]
+\centering
+\small
+\caption{Strategy literature by risk profile.}\label{tab:reading}
+\begin{tabular}{l p{4.5cm} p{5.6cm}}
+\hline
+Profile & Idea & Reading \\
+\hline
+Defensive & Preserve capital; diversified, cheap, boring; index funds & Graham, The Intelligent Investor (the defensive investor); Bogle, The Little Book of Common Sense Investing \\
+Core & A wonderful company at a fair price, held for years & The Berkshire Hathaway shareholder letters; Dorsey, The Little Book That Builds Wealth \\
+Value with a margin of safety & Buy at a deep discount to value & Graham (the enterprising investor); Klarman, Margin of Safety \\
+Quality growth & Growth at a reasonable price, good management & Fisher, Common Stocks and Uncommon Profits; Lynch, One Up on Wall Street \\
+Systematic value & Rules, ranked & Greenblatt, The Little Book That Beats the Market; Piotroski (2000), the F-score; Novy-Marx (2013), gross profitability \\
+Risk awareness & Cycles and what can go wrong & Marks, The Most Important Thing; Lakonishok, Shleifer and Vishny (1994), contrarian investment \\
+\hline
+\end{tabular}
+\end{table}
+Planned, and not yet available: a member will be able to bring the strategy literature they like and ask for answers drawn from those pages, with the source named. The Berkshire Hathaway letters are free to read on the company's site. Books are copyrighted: use your own copy. The list below is grouped by the kind of risk each approach accepts. It is a starting point only: the titles are given from general knowledge and have not been checked against the books, so check each one before relying on it.
 
 \section{Conclusions}
-In this sample, the value picks bought twice a year and held are worth more today than the same money in the S\&P SmallCap 600 or in Berkshire Hathaway for each of the four start years. That describes the past under rules and settings chosen while looking at it; it is not a test of the strategy. The lead is uneven: the 13 purchases of Universal Corporation (UVV) make up 15\% of the 2020 investor's value, and the purchases of January 2021, January 2022, July 2022, January 2023, July 2023, January 2024, July 2024, January 2025 and January 2026 trail the index.
+In this sample, the value picks bought twice a year and held are worth more today than the same money in the S\&P SmallCap 600 or in Berkshire Hathaway for each of the four start years. That describes the past under rules and settings chosen while looking at it; it is not a test of the strategy. The lead is uneven: the 2 purchases of Powell Industries, Inc. (POWL) make up 13\% of the 2020 investor's value, and the purchases of July 2022, January 2023, July 2023, January 2024, July 2024, January 2025, July 2025, January 2026 and July 2026 trail the index.
 
 Before the strategy is used, three steps are needed: the companies that left the index must be added to the data, the score must be tested on more decisions (each quarter instead of each year), and trading costs and taxes must be included.
 
@@ -252,121 +380,203 @@ Before the strategy is used, three steps are needed: the companies that left the
 Year & Company & Sector & Weight & In & Bought at & Now & Sold & Kept & Return \\
 \hline
 \endhead
-2020-01 & UVV & Staples & 21\% & 21 & 56.88 & 41.44 &  & 24 & +12\% \\
-2020-01 & GVA & Industrials & 20\% & 20 & 27.59 & 123.62 & 13 & 68 & +306\% \\
-2020-01 & LZB & Discretionary & 20\% & 20 & 31.04 & 30.44 &  & 23 & +13\% \\
-2020-01 & CALM & Staples & 20\% & 20 & 42.02 & 63.56 &  & 38 & +96\% \\
-2020-01 & SCSC & Technology & 19\% & 19 & 36.78 & 57.71 & 3 & 25 & +41\% \\
-2020-07 & UVV & Staples & 22\% & 22 & 41.90 & 41.44 &  & 33 & +48\% \\
-2020-07 & SMP & Discretionary & 20\% & 20 & 40.43 & 42.41 &  & 25 & +26\% \\
-2020-07 & GVA & Industrials & 20\% & 20 & 17.94 & 123.62 & 19 & 101 & +514\% \\
-2020-07 & SCSC & Technology & 19\% & 19 & 23.20 & 57.71 & 5 & 39 & +123\% \\
-2020-07 & SCL & Materials & 19\% & 19 & 94.63 & 69.61 &  & 16 & -18\% \\
-2021-01 & UVV & Staples & 23\% & 24 & 48.82 & 41.44 &  & 29 & +22\% \\
-2021-01 & SMP & Discretionary & 21\% & 21 & 40.11 & 42.41 &  & 27 & +26\% \\
-2021-01 & IOSP & Materials & 19\% & 20 & 89.56 & 99.89 &  & 24 & +21\% \\
-2021-01 & MTRN & Materials & 19\% & 19 & 62.61 & 221.94 & 2 & 68 & +263\% \\
-2021-01 & SCL & Materials & 18\% & 19 & 121.11 & 69.61 &  & 12 & -36\% \\
-2021-07 & UVV & Staples & 24\% & 28 & 57.25 & 41.44 &  & 28 & +2\% \\
-2021-07 & SMP & Discretionary & 20\% & 23 & 43.81 & 42.41 &  & 27 & +14\% \\
-2021-07 & SCL & Materials & 19\% & 22 & 122.75 & 69.61 &  & 14 & -37\% \\
-2021-07 & FELE & Industrials & 18\% & 21 & 81.08 & 95.38 &  & 26 & +24\% \\
-2021-07 & MATX & Industrials & 18\% & 20 & 64.68 & 223.85 &  & 76 & +270\% \\
-2022-01 & UVV & Staples & 24\% & 26 & 56.14 & 41.44 &  & 26 & +1\% \\
-2022-01 & SMP & Discretionary & 20\% & 21 & 52.39 & 42.41 &  & 20 & -6\% \\
-2022-01 & HCSG & Industrials & 19\% & 21 & 17.82 & 24.52 &  & 30 & +46\% \\
-2022-01 & WGO & Discretionary & 19\% & 20 & 75.64 & 30.61 &  & 9 & -54\% \\
-2022-01 & SCL & Materials & 19\% & 20 & 124.08 & 69.61 &  & 13 & -38\% \\
-2022-07 & UVV & Staples & 22\% & 22 & 60.81 & 41.44 &  & 20 & -10\% \\
-2022-07 & GIII & Discretionary & 20\% & 20 & 20.01 & 30.28 & 3 & 29 & +55\% \\
-2022-07 & SMP & Discretionary & 20\% & 20 & 45.77 & 42.41 &  & 21 & +7\% \\
-2022-07 & WGO & Discretionary & 19\% & 19 & 49.12 & 30.61 &  & 14 & -29\% \\
-2022-07 & BCC & Industrials & 19\% & 19 & 60.58 & 78.83 &  & 30 & +55\% \\
-2023-01 & UVV & Staples & 21\% & 21 & 53.18 & 41.44 &  & 21 & +0\% \\
-2023-01 & SMP & Discretionary & 20\% & 20 & 35.17 & 42.41 &  & 27 & +37\% \\
-2023-01 & HZO & Discretionary & 20\% & 20 & 31.38 & 52.76 &  & 34 & +68\% \\
-2023-01 & GIII & Discretionary & 20\% & 20 & 13.97 & 30.28 & 4 & 40 & +121\% \\
-2023-01 & AOSL & Technology & 19\% & 19 & 29.32 & 22.98 &  & 15 & -22\% \\
-2023-07 & UVV & Staples & 21\% & 21 & 50.58 & 41.44 &  & 22 & +2\% \\
-2023-07 & BCC & Industrials & 20\% & 20 & 90.57 & 78.83 &  & 20 & -3\% \\
-2023-07 & HZO & Discretionary & 20\% & 20 & 34.30 & 52.76 &  & 31 & +54\% \\
-2023-07 & AOSL & Technology & 19\% & 19 & 32.87 & 22.98 &  & 13 & -30\% \\
-2023-07 & MATX & Industrials & 19\% & 19 & 79.13 & 223.85 &  & 56 & +193\% \\
-2024-01 & UVV & Staples & 22\% & 23 & 67.18 & 41.44 &  & 17 & -25\% \\
-2024-01 & LNN & Materials & 20\% & 21 & 127.69 & 107.63 &  & 18 & -13\% \\
-2024-01 & BCC & Industrials & 20\% & 21 & 128.24 & 78.83 &  & 14 & -35\% \\
-2024-01 & WOR & Industrials & 20\% & 21 & 56.72 & 62.75 &  & 24 & +15\% \\
-2024-01 & SMP & Discretionary & 19\% & 21 & 39.74 & 42.41 &  & 24 & +17\% \\
-2024-07 & UVV & Staples & 21\% & 21 & 47.64 & 41.44 &  & 21 & +2\% \\
-2024-07 & SMP & Discretionary & 20\% & 20 & 27.04 & 42.41 &  & 34 & +70\% \\
-2024-07 & LNN & Materials & 20\% & 20 & 113.16 & 107.63 &  & 20 & -2\% \\
-2024-07 & WOR & Industrials & 20\% & 20 & 45.27 & 62.75 &  & 28 & +43\% \\
-2024-07 & BCC & Industrials & 20\% & 20 & 117.69 & 78.83 &  & 14 & -29\% \\
-2025-01 & UVV & Staples & 21\% & 22 & 54.70 & 41.44 &  & 19 & -14\% \\
-2025-01 & LNN & Materials & 20\% & 21 & 116.77 & 107.63 &  & 20 & -6\% \\
-2025-01 & SMP & Discretionary & 20\% & 21 & 30.59 & 42.41 &  & 31 & +47\% \\
-2025-01 & BCC & Industrials & 20\% & 21 & 117.23 & 78.83 &  & 14 & -31\% \\
-2025-01 & DIOD & Technology & 20\% & 21 & 61.31 & 80.13 &  & 27 & +31\% \\
-2025-07 & BCC & Industrials & 21\% & 21 & 92.12 & 78.83 &  & 19 & -13\% \\
-2025-07 & AEO & Discretionary & 20\% & 20 & 10.19 & 19.61 &  & 41 & +102\% \\
-2025-07 & UVV & Staples & 20\% & 20 & 57.48 & 41.44 &  & 16 & -21\% \\
-2025-07 & DIOD & Technology & 19\% & 19 & 55.30 & 80.13 &  & 28 & +45\% \\
-2025-07 & BHE & Technology & 19\% & 19 & 38.77 & 68.37 &  & 34 & +79\% \\
-2026-01 & BCC & Industrials & 21\% & 21 & 74.12 & 78.83 &  & 23 & +7\% \\
-2026-01 & LRN & Discretionary & 20\% & 20 & 64.61 & 78.36 &  & 25 & +21\% \\
-2026-01 & LNN & Materials & 20\% & 20 & 121.15 & 107.63 &  & 18 & -10\% \\
-2026-01 & UVV & Staples & 19\% & 20 & 52.58 & 41.44 &  & 17 & -16\% \\
-2026-01 & CALM & Staples & 19\% & 19 & 78.47 & 63.56 &  & 16 & -18\% \\
-2026-07 & LNN & Materials & 20\% & 22 & 121.07 & 107.63 &  & 20 & -11\% \\
-2026-07 & INVA & Health care & 20\% & 22 & 21.90 & 21.22 &  & 21 & -3\% \\
-2026-07 & EPAM & Technology & 20\% & 22 & 85.24 & 140.51 &  & 36 & +65\% \\
-2026-07 & LRN & Discretionary & 20\% & 22 & 88.57 & 78.36 &  & 19 & -12\% \\
-2026-07 & ALG & Industrials & 20\% & 21 & 166.30 & 147.76 &  & 19 & -11\% \\
+2020-01 & UVV & Staples & 11\% & 11 & 56.88 & 41.44 &  & 12 & +12\% \\
+2020-01 & GVA & Industrials & 11\% & 11 & 27.59 & 123.62 & 22 & 2 & +123\% \\
+2020-01 & SIG & Discretionary & 10\% & 10 & 18.93 & 117.59 & 20 & 34 & +411\% \\
+2020-01 & HZO & Discretionary & 10\% & 10 & 16.80 & 52.76 & 5 & 23 & +173\% \\
+2020-01 & CALY & Discretionary & 10\% & 10 & 21.36 & 15.16 & 11 & 0 & +9\% \\
+2020-01 & LCII & Discretionary & 10\% & 10 & 107.63 & 98.98 &  & 11 & +16\% \\
+2020-01 & SCSC & Technology & 10\% & 10 & 36.78 & 57.71 & 1 & 12 & +42\% \\
+2020-01 & NSIT & Industrials & 10\% & 10 & 71.29 & 172.74 &  & 23 & +142\% \\
+2020-01 & NPO & Industrials & 10\% & 10 & 67.72 & 271.53 & 28 & 13 & +328\% \\
+2020-01 & LZB & Discretionary & 9\% & 9 & 31.04 & 30.44 &  & 11 & +13\% \\
+2020-07 & UVV & Staples & 12\% & 13 & 41.90 & 41.44 &  & 19 & +48\% \\
+2020-07 & GVA & Industrials & 12\% & 12 & 17.94 & 123.62 & 38 & 3 & +238\% \\
+2020-07 & SCSC & Technology & 10\% & 11 & 23.20 & 57.71 & 3 & 21 & +125\% \\
+2020-07 & HZO & Discretionary & 10\% & 10 & 22.68 & 52.76 & 4 & 17 & +102\% \\
+2020-07 & IPAR & Staples & 10\% & 10 & 47.16 & 116.37 &  & 28 & +182\% \\
+2020-07 & LZB & Discretionary & 9\% & 10 & 27.14 & 30.44 &  & 13 & +29\% \\
+2020-07 & RES & Energy & 9\% & 10 & 2.95 & 6.17 & 7 & 15 & +125\% \\
+2020-07 & TILE & Industrials & 9\% & 10 & 7.49 & 36.81 & 9 & 21 & +215\% \\
+2020-07 & HCC & Materials & 9\% & 10 & 14.53 & 85.97 &  & 63 & +564\% \\
+2020-07 & AIR & Industrials & 9\% & 9 & 21.01 & 100.26 & 16 & 31 & +401\% \\
+2021-01 & UVV & Staples & 12\% & 13 & 48.82 & 41.44 &  & 16 & +22\% \\
+2021-01 & HZO & Discretionary & 12\% & 12 & 34.74 & 52.76 & 3 & 13 & +32\% \\
+2021-01 & POWL & Industrials & 10\% & 11 & 9.83 & 156.26 & 18 & 172 & +1687\% \\
+2021-01 & PLAB & Technology & 10\% & 10 & 10.97 & 27.58 &  & 26 & +151\% \\
+2021-01 & RES & Energy & 10\% & 10 & 3.40 & 6.17 & 6 & 14 & +96\% \\
+2021-01 & GFF & Industrials & 10\% & 10 & 20.36 & 101.09 & 26 & 6 & +207\% \\
+2021-01 & HCC & Materials & 9\% & 10 & 22.24 & 85.97 &  & 43 & +331\% \\
+2021-01 & SMP & Discretionary & 9\% & 10 & 40.11 & 42.41 &  & 12 & +26\% \\
+2021-01 & PATK & Discretionary & 9\% & 10 & 46.27 & 77.68 & 1 & 18 & +88\% \\
+2021-01 & INVA & Health care & 9\% & 10 & 12.48 & 21.22 &  & 17 & +70\% \\
+2021-07 & UVV & Staples & 12\% & 17 & 57.25 & 41.44 &  & 17 & +2\% \\
+2021-07 & HZO & Discretionary & 11\% & 15 & 48.76 & 52.76 & 3 & 11 & -6\% \\
+2021-07 & PLAB & Technology & 10\% & 14 & 13.04 & 27.58 &  & 31 & +112\% \\
+2021-07 & SMP & Discretionary & 10\% & 14 & 43.81 & 42.41 &  & 16 & +14\% \\
+2021-07 & GIII & Discretionary & 10\% & 14 & 32.61 & 30.28 &  & 13 & -6\% \\
+2021-07 & INVA & Health care & 10\% & 13 & 13.70 & 21.22 &  & 21 & +55\% \\
+2021-07 & BCC & Industrials & 10\% & 13 & 58.60 & 78.83 &  & 24 & +79\% \\
+2021-07 & FORM & Technology & 9\% & 13 & 36.75 & 87.53 &  & 31 & +138\% \\
+2021-07 & GFF & Industrials & 9\% & 13 & 25.86 & 101.09 & 26 & 6 & +140\% \\
+2021-07 & NSIT & Industrials & 9\% & 13 & 101.26 & 172.74 &  & 22 & +71\% \\
+2022-01 & UVV & Staples & 12\% & 14 & 56.14 & 41.44 &  & 14 & +1\% \\
+2022-01 & HZO & Discretionary & 11\% & 13 & 58.86 & 52.76 & 2 & 8 & -22\% \\
+2022-01 & GIII & Discretionary & 10\% & 12 & 28.27 & 30.28 &  & 13 & +9\% \\
+2022-01 & INVA & Health care & 10\% & 12 & 17.45 & 21.22 &  & 15 & +22\% \\
+2022-01 & SMP & Discretionary & 10\% & 12 & 52.39 & 42.41 &  & 11 & -6\% \\
+2022-01 & WGO & Discretionary & 10\% & 12 & 75.64 & 30.61 &  & 5 & -54\% \\
+2022-01 & PLAB & Technology & 10\% & 12 & 19.28 & 27.58 &  & 17 & +43\% \\
+2022-01 & BCC & Industrials & 10\% & 11 & 70.98 & 78.83 &  & 16 & +36\% \\
+2022-01 & POWL & Industrials & 9\% & 11 & 9.92 & 156.26 & 19 & 175 & +1610\% \\
+2022-01 & BHE & Technology & 9\% & 11 & 27.46 & 68.37 &  & 31 & +174\% \\
+2022-07 & BCC & Industrials & 12\% & 13 & 60.58 & 78.83 &  & 20 & +55\% \\
+2022-07 & HZO & Discretionary & 11\% & 12 & 36.83 & 52.76 & 3 & 12 & +25\% \\
+2022-07 & WGO & Discretionary & 10\% & 11 & 49.12 & 30.61 &  & 8 & -29\% \\
+2022-07 & UVV & Staples & 10\% & 11 & 60.81 & 41.44 &  & 10 & -10\% \\
+2022-07 & SMP & Discretionary & 10\% & 11 & 45.77 & 42.41 &  & 11 & +7\% \\
+2022-07 & GIII & Discretionary & 10\% & 10 & 20.01 & 30.28 &  & 16 & +53\% \\
+2022-07 & COHU & Technology & 9\% & 10 & 24.85 & 50.79 & 1 & 19 & +108\% \\
+2022-07 & ASTE & Industrials & 9\% & 10 & 41.50 & 39.27 &  & 10 & -0\% \\
+2022-07 & BHE & Technology & 9\% & 10 & 22.13 & 68.37 &  & 33 & +235\% \\
+2022-07 & SIG & Discretionary & 9\% & 10 & 53.55 & 117.59 &  & 22 & +132\% \\
+2023-01 & BCC & Industrials & 12\% & 14 & 70.12 & 78.83 &  & 19 & +31\% \\
+2023-01 & HZO & Discretionary & 11\% & 13 & 31.38 & 52.76 & 4 & 15 & +46\% \\
+2023-01 & AOSL & Technology & 11\% & 13 & 29.32 & 22.98 &  & 10 & -22\% \\
+2023-01 & UVV & Staples & 10\% & 12 & 53.18 & 41.44 &  & 12 & +0\% \\
+2023-01 & SMP & Discretionary & 10\% & 12 & 35.17 & 42.41 &  & 16 & +37\% \\
+2023-01 & GIII & Discretionary & 10\% & 11 & 13.97 & 30.28 &  & 25 & +120\% \\
+2023-01 & ASTE & Industrials & 9\% & 11 & 41.21 & 39.27 &  & 11 & -0\% \\
+2023-01 & WGO & Discretionary & 9\% & 11 & 52.51 & 30.61 &  & 7 & -34\% \\
+2023-01 & COHU & Technology & 9\% & 10 & 31.73 & 50.79 & 1 & 16 & +63\% \\
+2023-01 & SIG & Discretionary & 9\% & 10 & 66.20 & 117.59 &  & 19 & +87\% \\
+2023-07 & BCC & Industrials & 12\% & 14 & 90.57 & 78.83 &  & 14 & -3\% \\
+2023-07 & HCC & Materials & 11\% & 13 & 39.60 & 85.97 &  & 29 & +123\% \\
+2023-07 & HZO & Discretionary & 11\% & 12 & 34.30 & 52.76 & 3 & 13 & +34\% \\
+2023-07 & AOSL & Technology & 10\% & 11 & 32.87 & 22.98 &  & 8 & -30\% \\
+2023-07 & UVV & Staples & 10\% & 11 & 50.58 & 41.44 &  & 11 & +2\% \\
+2023-07 & SMP & Discretionary & 9\% & 11 & 37.97 & 42.41 &  & 13 & +25\% \\
+2023-07 & BHE & Technology & 9\% & 10 & 25.92 & 68.37 &  & 29 & +178\% \\
+2023-07 & LCII & Discretionary & 9\% & 10 & 127.06 & 98.98 &  & 9 & -11\% \\
+2023-07 & PLAB & Technology & 9\% & 10 & 26.19 & 27.58 &  & 11 & +5\% \\
+2023-07 & DIOD & Technology & 9\% & 10 & 93.36 & 80.13 &  & 9 & -14\% \\
+2024-01 & BCC & Industrials & 12\% & 14 & 128.24 & 78.83 &  & 9 & -35\% \\
+2024-01 & AOSL & Technology & 11\% & 12 & 27.38 & 22.98 &  & 10 & -16\% \\
+2024-01 & HCC & Materials & 10\% & 11 & 60.91 & 85.97 &  & 16 & +44\% \\
+2024-01 & UVV & Staples & 10\% & 11 & 67.18 & 41.44 &  & 8 & -25\% \\
+2024-01 & SMP & Discretionary & 10\% & 11 & 39.74 & 42.41 &  & 13 & +17\% \\
+2024-01 & LNN & Materials & 10\% & 11 & 127.69 & 107.63 &  & 9 & -13\% \\
+2024-01 & WOR & Industrials & 10\% & 10 & 56.72 & 62.75 &  & 12 & +15\% \\
+2024-01 & DIOD & Technology & 9\% & 10 & 79.65 & 80.13 &  & 10 & +1\% \\
+2024-01 & BHE & Technology & 9\% & 10 & 27.28 & 68.37 &  & 27 & +161\% \\
+2024-01 & AMR & Materials & 9\% & 10 & 341.24 & 159.19 &  & 5 & -53\% \\
+2024-07 & BCC & Industrials & 12\% & 14 & 117.69 & 78.83 &  & 10 & -29\% \\
+2024-07 & HCC & Materials & 11\% & 14 & 73.37 & 85.97 &  & 16 & +18\% \\
+2024-07 & AOSL & Technology & 10\% & 12 & 38.24 & 22.98 &  & 7 & -40\% \\
+2024-07 & DIOD & Technology & 10\% & 12 & 70.19 & 80.13 &  & 14 & +14\% \\
+2024-07 & SMP & Discretionary & 10\% & 12 & 27.04 & 42.41 &  & 20 & +70\% \\
+2024-07 & PLAB & Technology & 10\% & 12 & 24.48 & 27.58 &  & 13 & +13\% \\
+2024-07 & LNN & Materials & 10\% & 11 & 113.16 & 107.63 &  & 11 & -2\% \\
+2024-07 & UVV & Staples & 10\% & 11 & 47.64 & 41.44 &  & 12 & +2\% \\
+2024-07 & WOR & Industrials & 9\% & 11 & 45.27 & 62.75 &  & 16 & +43\% \\
+2024-07 & MTUS & Materials & 9\% & 11 & 20.20 & 21.12 &  & 11 & +5\% \\
+2025-01 & BCC & Industrials & 12\% & 13 & 117.23 & 78.83 &  & 9 & -31\% \\
+2025-01 & HCC & Materials & 11\% & 13 & 54.44 & 85.97 &  & 21 & +59\% \\
+2025-01 & DIOD & Technology & 10\% & 11 & 61.31 & 80.13 &  & 15 & +31\% \\
+2025-01 & PLAB & Technology & 10\% & 11 & 24.01 & 27.58 &  & 13 & +15\% \\
+2025-01 & LNN & Materials & 10\% & 11 & 116.77 & 107.63 &  & 11 & -6\% \\
+2025-01 & AOSL & Technology & 10\% & 11 & 36.54 & 22.98 &  & 7 & -37\% \\
+2025-01 & SMP & Discretionary & 10\% & 11 & 30.59 & 42.41 &  & 16 & +47\% \\
+2025-01 & UVV & Staples & 9\% & 11 & 54.70 & 41.44 &  & 9 & -14\% \\
+2025-01 & COHU & Technology & 9\% & 11 & 26.45 & 50.79 & 2 & 20 & +96\% \\
+2025-01 & ANDE & Staples & 9\% & 11 & 40.10 & 64.29 &  & 18 & +65\% \\
+2025-07 & BCC & Industrials & 11\% & 13 & 92.12 & 78.83 &  & 11 & -13\% \\
+2025-07 & HCC & Materials & 11\% & 13 & 44.39 & 85.97 &  & 25 & +95\% \\
+2025-07 & PLAB & Technology & 11\% & 12 & 19.74 & 27.58 &  & 17 & +40\% \\
+2025-07 & AOSL & Technology & 10\% & 12 & 26.55 & 22.98 &  & 10 & -13\% \\
+2025-07 & UVV & Staples & 10\% & 11 & 57.48 & 41.44 &  & 9 & -21\% \\
+2025-07 & AMR & Materials & 10\% & 11 & 104.99 & 159.19 &  & 16 & +52\% \\
+2025-07 & DIOD & Technology & 10\% & 11 & 55.30 & 80.13 &  & 16 & +45\% \\
+2025-07 & BHE & Technology & 10\% & 11 & 38.77 & 68.37 &  & 19 & +79\% \\
+2025-07 & LNN & Materials & 9\% & 11 & 147.56 & 107.63 &  & 8 & -26\% \\
+2025-07 & WS & Materials & 9\% & 10 & 30.75 & 40.66 &  & 14 & +35\% \\
+2026-01 & BCC & Industrials & 12\% & 15 & 74.12 & 78.83 &  & 16 & +7\% \\
+2026-01 & LRN & Discretionary & 11\% & 14 & 64.61 & 78.36 &  & 17 & +21\% \\
+2026-01 & HCC & Materials & 10\% & 13 & 89.55 & 85.97 &  & 13 & -4\% \\
+2026-01 & IPAR & Staples & 10\% & 13 & 85.44 & 116.37 &  & 18 & +39\% \\
+2026-01 & DIOD & Technology & 10\% & 13 & 51.43 & 80.13 &  & 20 & +56\% \\
+2026-01 & PLAB & Technology & 10\% & 13 & 33.41 & 27.58 &  & 10 & -17\% \\
+2026-01 & UVV & Staples & 10\% & 13 & 52.58 & 41.44 &  & 11 & -16\% \\
+2026-01 & LNN & Materials & 10\% & 12 & 121.15 & 107.63 &  & 11 & -10\% \\
+2026-01 & ALG & Industrials & 9\% & 12 & 170.43 & 147.76 &  & 10 & -13\% \\
+2026-01 & CNR & Energy & 9\% & 12 & 89.89 & 86.93 &  & 12 & -3\% \\
+2026-07 & HRMY & Health care & 11\% & 20 & 36.00 & 38.76 &  & 22 & +8\% \\
+2026-07 & LRN & Discretionary & 11\% & 20 & 88.57 & 78.36 &  & 17 & -12\% \\
+2026-07 & GIII & Discretionary & 10\% & 19 & 33.57 & 30.28 &  & 17 & -9\% \\
+2026-07 & INVA & Health care & 10\% & 19 & 21.90 & 21.22 &  & 18 & -3\% \\
+2026-07 & BCC & Industrials & 10\% & 18 & 75.48 & 78.83 &  & 19 & +5\% \\
+2026-07 & ALG & Industrials & 10\% & 18 & 166.30 & 147.76 &  & 16 & -11\% \\
+2026-07 & LNN & Materials & 10\% & 18 & 121.07 & 107.63 &  & 16 & -11\% \\
+2026-07 & IPAR & Staples & 10\% & 18 & 115.66 & 116.37 &  & 18 & +1\% \\
+2026-07 & UVV & Staples & 9\% & 17 & 52.08 & 41.44 &  & 14 & -18\% \\
+2026-07 & PLAB & Technology & 9\% & 17 & 30.31 & 27.58 &  & 16 & -9\% \\
 \hline
 \end{longtable}}
 \section{Wallet contents by year}
 \label{app:contents}
-\begin{table}[H]
-\centering
-\small
-\caption{Wallet with sells of the investor who started in 2020: value of each holding after each January's trades and today (USD), and the money put in and the proceeds of sales to date, July decisions included.}\label{tab:contents}
-\begin{tabular}{l r r r r r r r r }
+{\small
+\begin{longtable}{l r r r r r r r r }
+\caption{Wallet with sells of the investor who started in 2020: value of each holding after each January's trades and today (USD), and the money put in and the proceeds of sales to date, July decisions included.}\label{tab:contents}\\
 \hline
 Holding & 2020 & 2021 & 2022 & 2023 & 2024 & 2025 & 2026 & Now \\
 \hline
-LZB & 20 & 26 & 24 & 16 & 25 & 31 & 27 & 23 \\
-UVV & 21 & 70 & 139 & 180 & 295 & 302 & 347 & 292 \\
-CALM & 20 & 17 & 18 & 27 & 30 & 57 & 66 & 54 \\
-SCSC & 19 & 33 & 39 & 32 & 44 & 52 & 43 & 63 \\
-GVA & 20 & 49 & 56 & 51 & 74 & 124 & 168 & 169 \\
-SMP &  & 41 & 104 & 107 & 146 & 161 & 202 & 237 \\
-SCL &  & 43 & 87 & 74 & 67 & 46 & 36 & 54 \\
-IOSP &  & 20 & 21 & 24 & 28 & 25 & 18 & 24 \\
-MTRN &  & 19 & 29 & 27 & 40 & 30 & 40 & 68 \\
-FELE &  &  & 24 & 21 & 25 & 26 & 26 & 26 \\
-MATX &  &  & 28 & 20 & 65 & 80 & 73 & 132 \\
-HCSG &  &  & 21 & 15 & 13 & 14 & 21 & 30 \\
-WGO &  &  & 20 & 35 & 50 & 33 & 29 & 23 \\
-BCC &  &  &  & 23 & 96 & 133 & 123 & 132 \\
-GIII &  &  &  & 34 & 75 & 71 & 66 & 68 \\
-AOSL &  &  &  & 19 & 34 & 45 & 26 & 29 \\
-HZO &  &  &  & 20 & 47 & 34 & 29 & 64 \\
-WOR &  &  &  &  & 21 & 31 & 43 & 52 \\
-LNN &  &  &  &  & 21 & 62 & 85 & 96 \\
-DIOD &  &  &  &  &  & 21 & 35 & 55 \\
-BHE &  &  &  &  &  &  & 22 & 34 \\
-AEO &  &  &  &  &  &  & 54 & 41 \\
-LRN &  &  &  &  &  &  & 20 & 44 \\
-INVA &  &  &  &  &  &  &  & 21 \\
-EPAM &  &  &  &  &  &  &  & 36 \\
-ALG &  &  &  &  &  &  &  & 19 \\
+\endhead
+HZO & 10 & 49 & 113 & 84 & 117 & 84 & 61 & 113 \\
+UVV & 11 & 39 & 78 & 100 & 160 & 163 & 190 & 174 \\
+GVA & 11 & 28 & 17 & 16 & 18 & 14 & 8 & 4 \\
+SIG & 10 & 13 & 25 & 41 & 65 & 49 & 55 & 76 \\
+SCSC & 10 & 17 & 21 & 17 & 23 & 27 & 23 & 34 \\
+LCII & 10 & 12 & 15 & 9 & 23 & 19 & 25 & 20 \\
+LZB & 9 & 27 & 25 & 16 & 26 & 32 & 28 & 23 \\
+CALY & 10 & 4 & 1 & 0 & 0 & 0 & 0 & 0 \\
+NPO & 10 & 11 & 16 & 16 & 23 & 25 & 20 & 13 \\
+NSIT & 10 & 10 & 28 & 27 & 46 & 39 & 22 & 45 \\
+HCC &  & 25 & 29 & 38 & 105 & 118 & 235 & 226 \\
+AIR &  & 15 & 18 & 20 & 28 & 28 & 32 & 31 \\
+IPAR &  & 12 & 23 & 21 & 31 & 29 & 33 & 64 \\
+RES &  & 21 & 27 & 37 & 31 & 27 & 25 & 29 \\
+TILE &  & 13 & 16 & 10 & 7 & 14 & 16 & 21 \\
+POWL &  & 11 & 22 & 27 & 72 & 178 & 275 & 347 \\
+SMP &  & 10 & 42 & 49 & 79 & 88 & 110 & 129 \\
+PATK &  & 10 & 12 & 9 & 15 & 19 & 26 & 18 \\
+PLAB &  & 10 & 51 & 44 & 93 & 95 & 166 & 153 \\
+INVA &  & 10 & 43 & 33 & 40 & 43 & 49 & 70 \\
+GFF &  & 10 & 28 & 24 & 24 & 13 & 10 & 11 \\
+GIII &  &  & 24 & 31 & 73 & 70 & 65 & 84 \\
+FORM &  &  & 17 & 8 & 14 & 16 & 21 & 31 \\
+BCC &  &  & 29 & 60 & 155 & 176 & 137 & 167 \\
+WGO &  &  & 12 & 31 & 43 & 29 & 26 & 20 \\
+BHE &  &  & 11 & 23 & 45 & 77 & 88 & 138 \\
+COHU &  &  &  & 23 & 25 & 30 & 28 & 54 \\
+ASTE &  &  &  & 21 & 18 & 17 & 24 & 21 \\
+AOSL &  &  &  & 13 & 33 & 67 & 47 & 52 \\
+DIOD &  &  &  &  & 19 & 37 & 53 & 83 \\
+LNN &  &  &  &  & 11 & 33 & 56 & 66 \\
+WOR &  &  &  &  & 10 & 17 & 23 & 28 \\
+AMR &  &  &  &  & 10 & 6 & 27 & 21 \\
+MTUS &  &  &  &  &  & 7 & 10 & 11 \\
+ANDE &  &  &  &  &  & 11 & 14 & 18 \\
+WS &  &  &  &  &  &  & 12 & 14 \\
+CNR &  &  &  &  &  &  & 12 & 12 \\
+LRN &  &  &  &  &  &  & 14 & 34 \\
+ALG &  &  &  &  &  &  & 12 & 27 \\
+HRMY &  &  &  &  &  &  &  & 22 \\
 \hline
 Put in & 100 & 300 & 500 & 700 & 900 & 1,100 & 1,300 & 1,400 \\
-Sold & 0 & 3 & 26 & 26 & 32 & 39 & 39 & 48 \\
-Total & 100 & 319 & 611 & 725 & 1,196 & 1,378 & 1,599 & 1,887 \\
+Sold & 0 & 10 & 69 & 94 & 117 & 152 & 194 & 279 \\
+Total & 100 & 357 & 743 & 845 & 1,487 & 1,696 & 2,075 & 2,504 \\
 \hline
-\end{tabular}
-\end{table}
+\end{longtable}}
 \section{Testing the weighting}
 \label{app:weighting}
 \begin{table}[H]
@@ -377,30 +587,24 @@ Total & 100 & 319 & 611 & 725 & 1,196 & 1,378 & 1,599 & 1,887 \\
 \hline
 Rule & w\_r & w\_r beat & w\_r not & Pts beat & Pts not & Gap & Corr. \\
 \hline
-NN & 1.00 & 1.00 & 1.00 & 3.11 & 3.34 & -0.23 & -0.06 \\
-B1 & 0.97 & 0.97 & 0.97 & 1.59 & 2.24 & -0.64 & +0.04 \\
-E6 & 0.96 & 0.95 & 0.96 & 4.51 & 4.14 & +0.37 & +0.25 \\
-G6 & 0.80 & 0.79 & 0.81 & 3.81 & 3.99 & -0.18 & -0.03 \\
-G7 & 0.70 & 0.69 & 0.71 & 4.46 & 4.05 & +0.41 & +0.11 \\
-G4 & 0.68 & 0.68 & 0.68 & 4.14 & 4.41 & -0.27 & -0.42 \\
-G2b & 0.61 & 0.61 & 0.60 & 3.56 & 4.36 & -0.80 & +0.09 \\
-E2 & 0.57 & 0.57 & 0.57 & 3.56 & 4.36 & -0.80 & +0.09 \\
-G3 & 0.57 & 0.57 & 0.57 & 2.52 & 3.73 & -1.22 & -0.20 \\
-G5 & 0.52 & 0.51 & 0.52 & 3.96 & 2.90 & +1.05 & +0.05 \\
-E4 & 0.51 & 0.51 & 0.51 & 4.10 & 4.03 & +0.07 & -0.18 \\
-G2a & 0.47 & 0.48 & 0.47 & 2.24 & 3.69 & -1.45 & -0.34 \\
-E3 & 0.46 & 0.46 & 0.46 & 3.90 & 3.87 & +0.02 & -0.01 \\
-NI1 & 0.43 & 0.45 & 0.43 & 2.56 & 2.74 & -0.18 & +0.02 \\
-E5 & 0.35 & 0.35 & 0.36 & 3.28 & 2.93 & +0.35 & -0.12 \\
-E1 & 0.29 & 0.29 & 0.28 & 2.24 & 3.69 & -1.45 & -0.34 \\
+NN & 1.00 & 1.00 & 1.00 & 3.54 & 3.29 & +0.25 & +0.05 \\
+B1 & 0.91 & 0.91 & 0.90 & 2.51 & 3.11 & -0.60 & +0.01 \\
+G6 & 0.80 & 0.80 & 0.80 & 2.93 & 4.20 & -1.26 & -0.13 \\
+G7 & 0.70 & 0.70 & 0.71 & 4.20 & 4.27 & -0.07 & +0.03 \\
+G5 & 0.63 & 0.64 & 0.63 & 2.78 & 3.86 & -1.09 & -0.12 \\
+G2b & 0.61 & 0.60 & 0.61 & 4.01 & 4.49 & -0.48 & -0.08 \\
+E2 & 0.57 & 0.56 & 0.58 & 4.01 & 4.49 & -0.48 & -0.08 \\
+E4 & 0.51 & 0.50 & 0.51 & 4.19 & 3.37 & +0.82 & -0.01 \\
+G2a & 0.47 & 0.47 & 0.48 & 3.08 & 3.77 & -0.69 & -0.21 \\
+E1 & 0.29 & 0.28 & 0.29 & 3.08 & 3.77 & -0.69 & -0.21 \\
 \hline
 \end{tabular}
 \end{table}
-Each rule's points are multiplied by its weight, one less the share of companies passing it on the date, so a rule few companies pass counts more. A good weighting gives most weight to the rules whose points went with better returns. Table \ref{tab:weighting} sets each rule's mean weight on the dates the picks were made against two measures of how well it told the 70 picks apart: the gap between the mean points of the picks that beat the S\&P SmallCap 600 and of those that did not, weighted by dollars as in Figure \ref{fig:rules}, and the rank correlation of the rule's points with each pick's return a year above the S\&P SmallCap 600. Figure \ref{fig:weighting} plots weight against gap; a good weighting puts its rules on a rising line, with the heavy rules above zero.
+Each rule's points are multiplied by its weight, one less the share of companies passing it on the date, so a rule few companies pass counts more. A good weighting gives most weight to the rules whose points went with better returns. Table \ref{tab:weighting} sets each rule's mean weight on the dates the picks were made against two measures of how well it told the 140 picks apart: the gap between the mean points of the picks that beat the S\&P SmallCap 600 and of those that did not, weighted by dollars as in Figure \ref{fig:rules}, and the rank correlation of the rule's points with each pick's return a year above the S\&P SmallCap 600. Figure \ref{fig:weighting} plots weight against gap; a good weighting puts its rules on a rising line, with the heavy rules above zero.
 
-Across the rules, the rank correlation of weight and gap is +0.13, and of weight and correlation +0.40.
+Across the rules, the rank correlation of weight and gap is +0.09, and of weight and correlation +0.68.
 
-The weighting is unrelated to which rules worked. Weighted heavily but with a negative gap: debt to working capital (G2b), 20 years of dividends (G4), P/E (G6), debt to working capital (lenient) (E2), net-net (NN) and return on equity (B1). A positive gap but a light weight: 10-year earnings growth (G5), 5 years of profit (E3), current dividend (E4) and 4-year earnings growth (E5). Any change to the weights must be tested on years it was not fitted on.
+The weighting is unrelated to which rules worked. Weighted heavily but with a negative gap: 6-year earnings growth (G5), P/E (G6), P/E times P/B (G7) and return on equity (B1). A positive gap but a light weight: current dividend (E4). Any change to the weights must be tested on years it was not fitted on.
 
 \begin{figure}[H]
 \centering
@@ -413,7 +617,7 @@ The weighting is unrelated to which rules worked. Weighted heavily but with a ne
 \begin{table}[H]
 \centering
 \small
-\caption{Truncation check: companies scored on the date, companies whose score differs when every input is cut at the date (per score), and whether the five picks are the same.}\label{tab:lookahead}
+\caption{Truncation check: companies scored on the date, companies whose score differs when every input is cut at the date (per score), and whether the picks are the same.}\label{tab:lookahead}
 \begin{tabular}{l r r r r r l}
 \hline
 Date & Companies & Score & Score 0 to 1 & Unweighted & Share passed & Same picks \\
@@ -426,9 +630,9 @@ Date & Companies & Score & Score 0 to 1 & Unweighted & Share passed & Same picks
 \end{table}
 A score must use only what was known on its date. Four guards are built in. A company's figures count from the day its annual report was filed with the SEC, and of all the figures filed for a year only the first reported is used, never a later restatement. Prices are the close on the scoring date and dividends are counted by their ex-date. Each January and July purchase uses the scores of the rebalance date two weeks before it. Rule weights come from the companies on the date alone.
 
-These guards are tested by cutting every input at a date as if it were that day (filings filed on or before it, prices and dividends up to it), scoring the companies again and comparing the scores with the full run (Table \ref{tab:lookahead}). Any difference means information from after the date reached a score. On 21 December 2018, 16 December 2022 and 19 December 2025 the picks were the same, and the scores were identical on 21 December 2018, 16 December 2022 and 19 December 2025. The same check runs as a unit test. A rule whose window reaches back further than a company's price history (the 20-year dividend record of a younger company) is not evaluated rather than failed.
+These guards are tested by cutting every input at a date as if it were that day (filings filed on or before it, prices and dividends up to it), scoring the companies again and comparing the scores with the full run (Table \ref{tab:lookahead}). Any difference means information from after the date reached a score. On 21 December 2018, 16 December 2022 and 19 December 2025 the picks were the same, and the scores were identical on 21 December 2018, 16 December 2022 and 19 December 2025. The same check runs as a unit test. A rule whose window reaches back further than a company's price history (a long dividend record of a younger company) is not evaluated rather than failed.
 
-Three sources of forward information are outside this test. Only today's S\&P SmallCap 600 members are scored. The index's list gives no entry dates: a company counts from its latest addition in the list of changes, or from the start of that list (December 2019) when no addition is listed. The list holds selected changes only, so some companies count before they joined: a look-ahead that flatters the results. Companies that later left the index are missing, which flatters every result. Sectors are today's, used to leave out Financials and Real Estate in earlier years. And the score's design and settings were chosen while looking at 2016 to 2026, so no period tests it fairly: 2022 onwards, once meant as a held-out test, was used to choose between models.
+Three sources of forward information are outside this test. Only today's S\&P SmallCap 600 members are scored. The index's list gives no entry dates: a company counts from its latest addition in the list of changes, or from the start of that list (December 2019) when no addition is listed. The list holds selected changes only, so some companies count before they joined: a look-ahead that flatters the results. Companies that later left the index are missing, which flatters every result. Sectors are today's, used to leave out Financials and Real Estate in earlier years. And the score's design and settings were chosen while looking at 2009 to 2026, so no period tests it fairly: 2022 onwards, once meant as a held-out test, was used to choose between models.
 
 \subsection{Companies missing from the data}
 \begin{table}[H]
@@ -460,20 +664,14 @@ Rule & Name & What it measures & Better & Passes when \\
 \hline
 G2a & current ratio & Current assets divided by current liabilities: what the company owns against what it owes within a year. & higher & at least 2.0 \\
 G2b & debt to working capital & Long-term debt divided by net current assets (current assets less current liabilities). & lower & at most 1.0 \\
-G3 & 10 years of profit & Number of the last 10 fiscal years with positive earnings per share. & higher & all 10 years \\
-G4 & 20 years of dividends & Number of the 20 calendar years before the decision in which a dividend was paid. & higher & all 20 years \\
-G5 & 10-year earnings growth & Average earnings per share of the last 3 years over the average of 3 years a decade earlier. & higher & at least 1.33 \\
+G5 & 6-year earnings growth & Average earnings per share of the last 3 years over the average of the 3 years before them, within a window of 6 years. & higher & at least 1.33 times the earlier average \\
 G6 & P/E & Price over the average earnings per share of the last 3 years. & lower & at most 15.0 \\
 G7 & P/E times P/B & P/E as in G6 times the price over book value per share. & lower & P/B at most 1.5, or the product at most 22.5 \\
 E1 & current ratio (lenient) & Current ratio, as G2a. & higher & at least 1.5 \\
 E2 & debt to working capital (lenient) & Long-term debt over net current assets, as G2b. & lower & at most 1.1 \\
-E3 & 5 years of profit & Number of the last 5 fiscal years with positive earnings per share. & higher & all 5 years \\
 E4 & current dividend & Dividends paid over the last 365 days, as a yield on the price. & higher & any dividend \\
-E5 & 4-year earnings growth & Change in earnings per share over 4 years, relative to the earlier figure. & higher & earnings per share grew \\
-E6 & price to tangible assets & Market value over net tangible assets (equity less goodwill and other intangible assets). & lower & at most 1.2 \\
 NN & net-net & Market value over net current asset value (current assets less all liabilities). & lower & at most 0.67 \\
-B1 & return on equity & Number of the last 10 years with return on equity (net income over equity) of at least 15\%. & higher & at least 7 years, and long-term debt at most 0.5 times equity \\
-NI1 & net income growth & Growth of net income from the year before to the latest year. & higher & net income grew \\
+B1 & return on equity & Number of the last 3 years with return on equity (net income over equity) of at least 15\%. & higher & at least 2 of those years, and long-term debt at most 0.5 times equity \\
 \hline
 \end{tabular}
 \end{table}

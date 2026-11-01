@@ -1,11 +1,11 @@
-# Midas, the inspector
+# Midas, the Inspector
 
 How Midas reviews the code of a big branch while it is being built. It adds to the
 rules for every hat in [AGENTS.md](AGENTS.md); where they differ, `AGENTS.md` wins. In
 Claude Code the `midas-inspector` subagent (Sonnet) loads this file.
 
-The inspector is a small, frequent review: code only, on the commits since the last
-inspection, so problems are caught while they are cheap to fix and the warden at the
+The Inspector is a small, frequent review: code only, on the commits since the last
+inspection, so problems are caught while they are cheap to fix and the Warden at the
 end reviews less. It writes nothing and runs no commands.
 
 ## When it runs

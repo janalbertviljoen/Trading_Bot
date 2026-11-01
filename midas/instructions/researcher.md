@@ -1,4 +1,4 @@
-# Midas, the researcher
+# Midas, the Researcher
 
 How Midas improves strategy performance. It adds to the rules for every hat in
 [AGENTS.md](AGENTS.md); where they differ, `AGENTS.md` wins. In Claude Code the
@@ -6,7 +6,7 @@ How Midas improves strategy performance. It adds to the rules for every hat in
 
 The first part, the research protocol, holds for anyone developing a strategy here and
 names nothing internal, so that it can be served to members' Claude as it stands. The
-second part is how the researcher works in this repository.
+second part is how the Researcher works in this repository.
 
 ## Research protocol
 
@@ -18,17 +18,23 @@ second part is how the researcher works in this repository.
    same data source; then a look at what the model does (each pick's price with its
    buys and sales, turnover, how long losers are held); only then optimisation. A
    pattern seen by eye is a hypothesis, never a rule.
-3. **Out-of-sample or it did not happen.** Walk-forward: each date is calibrated only
+3. **Out-of-sample or it did not happen** (the full protocol is in `quant.md`,
+   "Testing and optimising a model"). Walk-forward: each date is calibrated only
    on outcomes already known on it. A test sample of about 10% of the companies,
    stratified by market capitalisation and seeded, stays out of every fit and out of
-   the choice between settings, on every date, so recent data counts too. The chosen
+   the choice between settings, on every date, so recent data counts too. Test means
+   never seen: no bucket edge, smoothing, cut-off, rule choice or exploratory look uses
+   it, and nothing built from all companies is compared on it. A split that informed a
+   choice is spent; draw a fresh one. The chosen
    settings are rerun on fresh test samples to give uncertainty bands. A small search,
    explicit transaction costs. The primary measures are out-of-sample: excess return
    over the benchmark, and how often and how far the strategy trails it over rolling
    periods. In-sample results are diagnostics only.
 4. **One hypothesis-driven change at a time**, with a baseline recorded first.
 5. **Report the search**: the number of combinations tried; be suspicious of large
-   grids, small gains and few trades.
+   grids, small gains and few trades. A modification that failed is not deleted: it is
+   recorded as *tried and not used*, with its design, in the tool's `notes.md`, and
+   re-tested when the optimisation framework exists.
 6. **The report**: hypothesis, change, a before/after table per dataset (in-sample and
    out-of-sample), combinations tried, and caveats (overfitting, trade count, costs,
    survivorship).
@@ -37,7 +43,7 @@ second part is how the researcher works in this repository.
 
 - Work on its own branch and change strategy code and config in the owning module.
   The sleeve's target is in `AGENTS.md`, "What this repository is". Every strategy change is a methodology change
-  (`AGENTS.md`); say so and hand the results to the secretary for the change file.
+  (`AGENTS.md`); say so and hand the results to the Secretary for the change file.
 - The steps of the protocol's point 2 here: the S&P 500, then the S&P 400 and 600 and a
   rule-based US universe (MD_202610_004), then the picks' price history and trades
   (VI_202610_007).
@@ -48,5 +54,5 @@ second part is how the researcher works in this repository.
   `optimise_strategy`, judged on out-of-sample `excess_vs_buy_and_hold`,
   `max_drawdown` and `sharpe_unannualised`. The value strategies follow the protocol on
   the portfolio engine once it exists (S_202610_006, spec §3.7).
-- Unit tests are the tester's, last (`AGENTS.md`, "Change lifecycle"): list the tests
+- Unit tests are the Tester's, last (`AGENTS.md`, "Change lifecycle"): list the tests
   new logic needs in the report; `run_checks` must pass.

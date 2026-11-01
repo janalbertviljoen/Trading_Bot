@@ -67,7 +67,8 @@ model score, annualised excess of the buy wallet : model_score
     k at the score horizon: (W / B)^(1 / Y) - 1, Y the years from the first decision to
     the last window's end.
 ranked book weights : book_weights
-    The ``names`` highest (buy) or lowest (sell) scores, extended by ties at the cut-off.
+    Exactly the ``names`` highest (buy) or lowest (sell) scores; a tie at the cut-off is
+    broken by symbol.
     ``score``: buy w = s / Σ s over the bought companies, sell equal
     weights; ``rank``: the rank weights, tied companies sharing the mean of the weights
     of the ranks they span, normalised to sum 1. Equal weights when the sum is 0.
@@ -479,7 +480,8 @@ class Wallet:
     weighting : str
         ``score`` (weights in proportion to the score) or ``rank`` (``rank_weights``).
     names : int
-        Companies per book before ties are added.
+        Companies per book: exactly this many (fewer when fewer are scored); a tie at the
+        last place is broken by symbol.
     book_usd : float
         Money per book; the wallet trades twice this.
     horizon_months : int
@@ -516,17 +518,23 @@ def book_weights(scores: pd.Series, wallet: Wallet, *, side: str) -> pd.Series:
     Returns
     -------
     pd.Series
-        Weights summing to 1, indexed by symbol, in rank order. Every company tied with
-        the last one chosen is included.
+        Weights summing to 1, indexed by symbol, in rank order: exactly ``wallet.names``
+        companies (fewer when fewer are scored); a tie at the last place is broken by
+        symbol, in alphabetical order.
+
+    Raises
+    ------
+    ValueError
+        When the weighting is ``rank`` and ``wallet.rank_weights`` has fewer entries than
+        ``wallet.names``.
     """
-    ordered = scores.sort_index().sort_values(ascending=side == "sell", kind="stable")
-    if len(ordered) > wallet.names:
-        cutoff = ordered.iloc[wallet.names - 1]
-        chosen = (
-            ordered[ordered >= cutoff] if side == "buy" else ordered[ordered <= cutoff]
+    if wallet.weighting == "rank" and len(wallet.rank_weights) < wallet.names:
+        raise ValueError(
+            f"rank weighting needs {wallet.names} rank_weights, got "
+            f"{len(wallet.rank_weights)}: ranks beyond them would get no money"
         )
-    else:
-        chosen = ordered
+    ordered = scores.sort_index().sort_values(ascending=side == "sell", kind="stable")
+    chosen = ordered.iloc[: wallet.names]
     if wallet.weighting == "rank":
         base = np.zeros(len(chosen))
         given = np.asarray(wallet.rank_weights[: len(chosen)], dtype=float)

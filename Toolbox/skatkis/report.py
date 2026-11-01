@@ -24,9 +24,10 @@ ReportFigure(path, caption, label, width)
     A saved image, its caption, an optional label for references and its width.
 FigureGroup(panels, caption, columns)
     Several images in one figure, lettered (a), (b), ..., in columns.
-Table(header, rows, columns, caption, label, breaks)
+Table(header, rows, columns, caption, label, breaks, fills)
     A table inside a section, numbered when it has a caption; kept whole on one page
-    unless it is longer than ``MAX_UNBROKEN_ROWS`` rows.
+    unless it is longer than ``MAX_UNBROKEN_ROWS`` rows; a cell whose text is a key of
+    ``fills`` gets that background colour.
 Section(title, text, figures, subsections)
     A numbered section.
 Document(title, subtitle, abstract, sections, appendix, contents)
@@ -45,7 +46,7 @@ The standard library.
 import os
 import re
 import subprocess
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from os.path import relpath
 from pathlib import Path
@@ -59,6 +60,7 @@ PREAMBLE = r"""\documentclass[11pt,a4paper]{article}
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{longtable}
+\usepackage[table]{xcolor}
 \captionsetup{font=small,labelfont=bf}
 \setlength{\parskip}{0.5em}
 \setlength{\parindent}{0pt}
@@ -66,6 +68,7 @@ PREAMBLE = r"""\documentclass[11pt,a4paper]{article}
 """
 
 MAX_UNBROKEN_ROWS = 40  # tables up to this length are kept whole on one page
+_BOLD = "**"  # the mark that sets text in bold
 _SPECIAL = {
     "\\": r"\textbackslash{}",
     "&": r"\&",
@@ -114,7 +117,8 @@ class Table:
 
     With a ``caption`` the table is numbered (Table 1, 2, ...) and ``label`` lets text
     refer to it with ``[[label]]``. ``breaks`` lists the rows (counted from 0) after
-    which a horizontal rule separates groups.
+    which a horizontal rule separates groups. ``fills`` maps a cell's text to a background
+    colour as six hex digits (``"C6EFCE"``); the text itself is unchanged.
     """
 
     header: Sequence[str]
@@ -123,6 +127,7 @@ class Table:
     caption: str = ""
     label: str | None = None
     breaks: Sequence[int] = ()
+    fills: Mapping[str, str] = field(default_factory=dict[str, str])
 
 
 @dataclass(frozen=True)
@@ -143,13 +148,24 @@ class Section:
 def escape(text: str) -> str:
     """Return ``text`` with LaTeX's special characters escaped.
 
-    ``$...$`` stays maths, and ``[[label]]`` becomes a reference to the labelled section.
+    ``$...$`` stays maths, ``[[label]]`` becomes a reference to the labelled section and
+    ``**...**`` is set in bold.
     """
-    parts = re.split(r"(\$[^$]+\$|\[\[[A-Za-z0-9:_-]+\]\])", text)
+    parts = re.split(r"(\$[^$]+\$|\[\[[A-Za-z0-9:_-]+\]\]|\*\*[^*]+\*\*)", text)
     out: list[str] = []
     for part in parts:
         if len(part) > 1 and part.startswith("$") and part.endswith("$"):
             out.append(part)
+        elif (
+            len(part) > 2 * len(_BOLD)
+            and part.startswith(_BOLD)
+            and part.endswith(_BOLD)
+        ):
+            out.append(
+                "\\textbf{"
+                + "".join(_SPECIAL.get(c, c) for c in part[len(_BOLD) : -len(_BOLD)])
+                + "}"
+            )
         elif part.startswith("[[") and part.endswith("]]"):
             out.append(f"\\ref{{{part[2:-2]}}}")
         else:
@@ -315,7 +331,15 @@ def _table(table: Table) -> list[str]:
     header = " & ".join(escape(h) for h in table.header) + " \\\\"
     body: list[str] = []
     for index, row in enumerate(table.rows):
-        body.append(" & ".join(escape(c) for c in row) + " \\\\")
+        cells = [
+            (
+                f"\\cellcolor[HTML]{{{table.fills[c]}}}{escape(c)}"
+                if c in table.fills
+                else escape(c)
+            )
+            for c in row
+        ]
+        body.append(" & ".join(cells) + " \\\\")
         if index in table.breaks and index < len(table.rows) - 1:
             body.append("\\hline")
     caption = ""

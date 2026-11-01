@@ -113,11 +113,18 @@ include = ["src", "tests"]
 | G1 | Adequate size | Inflation-adjusted sales floor (redundant for S&P 500; implement as configurable, default off) | Revenue |
 | G2a | Current ratio | Current assets / current liabilities ≥ 2.0 | Balance sheet |
 | G2b | Debt cover | Long-term debt ≤ net current assets (current assets − current liabilities) | Balance sheet |
-| G3 | Earnings stability | EPS > 0 in each of the last 10 fiscal years | 10y income statement |
-| G4 | Dividend record | Uninterrupted dividends for 20 years | Dividend history |
-| G5 | Earnings growth | 3-yr average EPS (latest) ≥ 1.33 × 3-yr average EPS (10 years earlier) | 13y EPS |
+| G3 | Earnings stability | EPS > 0 in each of the last 3 fiscal years (Graham: 10); off by default | 3y income statement |
+| G4 | Dividend record | A dividend in each of the 3 calendar years before the rebalance year (Graham: 20); off by default | Dividend history |
+| G5 | Earnings growth | 3-yr average EPS (latest) ≥ 1.33 × 3-yr average EPS (the 3 years before them, inside a 6-year window; Graham: 10 years earlier, 13 years of EPS) | 6y EPS |
 | G6 | Moderate P/E | Price / 3-yr average EPS ≤ 15 | Price, EPS |
 | G7 | Moderate price-to-assets | P/B ≤ 1.5 **or** (P/E × P/B) ≤ 22.5 | Book value |
+
+The windows of G3, G4, G5 and B1 are shorter than Graham's and Buffett's because EDGAR history is short. A shorter window changes what a rule asks, so its threshold changes in strictness:
+
+- G5: `min_growth = 1.33` now compares averages 3 years apart instead of about 10. At the same yearly rate, 1.33 over 10 years is about 2.9% a year (Graham's intent) and 1.33 over 3 years is about 10% a year, so G5 is a much stricter test of growth. The same yearly rate over 3 years would be about 1.09.
+- G3, G4 and B1: a record of 3 years is easier to meet than one of 10 or 20 years, so these rules are more lenient than Graham's.
+
+The thresholds are to be recalibrated together with the windows; until then they keep Graham's and Buffett's values and the strictness above applies.
 
 ### 2.2 Graham — Enterprising investor (Ch. 15)
 
@@ -141,7 +148,7 @@ include = ["src", "tests"]
 
 | ID | Rule | Formula |
 |---|---|---|
-| B1 | High, consistent ROE, unlevered | ROE ≥ 15% in most of last 10 years (count configurable) **and** debt/equity ≤ cap (configurable) |
+| B1 | High, consistent ROE, unlevered | ROE ≥ 15% in at least 2 of the last 3 years (Buffett's "most of 10"; window and count configurable) **and** debt/equity ≤ cap (configurable) |
 | B2 | Owner earnings | Net income + D&A − capex (total capex used as conservative proxy for maintenance capex) |
 | B3 | Moat proxy | Gross-margin level and 10-yr stability (standard deviation) |
 | B4 | Retained-earnings test | Δ market cap over 5 yrs ≥ cumulative retained earnings over the same 5 yrs |
@@ -156,11 +163,16 @@ include = ["src", "tests"]
 | Q2 | Piotroski F-score | 9 binary tests (profitability, leverage/liquidity, operating efficiency) |
 | Q3 | Novy-Marx gross profitability | Gross profit / total assets |
 
+### 2.6 Default rules
+
+Ten rules score by default: G6, G2a, G7, G2b, E2, NN, E1, G5, B1 and E4. G3, G4, E3, E5, E6 and NI1 (net income growth, a rule of this repository that is not in Graham's lists) are off and are switched on in `config/rules.toml`, by removing the leading `#` of the rule's table. The ten rules are eight concepts: G2a and E1 (current ratio) and G2b and E2 (debt cover) rank on the same value at different thresholds, so they count twice. A company is scored on a date when at least `score.min_available` rules (5) are evaluable for it; with ten rules that is 5 of 10.
+
 ## 3. Methodology decisions
 
 1. **Strict Graham screen yields too few names.** In today's S&P 500, G2 and G7 eliminate most companies; there may not be ten passes. Proposed two layers:
    - **Hard gates:** solvency and earnings stability (subset of G2/G3/E1–E3; configurable).
    - **Composite rank:** valuation + quality factors → top 10 / bottom 10 per quarter.
+   - **Exact-n books:** a book holds exactly `names` companies (10): the highest scores to buy, the lowest to sell, or fewer when fewer are scored. A tie at the last place is broken by symbol, in alphabetical order.
    - This is a documented departure from pure Graham.
 2. **Financials and REITs:** current ratio / NCA are meaningless. `DECISION REQUIRED`: exclude, or separate scoring (e.g. P/B and ROE).
 3. **Look-ahead bias:** key every fundamental to the SEC **filing (acceptance) date**, not period-end. 10-Q lag ≈ 40–45 days; 10-K ≈ 60–90 days. A rebalance at date *t* sees only filings accepted ≤ *t*.
@@ -171,7 +183,7 @@ include = ["src", "tests"]
    - Stock items (balance sheet) = latest quarter.
    - Price = rebalance-date close, USD.
    - `DECISION REQUIRED`: reporting currency (USD or ZAR).
-7. **Optimisation overfitting:** walk-forward with hold-out period, small parameter grid, net of explicit transaction costs.
+7. **Optimisation overfitting:** walk-forward with a test sample of companies instead of a time hold-out, small parameter grid, net of explicit transaction costs.
 
 ## 4. Data sources
 
@@ -290,7 +302,7 @@ value-bot/
 │   ├── backtest/
 │   │   ├── strategies.py
 │   │   ├── costs.py
-│   │   └── optimise.py         # walk-forward, hold-out
+│   │   └── optimise.py         # walk-forward, company test sample
 │   ├── validation/
 │   │   ├── schemas.py          # output schemas per node
 │   │   └── errors.py           # DataValidationError etc.

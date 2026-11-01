@@ -25,6 +25,10 @@ it. This file holds only what is specific to Claude Code.
   `.claude/agents/`: `midas-researcher`, `midas-inspector` (Sonnet), `midas-warden`
   (Opus), `midas-scribe` and `midas-tester`; start them as `developer.md`, "Building and
   finalising", describes.
+- **Models, for efficiency** (user, 2026-11-01). Most interactions run through Sonnet:
+  conversation, small edits, the Inspector and routine building. Opus is for big
+  refactors and the Warden's report (`midas-warden`). Switch the main session to Opus
+  (`/model`) for a big refactor and back to Sonnet afterwards.
 - **Area rules** in `.claude/rules/*.md` load automatically for matching paths:
   `midas-records.md` brings in `secretary.md` for `midas/`, `midas-index.md` brings in
   `developer.md` for Midas's server code.

@@ -41,6 +41,9 @@ excluded_sectors = ["Financials", "Real Estate"]
 # members on every date. The first view feeds the diagnostic plots.
 views = ["on_date", "current"]
 
+# The ten rules G6, G2A, G7, G2B, E2, NN, E1, G5, B1 and E4 are the default (user, 2026-11-01;
+# VI_202611_001, check 27). G3, G4, E3, E5, E6 and NI1 are commented out below, to switch on.
+
 # Graham, defensive investor (The Intelligent Investor, rev. ed., ch. 14)
 
 [rules.G2a]
@@ -50,15 +53,21 @@ min_current_ratio = 2.0
 # Long-term debt at most this multiple of net current assets.
 max_debt_to_net_current_assets = 1.0
 
-[rules.G3]
-years = 10
+# Off by default: switch on by removing the leading #.
+# [rules.G3]
+# # 3 years, not Graham's 10: EDGAR history is too short (user, 2026-11-01; VI_202611_001).
+# years = 3
 
-[rules.G4]
-# A dividend in each of this many calendar years before the rebalance year.
-years = 20
+# Off by default: switch on by removing the leading #.
+# [rules.G4]
+# # A dividend in each of this many calendar years before the rebalance year. 3, not
+# # Graham's 20, for lack of history (user, 2026-11-01; VI_202611_001).
+# years = 3
 
 [rules.G5]
-years = 13
+# 6, not 13: the shortest history its 3-year averages allow (user, 2026-11-01;
+# VI_202611_001).
+years = 6
 average_years = 3
 min_growth = 1.33
 
@@ -77,17 +86,20 @@ min_current_ratio = 1.5
 [rules.E2]
 max_debt_to_net_current_assets = 1.10
 
-[rules.E3]
-years = 5
+# Off by default: switch on by removing the leading #.
+# [rules.E3]
+# years = 5
 
 [rules.E4]
 window_days = 365
 
-[rules.E5]
-years = 4
+# Off by default: switch on by removing the leading #.
+# [rules.E5]
+# years = 4
 
-[rules.E6]
-max_price_to_net_tangible_assets = 1.20
+# Off by default: switch on by removing the leading #.
+# [rules.E6]
+# max_price_to_net_tangible_assets = 1.20
 
 # Graham, derived measures
 
@@ -97,17 +109,19 @@ max_price_to_ncav = 0.6667
 # Buffett and Munger
 
 [rules.B1]
-years = 10
+# 3 years with 2 of them at the minimum, not 10 and 7 (user, 2026-11-01; VI_202611_001).
+years = 3
 min_roe = 0.15
 # "Most" of the years: at least this many of them. Debt cap confirmed by the user
 # (2026-10-31).
-min_years_passed = 7
+min_years_passed = 2
 max_debt_to_equity = 0.5
 
 # Growth (VI_202610_005)
 
-[rules.NI1]
-# One-year net income growth; no threshold beyond growth itself.
+# Off by default: switch on by removing the leading #.
+# [rules.NI1]
+# # One-year net income growth; no threshold beyond growth itself.
 
 [learning]
 # score_ic (VI_202610_005): rule weights from the rank correlation of each rule's
@@ -138,12 +152,14 @@ correlation_max_months = 24
 
 [wallet]
 # Ranked wallet (VI_202610_004): each decision date, book_usd buys the `names` highest
-# scores (ties at the cut-off included), weight score / sum of their scores, held
+# scores (exactly `names`; a tie at the cut-off is broken by symbol), weight score / sum of their scores, held
 # horizon_months. The same money sells the `names` lowest, equal weights, reported
 # apart. Weighting "rank" uses rank_weights instead, normalised to the book.
-names = 5
+# 10 picks, diversified (user, 2026-11-01; VI_202611_001).
+names = 10
 book_usd = 100.0
 horizon_months = 12
+# For 5 names, and used only by the rank weighting, which is off (weightings = ["score"]).
 rank_weights = [40.0, 20.0, 10.0, 5.0, 5.0]
 # Models compared: each score column with each weighting.
 score_columns = [
@@ -189,6 +205,10 @@ peer_label = "Magnificent 7"
 # each of these rebalance dates and compares them with the full run.
 lookahead_dates = [2018-12-21, 2022-12-16, 2025-12-19]
 sell_threshold = 0.4
+# The worst list: below this share of sell_threshold a score is Red, from there up to
+# sell_threshold Amber, above it Green (the user's 0.2 against 0.4); not fixed, to follow
+# the fitted cut-offs (VI_202611_002).
+tier_ratio = 0.5
 # Price history of the picks (VI_202610_007, user, 2026-10-31): the companies the
 # investor from pick_scenario traded and the next picks, over the last pick_years years.
 # The weighting test's verdict: above verdict_band the rule weights favour the rules
@@ -200,4 +220,4 @@ pick_years = 5
 # pick_ends worst are shown. pick_page also caps the holdings drawn in the wallet-contents
 # figure (the pick_page worth most today).
 pick_page = 20
-pick_ends = 5
+pick_ends = 6

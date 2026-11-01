@@ -4,9 +4,10 @@ value_investing/report.py
 Assembles the value-investing report: buy-and-hold results with the report's text.
 
 The text (title, abstract, section texts and captions) is in
-``config/report_value_investing.toml``, which the secretary writes; this module fills
+``config/report_value_investing.toml``, which the Scribe writes; this module fills
 its placeholders from the results, builds the tables (picks, wallets, sales, next
-picks and the sell check) and the appendix of every
+picks, the worst list of the lowest scores, and the static tables of the missed
+winners, the testing, and the reading list) and the appendix of every
 purchase, and places the figures. ``skatkis.report`` writes the LaTeX document.
 
 Owns
@@ -22,7 +23,7 @@ Public API
 ----------
 Peers(label, ranks, profile, summary)
     A peer group set against the picks.
-ReportInputs(held, managed, next_picks, profile, weighting, peers, names, ...)
+ReportInputs(held, managed, next_picks, worst, profile, weighting, peers, names, ...)
     What the report shows.
 report_facts(inputs)
     The values of the text's placeholders.
@@ -113,6 +114,13 @@ class ReportInputs:
     next_picks : pd.DataFrame
         The picks on the latest score date: ``symbol``, ``gics_sector``, ``score``,
         ``score_share``, ``weight``, ``score_date``.
+    worst : pd.DataFrame
+        The lowest scores of the scored companies of the index on the latest score date
+        (Financials, Real Estate and companies with too few rules are not scored),
+        whatever anyone holds, as many as the picks, ties broken by symbol:
+        ``symbol``, ``gics_sector``, ``score``, ``score_share``, ``score_date``, plus the
+        ranked-position columns ``decision_date``, ``side``, ``weight`` and ``amount``
+        (of a hypothetical sell book, not a recommendation) and ``date``.
     profile : pd.DataFrame
         ``value_investing.holding.rule_profile`` output.
     weighting : pd.DataFrame
@@ -158,14 +166,22 @@ class ReportInputs:
         Valuation date.
     threshold : float
         Score share at or below which a holding is sold in part.
+    tier_ratio : float
+        The share of ``threshold`` below which the worst list colours a score Red
+        (``[report] tier_ratio``).
     verdict_band : float
         The weight-gap rank correlation above which the weighting favours the rules
         that told winners from losers, and below minus which it favours the wrong ones.
+    static_note : str
+        A notice put before the section that states figures written out in the text,
+        when they were produced with another model configuration or data date; empty
+        when they match.
     """
 
     held: BuyAndHold
     managed: Managed
     next_picks: pd.DataFrame
+    worst: pd.DataFrame
     profile: pd.DataFrame
     weighting: pd.DataFrame
     peers: Peers | None
@@ -187,7 +203,9 @@ class ReportInputs:
     picks: int
     end: pd.Timestamp
     threshold: float
+    tier_ratio: float
     verdict_band: float
+    static_note: str = ""
 
 
 def report_facts(inputs: ReportInputs, names: Mapping[str, str]) -> dict[str, str]:
@@ -328,14 +346,12 @@ def _dollar_table(inputs: ReportInputs) -> Table:
 
 
 def _wallet_facts(inputs: ReportInputs) -> dict[str, str]:
-    """Return the facts of the wallet with sells, next year's picks and the sell check."""
+    """Return the facts of the wallet with sells, next year's picks and the worst stocks."""
     first_start = inputs.reference
     trades = inputs.managed.trades
     sales = trades[(trades["scenario"] == first_start) & (trades["action"] == "sell")]
     picks = inputs.next_picks
-    holdings = inputs.managed.holdings
-    own = holdings[holdings["scenario"] == first_start]
-    selling = own[own["sell_fraction"] > 0]
+    worst = inputs.worst
     return {
         "threshold": f"{inputs.threshold:g}",
         "first_start": str(first_start),
@@ -343,16 +359,9 @@ def _wallet_facts(inputs: ReportInputs) -> dict[str, str]:
         "sold_usd": f"{float(sales['usd'].sum()):,.0f}",
         "next_score_date": f"{pd.Timestamp(picks['score_date'].iloc[0]):%d %B %Y}",
         "next_picks": _listing([_full(inputs, str(s)) for s in picks["symbol"]]),
-        "sell_now": _listing(
-            [
-                f"{_full(inputs, str(symbol))}, {fraction:.0%}"
-                for symbol, fraction in zip(
-                    selling["symbol"], selling["sell_fraction"], strict=True
-                )
-            ]
-        ),
-        "holdings": str(len(own)),
-        "keep_now": str(len(own) - len(selling)),
+        "tier_edge": f"{inputs.threshold * inputs.tier_ratio:g}",
+        "worst_count": str(len(worst)),
+        "worst_list": _listing([_full(inputs, str(s)) for s in worst["symbol"]]),
     }
 
 
@@ -469,11 +478,26 @@ def build_report(
         Section(
             title=fill(text["selling"]["title"]),
             text=fill(text["selling"]["text"]),
-            table=replace(
-                _sales_table(inputs),
-                caption=fill(text["selling"]["table_caption"]),
-                label="tab:sales",
-            ),
+            subsections=[
+                Section(
+                    title=fill(text["selling"]["sold_title"]),
+                    text=fill(text["selling"]["sold_text"]),
+                    table=replace(
+                        _sales_table(inputs),
+                        caption=fill(text["selling"]["table_caption"]),
+                        label="tab:sales",
+                    ),
+                ),
+                Section(
+                    title=fill(text["selling"]["worst_title"]),
+                    text=fill(text["selling"]["worst_text"]),
+                    table=replace(
+                        _worst_table(inputs),
+                        caption=fill(text["selling"]["worst_caption"]),
+                        label="tab:worst",
+                    ),
+                ),
+            ],
             label="sec:selling",
         ),
         Section(
@@ -534,17 +558,44 @@ def build_report(
                     label="fig:next-prices",
                 )
             ],
-            subsections=[
-                Section(
-                    title=fill(text["next"]["sell_title"]),
-                    text=fill(text["next"]["sell_text"]),
-                    table=replace(
-                        _sell_check_table(inputs),
-                        caption=fill(text["next"]["sell_caption"]),
-                        label="tab:sell",
-                    ),
-                )
-            ],
+        ),
+        Section(
+            title=fill(text["missed"]["title"]),
+            text=fill(text["missed"]["text"]),
+            table=_static_table(
+                text["missed"]["table"],
+                fill(text["missed"]["table_caption"]),
+                "tab:missed",
+            ),
+            label="sec:missed",
+        ),
+        Section(
+            title=fill(text["testing"]["title"]),
+            text=(
+                (inputs.static_note + "\n\n" if inputs.static_note else "")
+                + fill(text["testing"]["text"])
+            ),
+            table=_static_table(
+                text["testing"]["table"],
+                fill(text["testing"]["table_caption"]),
+                "tab:testing",
+            ),
+            label="sec:testing",
+        ),
+        Section(
+            title=fill(text["dialogue"]["title"]),
+            text=fill(text["dialogue"]["text"]),
+            label="sec:dialogue",
+        ),
+        Section(
+            title=fill(text["reading"]["title"]),
+            text=fill(text["reading"]["text"]),
+            table=_static_table(
+                text["reading"]["table"],
+                fill(text["reading"]["table_caption"]),
+                "tab:reading",
+            ),
+            label="sec:reading",
         ),
         Section(
             title=fill(text["conclusions"]["title"]),
@@ -903,25 +954,50 @@ def _next_table(inputs: ReportInputs, sectors: Mapping[str, str]) -> Table:
     )
 
 
-def _sell_check_table(inputs: ReportInputs) -> Table:
-    """Return the reference investor's holdings that the rule would sell in part."""
-    holdings = inputs.managed.holdings
-    first = inputs.reference
-    own = holdings[(holdings["scenario"] == first) & (holdings["sell_fraction"] > 0)]
+def _static_table(spec: Mapping[str, Any], caption: str, label: str) -> Table:
+    """Return a table written out in the report text: ``header``, ``rows``, ``columns``."""
+    return Table(
+        header=[str(h) for h in spec["header"]],
+        rows=[[str(cell) for cell in row] for row in spec["rows"]],
+        columns=str(spec["columns"]),
+        caption=caption,
+        label=label,
+    )
+
+
+_TIER_FILLS = {"Green": "C6EFCE", "Amber": "FFEB9C", "Red": "F4B6B6"}
+
+
+def _tier(share: float, threshold: float, ratio: float) -> str:
+    """Return the colour of a 0-to-1 score against the sell threshold.
+
+    Green above ``threshold``; Amber from ``threshold * ratio`` up to and including
+    ``threshold``; Red strictly below ``threshold * ratio``, down to 0.
+    """
+    if share < threshold * ratio:
+        return "Red"
+    if share <= threshold:
+        return "Amber"
+    return "Green"
+
+
+def _worst_table(inputs: ReportInputs) -> Table:
+    """Return the lowest scores of the index with the tier each one falls in."""
     rows = [
         [
             _full(inputs, str(r["symbol"])),
-            f"{float(r['value_usd']):,.2f}",
+            str(r["gics_sector"]),
+            f"{float(r['score']):.1f}",
             f"{float(r['score_share']):.2f}",
-            f"{float(r['sell_fraction']):.0%}",
-            f"{float(r['value_usd']) * float(r['sell_fraction']):,.2f}",
+            _tier(float(r["score_share"]), inputs.threshold, inputs.tier_ratio),
         ]
-        for r in own.to_dict("records")
+        for r in inputs.worst.to_dict("records")
     ]
     return Table(
-        header=["Company", "Holding, USD", "Score 0 to 1", "Sell", "Sell, USD"],
+        header=["Company", "Sector", "Score", "Score 0 to 1", "Colour"],
         rows=rows or [["none", "", "", "", ""]],
-        columns="l r r r r",
+        columns="p{4.4cm} p{3cm} r r p{3cm}",
+        fills=_TIER_FILLS,
     )
 
 

@@ -44,7 +44,7 @@ infrastructure, so the parts are interfaces with small built-in implementations.
    sample on every date, stratified by market capitalisation, seeded. Test companies
    never enter a fit or the choice between runs.
 7. **Calibrate, then validate.** A study calibrates on 10 sampled parameter sets
-   (default) and keeps the best on the test sample; the chosen specification is then
+   (default) and keeps the best on the training companies; the chosen specification is then
    rerun 10 times with a new stratified test sample each time, which gives uncertainty
    bands on every reported value.
 8. **Manifest per run**: configuration hash, overrides, seeds, snapshot as-of dates,
@@ -81,9 +81,34 @@ infrastructure, so the parts are interfaces with small built-in implementations.
   profile, once profiles exist. Each run writes its input parameters (the specification
   and manifest) to the results folder of its as-of date, overwritten by the next run.
 
+- 2026-11-01 (user): two stages of uncertainty. During calibration and optimisation the
+  time bootstrap is the band (cheap, no test companies). Once the pick is chosen, 10
+  stratified test samples put values and bands on the final specification; the 10-fold
+  nested design is not used. The choice between runs is made on the training companies only
+  (the wording of step 7, "keeps the best on the test sample", is corrected accordingly:
+  the test companies never enter the choice).
+- 2026-11-01 (user): the final sampling bands use 12 stratified draws, not 10 (it fits
+  the layout better); `validation_reruns = 12` in the draft studies.
+- 2026-11-01 (user, answering the Warden's finding B3): only the results used in the final
+  analysis are kept, and the engine reproduces them; the scratch scripts are not committed. The
+  results are deterministic given their seeds (the stratified split 1, the company draws 2 to
+  13, the random books 7, the bootstrap 5, the random subsets 11), so the engine must carry the
+  seeds and match the recorded numbers. The reference scripts and logs of the final set are
+  kept locally, git-ignored, in `data/private/vi_202611_001_reference/` (an index by check
+  number in its README) as the source of the numbers to match. Until the engine reproduces
+  them, the accreditation results are provisional.
+- 2026-11-01 (user): two tiers of optimisation. The general run searches only the
+  sensitive parameters (found by the first studies: the earnings averaging years and the
+  buckets; E5 years mildly), with the number of picks fixed per tier; speed is essential,
+  and the code is optimised in later refactors. The large input space and the response
+  surface (regression fit, `scipy.optimize`) are for studio development, behind the
+  paywall, on resources of a private account; not needed now. The parameters are settled.
+- 2026-11-01 (user): the ranges and floors of the draft default study
+  (`config/studies/default.toml`) are accepted.
+
 ## Open decisions (user)
 
-- The ranges and floors of each parameter in the default study.
+- None.
 
 ## Notes
 
@@ -93,6 +118,20 @@ infrastructure, so the parts are interfaces with small built-in implementations.
   (`skatkis/notes.md`). The refactor of `pipeline.buyability` is checked by comparing
   the buyability tables and the report summaries of the three indices before and after,
   which must be identical.
+
+- 2026-11-01: draft study file `config/studies/default.toml` written (unstaged for the
+  user's review): 8 searched parameters (names 5, 10 or 20; buckets 4 to 10; averaging
+  years 2 to 7; G3, E3, E5, B1 and G4 windows with floors), objective annualised excess at
+  36 months, 10 samples, 10 validation reruns. No code reads it yet; the ranges and floors
+  are proposals.
+
+- 2026-11-01: two kinds of uncertainty band, both reported. (1) Time: a moving-block
+  bootstrap over the rebalance dates, blocks of one holding window, on the advantage over
+  random books; this is what the checks of VI_202611_001 used (checks 4 and 5 used a plain
+  bootstrap and are too narrow). It covers the market history seen, not the choice of
+  companies or of the specification. (2) Companies: the spread across the held-out
+  company samples (reruns or folds). Neither covers multiple testing; the number of
+  combinations tried is reported beside them.
 
 ## Kickoff prompt
 

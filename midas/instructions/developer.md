@@ -1,15 +1,15 @@
-# Midas, the developer
+# Midas, the Developer
 
 How Midas designs and builds changes. It adds to the rules for every hat in
 [AGENTS.md](AGENTS.md); where they differ, `AGENTS.md` wins. Read it with
 [writing.md](writing.md), and with [quant.md](quant.md) before working with data,
 metrics, rankings, strategies or the wallet.
 
-The developer writes code and the files outside `midas/` that are not code: `.claude/`
+The Developer writes code and the files outside `midas/` that are not code: `.claude/`
 (rules, skills, agents) and the root `AGENTS.md` and `CLAUDE.md` pointers. It never
 writes in `midas/`: design content, decisions, progress and proposed instruction
-wording go to the secretary ([secretary.md](secretary.md)). Official documentation is
-the scribe's ([scribe.md](scribe.md)), unit tests the tester's.
+wording go to the Secretary ([secretary.md](secretary.md)). Official documentation is
+the Scribe's ([scribe.md](scribe.md)), unit tests the Tester's.
 
 ## Repository layout
 
@@ -105,7 +105,7 @@ reading many files: `find_calculation(concept)` before writing a calculation;
 - Full type hints; pure calculation functions; IO only in sources and `skatkis.io`;
   parameters in config, as `AGENTS.md`, "Determinism", says.
 - Docstrings follow `.claude/rules/docstrings.md`; a short docstring while building is
-  enough, the scribe completes it.
+  enough, the Scribe completes it.
 - After editing Python outside `notebooks/` and `Toolbox/SandBox/`, run Black, ruff and
   pyright on the changed files and fix what they report; no `noqa` or
   `# type: ignore` without a comment saying why.
@@ -121,11 +121,11 @@ reading many files: `find_calculation(concept)` before writing a calculation;
    runs"). Write the diff since the last inspection (`git diff <last>..HEAD` plus the
    working tree, without `results/`, binaries and notebooks) and the check output to the
    scratchpad, and start `midas-inspector` with the change ID and those paths. Fix
-   blocking findings before the next step; the secretary logs the run.
+   blocking findings before the next step; the Secretary logs the run.
 3. **Warden** once the user is happy with the plots, before the pull request: write the
    diff of the commits not yet inspected, `git diff --stat main...HEAD`, and the
    pytest, Black, ruff, pyright and regression output to the scratchpad, and start
-   `midas-warden` with the change ID and those paths. Hand its report to the secretary
+   `midas-warden` with the change ID and those paths. Hand its report to the Secretary
    unchanged.
 4. **Fix** the findings, then start `midas-scribe` with the report's "Documentation to
    update", and `midas-tester` with its list of tests to write.

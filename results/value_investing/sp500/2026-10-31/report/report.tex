@@ -7,6 +7,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{longtable}
+\usepackage[table]{xcolor}
 \captionsetup{font=small,labelfont=bf}
 \setlength{\parskip}{0.5em}
 \setlength{\parindent}{0pt}
@@ -18,14 +19,16 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-Each January and July since 2016, a rule-based value score picks 5 S\&P 500 companies, and 100 USD is invested in them, weighted by score and never sold. Investors who started in 2016, 2020, 2023 and 2025 (an earlier start buys from 2016) are followed to 30 October 2026, each against the same money in the S\&P 500 total-return index, and in Berkshire Hathaway. The reference is the investor who started in 2020: the data hold only today's index members, and by the index's list of changes, which starts in July 1976, 125 companies have left the index since then against 230 since 2016, so fewer failed companies are missing. That investor's 1,400 USD is worth 4,700 USD, against 2,480 USD in the benchmark and 2,415 USD in Berkshire Hathaway; a second wallet that also sells holdings whose score has fallen is worth 4,681 USD. The report closes with the next picks: First Solar (FSLR), Cognizant (CTSH), Snap-on (SNA), Skyworks Solutions (SWKS) and ResMed (RMD). The result rests on few decisions and few companies, with 50\% of the value in one company; it is a research result, not evidence of a lasting edge.
+Each January and July since 2016, a rule-based value score picks 10 S\&P 500 companies, and 100 USD is invested in them, weighted by score and never sold. Investors who started in 2016, 2020, 2023 and 2025 (an earlier start buys from 2016) are followed to 30 October 2026, each against the same money in the S\&P 500 total-return index, and in Berkshire Hathaway. The reference is the investor who started in 2020: the data hold only today's index members, and by the index's list of changes, which starts in July 1976, 125 companies have left the index since then against 230 since 2016, so fewer failed companies are missing. That investor's 1,400 USD is worth 3,947 USD, against 2,480 USD in the benchmark and 2,415 USD in Berkshire Hathaway; a second wallet that also sells holdings whose score has fallen is worth 3,927 USD. The report closes with the next picks: First Solar (FSLR), Snap-on (SNA), Cognizant (CTSH), ResMed (RMD), Edwards Lifesciences (EW), Skyworks Solutions (SWKS), Brown–Forman (BF-B), ON Semiconductor (ON), Insulet Corporation (PODD) and Fastenal (FAST). The result rests on few decisions and few companies, with 33\% of the value in one company; it is a research result, not evidence of a lasting edge.
 \end{abstract}
 \section{Method}
 Company fundamentals are the values first reported in each annual report (10-K) to the SEC, used from the day they were filed. When a company reports an item under more than one label, the label it used most recently by the date is taken, so later filings never decide it (Appendix \ref{app:lookahead}). Prices and dividends are from Yahoo Finance; returns include reinvested dividends and are in US dollars. On each date, only companies already in the S\&P 500 are considered, outside the Financials and Real Estate sectors.
 
-Sixteen rules from Graham, Buffett and a net income growth test grade every company. For each rule, the companies are ranked by the rule's value and placed in six equal groups, from 5 points for the best sixth to 0 for the worst; each rule's points are multiplied by its weight, one less the share of companies that pass the rule's threshold, so rules few companies pass count more. The score is the sum. On the first trading day of January and of July, the 5 highest-scoring companies are bought for 100 USD, each in proportion to its score.
+Ten rules from Graham and Buffett grade every company: G6 and G7 (price against earnings and book value), G2a and E1 (current ratio), G2b and E2 (debt), NN (net-net), G5 (earnings growth), B1 (return on equity) and E4 (current dividend). Six more (G3, G4, E3, E5, E6 and NI1) are switched off and can be switched on. The ten are eight concepts, because G2a and E1 (current ratio) and G2b and E2 (debt cover) measure the same thing and so count twice. For each rule, the companies are ranked by the rule's value and placed in equal-sized groups, from the most points for the best group to none for the worst; each rule's points are multiplied by its weight, one less the share of companies that pass the rule's threshold, so rules few companies pass count more. The score is the sum. On the first trading day of January and of July, the 10 highest-scoring companies are bought for 100 USD, each in proportion to its score.
 
-Three limits apply to every number in this report. Companies that left the index are missing from the data, which flatters the results. The score's design and every setting of this report (the rules' weighting, the five picks, the decision months, the sell threshold, the start years) were chosen while looking at the whole period from 2016, so no period here is out of sample: the results describe how these rules would have done, not evidence that they will do so. There are no trading costs or taxes.
+Three limits apply to every number in this report. Companies that left the index are missing from the data, which flatters the results. The score's design and every setting of this report (the rules and their weighting, the number of picks, the decision months, the sell threshold, the start years) were chosen while looking at the whole period from 2009, so no period here is out of sample: the results describe how these rules would have done, not evidence that they will do so. There are no trading costs or taxes.
+
+Neither Benjamin Graham nor Berkshire Hathaway or Warren Buffett has endorsed, reviewed or approved this score or this report. The rules are our reading of Graham's books; the quotations from Berkshire's published letters to shareholders are cited by year and show where a question was taken, not what any of them would say about these results.
 
 \section{Picks per half-year}
 \begin{table}[H]
@@ -36,32 +39,32 @@ Three limits apply to every number in this report. Companies that left the index
 \hline
 Bought & Picks and weights & Wallet & S\&P 500 & Berkshire \\
 \hline
-2016-01 & WDC 21\%, CMI 21\%, GLW 21\%, CSCO 20\%, NTAP 17\% & 821 & 452 & 415 \\
-2016-07 & WDC 22\%, CSCO 21\%, NTAP 19\%, QCOM 19\%, CMI 19\% & 756 & 428 & 377 \\
-2017-01 & CSCO 22\%, QCOM 21\%, LRCX 20\%, CTSH 19\%, CMI 18\% & 781 & 394 & 331 \\
-2017-07 & GLW 21\%, QCOM 21\%, CSCO 20\%, CTSH 20\%, BAX 19\% & 305 & 363 & 316 \\
-2018-01 & CSCO 21\%, TPR 20\%, GLW 20\%, CTSH 19\%, QCOM 19\% & 315 & 324 & 275 \\
-2018-07 & QCOM 22\%, TPR 21\%, CSCO 19\%, CTSH 19\%, SNA 19\% & 273 & 317 & 289 \\
-2019-01 & MU 22\%, LRCX 21\%, CTSH 21\%, KLAC 18\%, SNA 18\% & 1,441 & 341 & 267 \\
-2019-07 & MU 21\%, NUE 21\%, SNA 20\%, CTSH 20\%, LRCX 18\% & 925 & 286 & 253 \\
-2020-01 & NUE 21\%, CTSH 21\%, MU 20\%, SNA 20\%, CMI 18\% & 579 & 257 & 238 \\
-2020-07 & CTSH 21\%, NUE 21\%, HAS 20\%, MU 19\%, SNA 18\% & 638 & 266 & 305 \\
-2021-01 & HAS 21\%, NUE 21\%, CTSH 20\%, MU 20\%, HUM 19\% & 429 & 223 & 237 \\
-2021-07 & SNA 21\%, INTC 20\%, CMI 20\%, MU 20\%, HUM 19\% & 351 & 189 & 194 \\
-2022-01 & MU 21\%, SNA 20\%, CMI 20\%, HUM 20\%, INTC 19\% & 329 & 169 & 180 \\
-2022-07 & NUE 22\%, SNA 20\%, MU 20\%, INTC 19\%, CMI 19\% & 526 & 211 & 195 \\
-2023-01 & MU 22\%, NUE 21\%, CTSH 19\%, INTC 19\%, SNA 19\% & 535 & 209 & 175 \\
-2023-07 & STLD 22\%, NUE 21\%, MU 21\%, SNA 19\%, PKG 18\% & 439 & 178 & 159 \\
-2024-01 & STLD 22\%, NUE 21\%, SWKS 20\%, SNA 19\%, CTSH 18\% & 141 & 166 & 150 \\
-2024-07 & NUE 22\%, STLD 20\%, SWKS 20\%, SNA 20\%, BG 19\% & 144 & 142 & 134 \\
-2025-01 & NUE 21\%, SWKS 21\%, STLD 20\%, BG 19\%, AMAT 19\% & 191 & 132 & 120 \\
-2025-07 & SWKS 22\%, ON 21\%, SNA 20\%, AMAT 19\%, STLD 19\% & 154 & 124 & 111 \\
-2026-01 & SWKS 21\%, ON 21\%, SNA 20\%, NUE 19\%, CTSH 19\% & 123 & 112 & 109 \\
-2026-07 & CTSH 21\%, SWKS 20\%, SNA 20\%, RMD 19\%, BF-B 19\% & 122 & 102 & 109 \\
+2016-01 & CMI 11\%, WDC 11\%, CSCO 11\%, QCOM 10\%, TPR 10\%, GWW 10\%, NTAP 10\%, GLW 9\%, HAL 9\%, PFE 9\% & 621 & 452 & 415 \\
+2016-07 & CSCO 11\%, WDC 11\%, QCOM 11\%, NTAP 10\%, TPR 10\%, CMI 10\%, CTSH 10\%, VLO 9\%, TEL 9\%, BBY 9\% & 633 & 428 & 377 \\
+2017-01 & CSCO 12\%, CTSH 11\%, LRCX 10\%, QCOM 10\%, NKE 10\%, VLO 10\%, CMI 10\%, AMGN 9\%, GILD 9\%, FAST 9\% & 616 & 394 & 331 \\
+2017-07 & CSCO 11\%, QCOM 10\%, CTSH 10\%, FAST 10\%, TSCO 10\%, BBY 10\%, GLW 10\%, BIIB 9\%, VLO 9\%, LRCX 9\% & 539 & 363 & 316 \\
+2018-01 & CSCO 11\%, CTSH 11\%, LRCX 10\%, TPR 10\%, GLW 10\%, QCOM 10\%, BBY 10\%, AMAT 10\%, TSCO 10\%, VLO 9\% & 483 & 324 & 275 \\
+2018-07 & QCOM 11\%, LRCX 10\%, CSCO 10\%, AMAT 10\%, LYB 10\%, GILD 10\%, FAST 10\%, TPR 10\%, CTSH 10\%, SNA 9\% & 485 & 317 & 289 \\
+2019-01 & LRCX 12\%, MU 12\%, KLAC 10\%, LYB 10\%, CTSH 10\%, AMAT 10\%, GILD 10\%, FAST 9\%, VLO 9\%, HAS 9\% & 1,060 & 341 & 267 \\
+2019-07 & MU 12\%, NUE 11\%, LRCX 11\%, SNA 10\%, CTSH 10\%, NVDA 10\%, FAST 9\%, KLAC 9\%, HUM 9\%, AMAT 9\% & 1,260 & 286 & 253 \\
+2020-01 & MU 12\%, NUE 12\%, CTSH 11\%, SNA 10\%, FAST 9\%, TPR 9\%, AMAT 9\%, PKG 9\%, GILD 9\%, LYB 9\% & 508 & 257 & 238 \\
+2020-07 & MU 12\%, NUE 11\%, CTSH 11\%, HAS 10\%, HUM 10\%, PKG 10\%, SNA 9\%, FAST 9\%, TPR 9\%, HSIC 9\% & 538 & 266 & 305 \\
+2021-01 & MU 11\%, NUE 11\%, HUM 10\%, CTSH 10\%, AMAT 10\%, HAS 10\%, PKG 10\%, LRCX 9\%, GILD 9\%, BIIB 9\% & 396 & 223 & 237 \\
+2021-07 & SNA 12\%, MU 11\%, HUM 10\%, CMI 10\%, INTC 10\%, FAST 10\%, NUE 10\%, BBY 9\%, HSIC 9\%, CTSH 9\% & 274 & 189 & 194 \\
+2022-01 & SNA 11\%, MU 11\%, HUM 10\%, CMI 10\%, HSIC 10\%, INTC 10\%, NUE 10\%, AMAT 10\%, PKG 9\%, CTSH 9\% & 259 & 169 & 180 \\
+2022-07 & SNA 11\%, NUE 11\%, MU 11\%, AMAT 10\%, SWKS 10\%, GOOG 10\%, GOOGL 10\%, CMI 10\%, INTC 10\%, CTSH 9\% & 393 & 211 & 195 \\
+2023-01 & MU 11\%, SNA 10\%, GOOG 10\%, GOOGL 10\%, NUE 10\%, CTSH 10\%, LRCX 10\%, SWKS 10\%, CMI 9\%, INTC 9\% & 419 & 209 & 175 \\
+2023-07 & STLD 12\%, NUE 11\%, SNA 11\%, MU 10\%, CF 10\%, DD 10\%, CTSH 10\%, LRCX 9\%, SWKS 9\%, GOOG 9\% & 313 & 178 & 159 \\
+2024-01 & STLD 11\%, NUE 11\%, SWKS 11\%, SNA 11\%, CF 10\%, DD 10\%, CTSH 9\%, AMAT 9\%, KEYS 9\%, LRCX 9\% & 177 & 166 & 150 \\
+2024-07 & NUE 11\%, SNA 11\%, STLD 10\%, BG 10\%, SWKS 10\%, EOG 10\%, CTSH 10\%, CF 9\%, ON 9\%, EBAY 9\% & 147 & 142 & 134 \\
+2025-01 & NUE 11\%, SWKS 10\%, STLD 10\%, BG 10\%, SNA 10\%, EOG 10\%, CTSH 10\%, AMAT 9\%, ON 9\%, CF 9\% & 157 & 132 & 120 \\
+2025-07 & ON 11\%, SWKS 11\%, SNA 11\%, EW 10\%, BG 10\%, FSLR 10\%, CTSH 10\%, AMAT 9\%, STLD 9\%, EOG 9\% & 135 & 124 & 111 \\
+2026-01 & ON 11\%, SNA 11\%, SWKS 10\%, EW 10\%, CPRT 10\%, CTSH 10\%, BG 10\%, EOG 10\%, NUE 10\%, STLD 9\% & 121 & 112 & 109 \\
+2026-07 & SNA 11\%, CTSH 11\%, FSLR 11\%, SWKS 10\%, RMD 10\%, EW 10\%, BF-B 10\%, PODD 9\%, CF 9\%, HUM 9\% & 110 & 102 & 109 \\
 \hline
 \end{tabular}
 \end{table}
-Table \ref{tab:picks} lists the companies bought each January and July, with their weights, and what each 100 USD is worth on 30 October 2026, next to the same money in the S\&P 500 and in Berkshire Hathaway. Figure \ref{fig:yearly} shows the same values. Most of the money went to Information Technology, Industrials and Materials; the best single purchase is MU in January 2019, now worth 28 times its cost. The purchases of July 2017, January 2018, July 2018 and January 2024 are worth less today than the same money in the S\&P 500. Appendix \ref{app:purchases} lists every purchase of the wallet with sells of the investor who started in 2020, with its price at purchase and today, what later sales took from it, what it keeps today and its total return with dividends.
+Table \ref{tab:picks} lists the companies bought each January and July, with their weights, and what each 100 USD is worth on 30 October 2026, next to the same money in the S\&P 500 and in Berkshire Hathaway. Figure \ref{fig:yearly} shows the same values. Most of the money went to Information Technology, Industrials and Materials; the best single purchase is NVDA in July 2019, now worth 50 times its cost. The purchases of none are worth less today than the same money in the S\&P 500. Appendix \ref{app:purchases} lists every purchase of the wallet with sells of the investor who started in 2020, with its price at purchase and today, what later sales took from it, what it keeps today and its total return with dividends.
 
 \begin{figure}[H]
 \centering
@@ -78,23 +81,23 @@ Table \ref{tab:picks} lists the companies bought each January and July, with the
 \hline
 Start & Holder & Put in & Value & Multiple & A year \\
 \hline
-2016 & Value wallet & 2,200 & 10,317 & 4.69 & 26.0\% \\
- & Value wallet with sells & 2,200 & 11,086 & 5.04 & 27.2\% \\
+2016 & Value wallet & 2,200 & 9,644 & 4.38 & 24.9\% \\
+ & Value wallet with sells & 2,200 & 10,014 & 4.55 & 25.5\% \\
  & S\&P 500 & 2,200 & 5,383 & 2.45 & 15.3\% \\
  & Berkshire Hathaway & 2,200 & 4,938 & 2.24 & 13.9\% \\
 \hline
-2020 & Value wallet & 1,400 & 4,700 & 3.36 & 33.9\% \\
- & Value wallet with sells & 1,400 & 4,681 & 3.34 & 33.8\% \\
+2020 & Value wallet & 1,400 & 3,947 & 2.82 & 28.9\% \\
+ & Value wallet with sells & 1,400 & 3,927 & 2.80 & 28.8\% \\
  & S\&P 500 & 1,400 & 2,480 & 1.77 & 15.9\% \\
  & Berkshire Hathaway & 1,400 & 2,415 & 1.73 & 15.2\% \\
 \hline
-2023 & Value wallet & 800 & 1,848 & 2.31 & 43.7\% \\
- & Value wallet with sells & 800 & 1,845 & 2.31 & 43.6\% \\
+2023 & Value wallet & 800 & 1,577 & 1.97 & 34.9\% \\
+ & Value wallet with sells & 800 & 1,569 & 1.96 & 34.6\% \\
  & S\&P 500 & 800 & 1,164 & 1.46 & 18.7\% \\
  & Berkshire Hathaway & 800 & 1,066 & 1.33 & 14.2\% \\
 \hline
-2025 & Value wallet & 400 & 590 & 1.47 & 41.0\% \\
- & Value wallet with sells & 400 & 590 & 1.47 & 41.0\% \\
+2025 & Value wallet & 400 & 522 & 1.30 & 27.0\% \\
+ & Value wallet with sells & 400 & 522 & 1.30 & 27.0\% \\
  & S\&P 500 & 400 & 469 & 1.17 & 15.7\% \\
  & Berkshire Hathaway & 400 & 449 & 1.12 & 11.1\% \\
 \hline
@@ -102,9 +105,9 @@ Start & Holder & Put in & Value & Multiple & A year \\
 \end{table}
 Table \ref{tab:value} and Figure \ref{fig:value} follow the four investors. Each puts in 100 USD every January and July from the start year; the value wallet never sells. The return a year is money-weighted: the constant yearly rate that turns the payments into today's value.
 
-The investor who started in 2016 earns 26.0\% a year against 15.3\% in the S\&P 500 and 13.9\% in Berkshire Hathaway. From 2020 the rates are 33.9\%, 15.9\% and 15.2\%; from 2023 43.7\%, 18.7\% and 14.2\%; from 2025, over less than two years, 41.0\%, 15.7\% and 11.1\%. The wallet's value swings more than either comparison, because five companies of a few industries are far less diversified than the index or Berkshire.
+The investor who started in 2016 earns 24.9\% a year against 15.3\% in the S\&P 500 and 13.9\% in Berkshire Hathaway. From 2020 the rates are 28.9\%, 15.9\% and 15.2\%; from 2023 34.9\%, 18.7\% and 14.2\%; from 2025, over less than two years, 27.0\%, 15.7\% and 11.1\%. The wallet's value swings more than either comparison, because 10 companies of a few industries are far less diversified than the index or Berkshire.
 
-The value wallet with sells buys the same picks with the same money, but at each decision it also sells part of any holding whose score has fallen; Section \ref{sec:selling} describes the rule. From 2016 it is worth 11,086 USD (27.2\% a year), from 2020 4,681 USD (33.8\%) and from 2025 590 USD (41.0\%).
+The value wallet with sells buys the same picks with the same money, but at each decision it also sells part of any holding whose score has fallen; Section \ref{sec:selling} describes the rule. From 2016 it is worth 10,014 USD (25.5\% a year), from 2020 3,927 USD (28.8\%) and from 2025 522 USD (27.0\%).
 
 \begin{figure}[H]
 \centering
@@ -134,6 +137,9 @@ The value wallet with sells buys the same picks with the same money, but at each
 \end{figure}
 \section{Selling below the threshold}
 \label{sec:selling}
+Each January and July, before buying, the wallet with sells checks every company it holds. The score is put on a scale from 0 to 1, the share of the most the company could score on the rules it is measured on. A holding scoring 0.4 or less is sold in part: the share sold is (0.4 less the score) divided by 0.4, so all of it at a score of 0 and almost none just under 0.4. Holdings are sold, never sold short. The proceeds are added to the decision's 100 USD and buy its picks.
+
+\subsection{Sold in the wallet}
 \begin{table}[H]
 \centering
 \small
@@ -142,17 +148,47 @@ The value wallet with sells buys the same picks with the same money, but at each
 \hline
 Year & Sold: share of the holding (score) & Proceeds, USD \\
 \hline
-2023-07 & HAS 11\% (score 0.36) & 3.85 \\
-2024-01 & HAS 2\% (score 0.39) & 0.40 \\
-2024-07 & HAS 60\% (score 0.16) & 17.72 \\
-2025-01 & HAS 60\% (score 0.16) & 7.03 \\
-2025-07 & HAS 15\% (score 0.34), INTC 9\% (score 0.36) & 5.36 \\
-2026-01 & HAS 14\% (score 0.34), INTC 11\% (score 0.36) & 9.01 \\
-2026-07 & HAS 40\% (score 0.24) & 2.05 \\
+2021-01 & TPR 11\% (score 0.36) & 3.64 \\
+2021-07 & TPR 23\% (score 0.31), HAS 0\% (score 0.40) & 9.33 \\
+2022-01 & HAS 2\% (score 0.39) & 0.53 \\
+2023-01 & GILD 16\% (score 0.34) & 4.49 \\
+2023-07 & GILD 1\% (score 0.40), HAS 23\% (score 0.31) & 4.00 \\
+2024-01 & GILD 0\% (score 0.40), HAS 10\% (score 0.36) & 1.07 \\
+2024-07 & HAS 73\% (score 0.11), BBY 11\% (score 0.36) & 8.95 \\
+2025-01 & HAS 74\% (score 0.11), CMI 1\% (score 0.39), BBY 11\% (score 0.36) & 3.89 \\
+2025-07 & GILD 1\% (score 0.40), HAS 20\% (score 0.32), INTC 46\% (score 0.22), BBY 5\% (score 0.38), EBAY 27\% (score 0.29) & 15.76 \\
+2026-01 & GILD 1\% (score 0.40), HAS 21\% (score 0.32), INTC 48\% (score 0.21), BBY 4\% (score 0.39), EBAY 20\% (score 0.32) & 14.15 \\
+2026-07 & HAS 32\% (score 0.27), INTC 13\% (score 0.35), EBAY 26\% (score 0.30) & 8.40 \\
 \hline
 \end{tabular}
 \end{table}
-Each January and July, before buying, the wallet with sells checks every company it holds. The score is put on a scale from 0 to 1, the share of the most the company could score on the rules it is measured on. A holding scoring 0.4 or less is sold in part: the share sold is (0.4 less the score) divided by 0.4, so all of it at a score of 0 and almost none just under 0.4. Holdings are sold, never sold short. The proceeds are added to the decision's 100 USD and buy its picks. Table \ref{tab:sales} lists the 9 sales of the investor who started in 2020, worth 45 USD in all.
+Table \ref{tab:sales} lists the 27 sales of the investor who started in 2020, worth 74 USD in all. They are the wallet's own cash flows; the list below does not depend on what anyone holds.
+
+\subsection{Lowest scores in the index}
+\begin{table}[H]
+\centering
+\small
+\caption{The 10 lowest-scoring of the companies scored on the latest score date: sector, score, score on the 0-to-1 scale and colour (Green, Amber or Red; not a recommendation).}\label{tab:worst}
+\begin{tabular}{p{4.4cm} p{3cm} r r p{3cm}}
+\hline
+Company & Sector & Score & Score 0 to 1 & Colour \\
+\hline
+EchoStar (ECHO) & Communication Services & 0.8 & 0.03 & \cellcolor[HTML]{F4B6B6}Red \\
+Palo Alto Networks (PANW) & Information Technology & 1.4 & 0.06 & \cellcolor[HTML]{F4B6B6}Red \\
+GE Vernova (GEV) & Industrials & 1.6 & 0.07 & \cellcolor[HTML]{F4B6B6}Red \\
+J.M. Smucker Company (The) (SJM) & Consumer Staples & 1.9 & 0.05 & \cellcolor[HTML]{F4B6B6}Red \\
+Dell Technologies (DELL) & Information Technology & 2.4 & 0.07 & \cellcolor[HTML]{F4B6B6}Red \\
+Exelon (EXC) & Utilities & 3.3 & 0.13 & \cellcolor[HTML]{F4B6B6}Red \\
+AbbVie (ABBV) & Health Care & 3.4 & 0.09 & \cellcolor[HTML]{F4B6B6}Red \\
+Cardinal Health (CAH) & Health Care & 3.6 & 0.10 & \cellcolor[HTML]{F4B6B6}Red \\
+Hilton Worldwide (HLT) & Consumer Discretionary & 3.8 & 0.10 & \cellcolor[HTML]{F4B6B6}Red \\
+Live Nation Entertainment (LYV) & Communication Services & 3.9 & 0.10 & \cellcolor[HTML]{F4B6B6}Red \\
+\hline
+\end{tabular}
+\end{table}
+These are the 10 lowest scores, as many as the picks, among the companies of the S\&P 500 that are scored on 18 September 2026, whether or not anyone holds them: EchoStar (ECHO), Palo Alto Networks (PANW), GE Vernova (GEV), J.M. Smucker Company (The) (SJM), Dell Technologies (DELL), Exelon (EXC), AbbVie (ABBV), Cardinal Health (CAH), Hilton Worldwide (HLT) and Live Nation Entertainment (LYV) (Table \ref{tab:worst}). Financials, Real Estate and companies with too few rules to score are not scored and so cannot appear. Companies with the same score are ordered by symbol, so when several share the last place, the alphabetically first are shown. The list shows where the score ranks these companies today; it is not a recommendation to buy, sell or sell short anything. A score of 0 means only that no rule awarded the company any points; it says nothing about what the company is worth.
+
+The last column colours each score on the 0-to-1 scale against the sell threshold of 0.4. Green is a score above 0.4. Amber is a score from 0.2 up to and including 0.4: a company one would not buy, and would hold only if already owned. Red is a score below 0.2: a company one might start to think about selling. The colours are not the rule of the wallet with sells. That rule is mechanical: at or below 0.4 it sells part of a holding, the more the lower the score, and at 0 all of it, whatever the colour. The sell signal on these companies has not been tested: no test has measured what the lowest scores did afterwards. The cut-offs are those the score uses today and are not fixed. The wallet never sells short; a short position on these companies is a later step and has not been tested.
 
 \section{Wallet contents}
 Figure \ref{fig:contents} follows every company in the wallet with sells of the investor who started in 2020, month by month. A line starts or steps up when the company is bought, steps down when part of it is sold, and rises or falls with the price in between. The dashed lines follow the same money in the S\&P 500 and in Berkshire Hathaway, divided by the number of companies the wallet holds on the date, so they show what one holding would be worth in the index or in Berkshire. Appendix \ref{app:contents} gives each holding's value after every January's trades, the money put in and the proceeds of sales.
@@ -172,21 +208,21 @@ Figure \ref{fig:contents} follows every company in the wallet with sells of the 
 \hline
 Picks & Number & USD ahead, total & Average & Median \\
 \hline
-Beat the S\&P 500 & 63 & +5,601 & +88.9 & +17.4 \\
-Lagged the S\&P 500 & 47 & -667 & -14.2 & -8.1 \\
+Beat the S\&P 500 & 126 & +4,986 & +39.6 & +9.5 \\
+Lagged the S\&P 500 & 94 & -725 & -7.7 & -5.3 \\
 \hline
-All picks & 110 & +4,934 & +44.9 & +4.5 \\
+All picks & 220 & +4,261 & +19.4 & +1.6 \\
 \hline
 \end{tabular}
 \end{table}
-Of the picks, 63 have done better than the S\&P 500 since their purchase and 47 have not, but a count treats a large win and a small loss alike. Table \ref{tab:dollars} weighs them in dollars: each pick's value today less what the same money would be worth in the S\&P 500. The winners are 5,601 USD ahead of the index and the laggards 667 USD behind, a net 4,934 USD, the wallet's whole lead over the index. The median winner is 17 USD ahead and the median laggard 8 USD behind; the average win is 6.3 times the average loss. The wins are concentrated: the 5 largest, MU Jan 2019, LRCX Jan 2017, MU Jul 2019, MU Jan 2023 and LRCX Jan 2019, make up 37\% of the winners' total.
+Of the picks, 126 have done better than the S\&P 500 since their purchase and 94 have not, but a count treats a large win and a small loss alike. Table \ref{tab:dollars} weighs them in dollars: each pick's value today less what the same money would be worth in the S\&P 500. The winners are 4,986 USD ahead of the index and the laggards 725 USD behind, a net 4,261 USD, the wallet's whole lead over the index. The median winner is 9 USD ahead and the median laggard 5 USD behind; the average win is 5.1 times the average loss. The wins are concentrated: the 5 largest, NVDA Jul 2019, MU Jan 2019, MU Jul 2019, LRCX Jan 2017 and LRCX Jan 2019, make up 28\% of the winners' total.
 
-Figure \ref{fig:rules} compares the mean points per rule of the winners and of the laggards on the day they were picked, each pick weighted by its dollars ahead or behind the index, so the large wins and losses count most; the rules are ordered by how much more the winners scored. The winners scored most above the others on price to tangible assets (E6), P/E (G6), P/E times P/B (G7) and 4-year earnings growth (E5); the picks that lagged scored higher on 10 years of profit (G3) and return on equity (B1). With so few picks, these differences describe this sample; they do not establish which rules work. Appendix \ref{app:rules} explains each rule, and Appendix \ref{app:weighting} tests whether the rule weights favour the rules that told winners from losers.
+Figure \ref{fig:rules} compares the mean points per rule of the winners and of the laggards on the day they were picked, each pick weighted by its dollars ahead or behind the index, so the large wins and losses count most; the rules are ordered by how much more the winners scored. The winners scored most above the others on net-net (NN), 6-year earnings growth (G5), current ratio (G2a) and current ratio (lenient) (E1); the picks that lagged scored higher on return on equity (B1) and current dividend (E4). With so few picks, these differences describe this sample; they do not establish which rules work. Appendix \ref{app:rules} explains each rule, and Appendix \ref{app:weighting} tests whether the rule weights favour the rules that told winners from losers.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\textwidth]{rules.png}
-\caption{Mean points per rule (0 to 5) of the picks that beat the S\&P 500 since purchase and of those that did not, each pick weighted by its dollars ahead or behind the index.}
+\caption{Mean points per rule of the picks that beat the S\&P 500 since purchase and of those that did not, each pick weighted by its dollars ahead or behind the index.}
 \label{fig:rules}
 \end{figure}
 \section{The Magnificent 7}
@@ -198,28 +234,28 @@ Figure \ref{fig:rules} compares the mean points per rule of the winners and of t
 \hline
 Company & Score & Score 0 to 1 & Rank today & Median rank \\
 \hline
-Nvidia (NVDA) & 29.0 & 0.59 & 22 of 387 & 40 \\
-Microsoft (MSFT) & 27.5 & 0.56 & 37 of 387 & 36 \\
-Meta Platforms (META) & 25.2 & 0.77 & 52 of 387 & 192 \\
-Alphabet Inc. (Class A) (GOOGL) & 24.2 & 0.56 & 68 of 387 & 28 \\
-Tesla, Inc. (TSLA) & 18.6 & 0.40 & 153 of 387 & 149 \\
-Amazon (AMZN) & 16.3 & 0.33 & 209 of 387 & 239 \\
-Apple Inc. (AAPL) & 12.4 & 0.28 & 300 of 387 & 143 \\
+Nvidia (NVDA) & 22.5 & 0.60 & 28 of 379 & 32 \\
+Alphabet Inc. (Class A) (GOOGL) & 21.4 & 0.57 & 44 of 379 & 22 \\
+Meta Platforms (META) & 21.1 & 0.76 & 50 of 379 & 178 \\
+Microsoft (MSFT) & 19.0 & 0.51 & 78 of 379 & 50 \\
+Tesla, Inc. (TSLA) & 18.1 & 0.48 & 94 of 379 & 112 \\
+Amazon (AMZN) & 12.4 & 0.33 & 212 of 379 & 229 \\
+Apple Inc. (AAPL) & 7.0 & 0.19 & 340 of 379 & 151 \\
 \hline
 \end{tabular}
 \end{table}
-The best-known growth companies of the period, the Magnificent 7, are rarely picked. On the latest score date Nvidia (NVDA) ranks highest of them, 22 of 387 companies, and Apple Inc. (AAPL) lowest at 300 (Table \ref{tab:peers}). The rules are Graham's and Buffett's, written to avoid paying a high price for growth: Figure \ref{fig:peers} shows that the Magnificent 7 score far fewer points than the picks on P/E times P/B (G7), P/E (G6), price to tangible assets (E6) and current dividend (E4), and more only on 4-year earnings growth (E5), net income growth (NI1) and 10-year earnings growth (G5).
+The best-known growth companies of the period, the Magnificent 7, are rarely picked. On the latest score date Nvidia (NVDA) ranks highest of them, 28 of 379 companies, and Apple Inc. (AAPL) lowest at 340 (Table \ref{tab:peers}). The rules are Graham's and Buffett's, written to avoid paying a high price for growth: Figure \ref{fig:peers} shows that the Magnificent 7 score far fewer points than the picks on P/E times P/B (G7), P/E (G6), current dividend (E4) and net-net (NN), and more only on 6-year earnings growth (G5).
 
-The same 100 USD at each decision, split equally over the Magnificent 7 in the index on the date and never sold, is worth 22,613 USD from 2016 (39.0\% a year), 4,445 USD from 2020 (32.3\%) and 462 USD from 2025 (14.1\%), against 10,317, 4,700 and 590 USD in the value wallet. The comparison picks the Magnificent 7 with hindsight: they are named for having been the winners of these years.
+The same 100 USD at each decision, split equally over the Magnificent 7 in the index on the date and never sold, is worth 23,955 USD from 2016 (39.9\% a year), 4,445 USD from 2020 (32.3\%) and 462 USD from 2025 (14.1\%), against 9,644, 3,947 and 522 USD in the value wallet. The comparison picks the Magnificent 7 with hindsight: they are named for having been the winners of these years.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\textwidth]{peers.png}
-\caption{Mean points per rule (0 to 5) of the Magnificent 7 and of our picks on the decision dates since 2016, the rules ordered by how many more points the picks scored.}
+\caption{Mean points per rule of the Magnificent 7 and of our picks on the decision dates since 2016, the rules ordered by how many more points the picks scored.}
 \label{fig:peers}
 \end{figure}
 \section{Price history of the picks}
-Figure \ref{fig:pick-prices} shows the share price of every company the investor who started in 2023 bought or sold, and of the next picks, over the last 5 years. The price is split-adjusted and excludes dividends, as a price chart shows it; the companies run from the best to the worst price change over the 5 years, given beside each name; when they do not fit on one page, only the 5 best and the 5 worst are shown. Each purchase is marked in green and each sale in red, at the price on the decision date; a larger marker means more money. Figure \ref{fig:trade-amounts} gives the same trades in USD per company and decision date.
+Figure \ref{fig:pick-prices} shows the share price of every company the investor who started in 2023 bought or sold, and of the next picks, over the last 5 years. The price is split-adjusted and excludes dividends, as a price chart shows it; the companies run from the best to the worst price change over the 5 years, given beside each name; when they do not fit on one page, only the 6 best and the 6 worst are shown. Each purchase is marked in green and each sale in red, at the price on the decision date; a larger marker means more money. Figure \ref{fig:trade-amounts} gives the same trades in USD per company and decision date.
 
 \begin{figure}[H]
 \centering
@@ -242,15 +278,20 @@ Figure \ref{fig:pick-prices} shows the share price of every company the investor
 \hline
 Company & Sector & Score & Score 0 to 1 & Weight & USD \\
 \hline
-First Solar (FSLR) & Technology & 39.2 & 0.83 & 20.5\% & 20.49 \\
-Cognizant (CTSH) & Technology & 38.7 & 0.79 & 20.3\% & 20.26 \\
-Snap-on (SNA) & Industrials & 38.1 & 0.85 & 19.9\% & 19.95 \\
-Skyworks Solutions (SWKS) & Technology & 37.9 & 0.77 & 19.8\% & 19.80 \\
-ResMed (RMD) & Health care & 37.3 & 0.76 & 19.5\% & 19.50 \\
+First Solar (FSLR) & Technology & 34.6 & 0.93 & 11.7\% & 11.71 \\
+Snap-on (SNA) & Industrials & 33.4 & 0.89 & 11.3\% & 11.29 \\
+Cognizant (CTSH) & Technology & 31.4 & 0.84 & 10.6\% & 10.63 \\
+ResMed (RMD) & Health care & 30.7 & 0.82 & 10.4\% & 10.37 \\
+Edwards Lifesciences (EW) & Health care & 29.4 & 0.79 & 9.9\% & 9.94 \\
+Skyworks Solutions (SWKS) & Technology & 29.1 & 0.78 & 9.8\% & 9.82 \\
+Brown–Forman (BF-B) & Staples & 27.8 & 0.74 & 9.4\% & 9.39 \\
+ON Semiconductor (ON) & Technology & 27.3 & 0.73 & 9.2\% & 9.23 \\
+Insulet Corporation (PODD) & Health care & 27.0 & 0.72 & 9.1\% & 9.12 \\
+Fastenal (FAST) & Industrials & 25.1 & 0.67 & 8.5\% & 8.50 \\
 \hline
 \end{tabular}
 \end{table}
-On the latest score date, 18 September 2026, the five highest-scoring companies are First Solar (FSLR), Cognizant (CTSH), Snap-on (SNA), Skyworks Solutions (SWKS) and ResMed (RMD) (Table \ref{tab:next}). Each would receive its share of the next decision's 100 USD and of any proceeds from sales. The decision is taken on the first trading day of January with the scores known then, which include the annual reports filed until that day; these picks are a preview and may change. Figure \ref{fig:next-prices} shows each pick's share price over the last 5 years, with the earlier purchases of the investor who started in 2023 and the potential purchase at today's price.
+On the latest score date, 18 September 2026, the 10 highest-scoring companies are First Solar (FSLR), Snap-on (SNA), Cognizant (CTSH), ResMed (RMD), Edwards Lifesciences (EW), Skyworks Solutions (SWKS), Brown–Forman (BF-B), ON Semiconductor (ON), Insulet Corporation (PODD) and Fastenal (FAST) (Table \ref{tab:next}). Each would receive its share of the next decision's 100 USD and of any proceeds from sales. The decision is taken on the first trading day of January with the scores known then, which include the annual reports filed until that day; these picks are a preview and may change. Figure \ref{fig:next-prices} shows each pick's share price over the last 5 years, with the earlier purchases of the investor who started in 2023 and the potential purchase at today's price.
 
 \begin{figure}[H]
 \centering
@@ -258,24 +299,108 @@ On the latest score date, 18 September 2026, the five highest-scoring companies 
 \caption{Share price of each next pick (USD, split-adjusted, dividends excluded) over the last 5 years: earlier purchases of the investor who started in 2023 in green, the potential purchase at the latest price in orange.}
 \label{fig:next-prices}
 \end{figure}
-\subsection{Sell check}
+\section{Winning picks we missed}
+\label{sec:missed}
 \begin{table}[H]
 \centering
 \small
-\caption{Holdings the rule would sell in part: value today, score on the 0-to-1 scale, share to sell and amount.}\label{tab:sell}
-\begin{tabular}{l r r r r}
+\caption{Winners over the next 36 months that the score missed, by index: the share of winners held (by chance), their mean score and examples with their score on a scale from 0 to 1.}\label{tab:missed}
+\begin{tabular}{l l l p{5.9cm}}
 \hline
-Company & Holding, USD & Score 0 to 1 & Sell & Sell, USD \\
+Index & Winners held (by chance) & Winners' mean score & Missed winners and their score \\
 \hline
-Intel (INTC) & 111.96 & 0.39 & 4\% & 3.96 \\
-Hasbro (HAS) & 4.53 & 0.24 & 40\% & 1.81 \\
+S\&P 500 & 10\% (4\%) & 0.55 & Amazon 0.08, Netflix 0.23, Constellation Brands 0.32, Adobe 0.48 \\
+S\&P 400 & 5\% (9\%) & 0.42 & Paylocity 0.03, Repligen 0.16, Tenet 0.17, Qualys 0.20, Chemed 0.34 \\
+S\&P 600 & 9\% (5\%) & 0.51 & Archrock 0.14, Brinker 0.16, SM Energy 0.19 \\
 \hline
 \end{tabular}
 \end{table}
-The investor who started in 2020 holds 16 companies. With the scores of 18 September 2026, the rule would sell part of Intel (INTC), 4\% and Hasbro (HAS), 40\%, and keep the other 14 as they are (Table \ref{tab:sell}).
+No score picks every winner, and a winner is only known afterwards. Here the winners are the ten companies with the highest return above their index over the next 36 months, found with hindsight on every date. A book of ten companies that knew nothing would hold about 4\% of them on the S\&P 500, 9\% on the S\&P 400 and 5\% on the S\&P 600 (Table \ref{tab:missed}). They are shown as a check on the rules, not as advice.
+
+On the S\&P 500 the score holds 10\% of the winners and ranks them slightly above the median (0.55 on a scale from 0 to 1). It found the chip makers (Nvidia 0.91, Lam Research 0.96, Micron 0.91) and missed the growth platforms: Amazon 0.08, Netflix 0.23 and Constellation Brands 0.32. On the S\&P 400 the winners score below the median (0.42): Paylocity 0.03, Repligen 0.16, Tenet 0.17 and Qualys 0.20. Health care is 17\% of the winners there and 3\% of our picks. On the S\&P 600 energy companies are 24\% of the winners and 2\% of our picks.
+
+A possible cause is in the rules. They are Graham's and Buffett's, and they reward cheap, low-debt, asset-rich companies. Many winners of the period were growth and quality companies that pay no dividend and trade at higher multiples. On the S\&P 400 they score 0.7 points lower than the average company on the dividend rule and 0.4 lower on debt cover, while our picks score 4.4 on debt cover against 2.1 for the average company. On the earlier sixteen-rule score, dropping the dividend rules made no measurable difference on the S\&P 500 and the S\&P 400, so they are not what holds the score back there; on the S\&P 600 the bands excluded zero (+0.72 and -0.93). The price rules are one more possible cause: dropping them raised the best ten on the S\&P 500, but that held on the S\&P 500 only, showed nothing on the S\&P 400 and was contradicted on the S\&P 600, so it was not adopted (Section \ref{sec:dialogue}). Companies that S\&P later added to the S\&P 500 scored lower than its existing members before they joined (0.42 against 0.51 on a scale from 0 to 1), which fits the hypothesis that the score undervalues growth; it is a hypothesis, not a tested result.
+
+\section{How the model was tested}
+\label{sec:testing}
+\begin{table}[H]
+\centering
+\small
+\caption{The tests the model must pass before launch, and where each stands.}\label{tab:testing}
+\begin{tabular}{l p{3.6cm} p{4.6cm} p{2.3cm}}
+\hline
+Test & What is checked & Result & Status \\
+\hline
+Winners removed & The wallet still beats its index with the 3 largest winners removed & S\&P 500: yes, by 1.9 to 3.7 points (2016 to 2023 starts). S\&P 400: no. S\&P 600: mixed & S\&P 500 passed in-sample; others not \\
+Company samples & Repeated samples, each leaving out a random part of the companies & S\&P 500: ahead of the index in every sample (the samples share most of their companies) & Passed on the S\&P 500, in-sample \\
+Unseen companies & The score frozen, then run once on a part of the companies never used & Positive, but two companies gave 99\% of the gain (earlier sixteen-rule score) & To rerun \\
+Other indices & The score beats random picks of its own index on the S\&P 400 and 600 & Not reproduced & Open \\
+Two periods & The edge appears before and after 2017 & Yes on the S\&P 500 (earlier sixteen-rule score) & To rerun \\
+Missed winners & Which winners the score missed, and why & Section \ref{sec:missed} & Done \\
+Survivorship & The effect of companies that left the index & Not yet measured & Open \\
+Real-world check & Results compared with market events and institutional logic & Not yet done & Open \\
+\hline
+\end{tabular}
+\end{table}
+This is a prototype, "first light": the first version of the model that is frozen and dated, with nothing earlier to compare it with. The figures below are in-sample stress and sampling diagnostics, compared with the index and not with random books of the same size, on a configuration that was chosen on this data after more than 100 designs were tried. The bands cover the sampling of companies only: they do not allow for the number of designs tried (multiple testing) or for the period, which the designs were chosen while looking at, so no result here is out of sample. The one held-out test, on companies the score never used, is on the earlier sixteen-rule score and is marked to rerun. The tests follow a written protocol, and a test that failed is shown as failed. The model has not cleared them: the tests below are open or failed in part. The numbers are from runs on 1 November 2026 on the ten default rules, with data as of 31 October 2026.
+
+On the S\&P 500 the picks beat the index in every one of a set of repeated samples that each left out a random part of the companies (the samples share most of their companies, so this is not independent confirmation), by 9 to 15 points a year on average depending on the start year, and by about 5 points in the worst sample. The investor who started in 2020 earns 27.7\% a year against 15.9\% in the index. The gain is concentrated: Micron makes up 24\% and Lam Research 16\% of the 2016 investor's gain. They still beat it with the three largest winners removed as if they had never existed (Applied Materials, Lam Research and Micron): by 3.7, 1.9 and 2.1 points a year for the investors who started in 2016, 2020 and 2023, and by 8.9 for 2025. With five removed (adding Nucor and Nvidia) the margin shrinks to 0.3 to 2.3 points for the first three. The edge is present in this sample of the index but thin, and concentrated in chip and materials companies that did well in a long bull market after 2009.
+
+The other two indices do not confirm it. On the S\&P 400 the picks beat their fund by 2 to 5 points a year for the 2016 to 2023 starts, and with the three largest winners removed the margin is gone (0.4, -0.4 and -0.1). On the S\&P 600 the investors who started in 2016 and 2020 are ahead by about 6 points, which survives the removal of the three largest winners, while those who started in 2023 and 2025 trail the fund. The lists of the S\&P 400 and 600 give no entry dates and lose the companies that grew into a larger index, so these two tests are biased and not yet a verdict on the rules. Companies that left the index are missing from every test, which flatters the results.
+
+\section{Midas and the Investor}
+\label{sec:dialogue}
+Every result in this report was questioned before it was believed. When something looked wrong, too good, different between indices or against what a long-term investor would say, Midas, who reads the numbers, put the question to the Investor. The Investor answers only from Berkshire Hathaway's published letters to shareholders and names the year; the quotations imply no endorsement by Berkshire or Mr Buffett. Midas then tested the answer and reported back. Three of the exchanges follow. The figures in them are in-sample stress and sampling diagnostics, compared with the index and not with random books, on a configuration chosen on this data (Section \ref{sec:testing}).
+
+\textbf{Is the dividend rule holding the score back?}
+
+\textbf{Midas:} The winners we missed mostly pay no dividend, and they score low on the dividend rules. Should we drop them?
+
+\textbf{The Investor:} (1984) "Berkshire has earned well over market rates on retained earnings, thereby creating over one dollar of market value for every dollar retained. Under such circumstances, any distribution would have been contrary to the financial interest of shareholders, large or small."
+
+\textbf{Midas:} I dropped the two dividend rules from the sixteen-rule score and compared. On the S\&P 500 the best ten changed by -0.03 points a year, with a 99\% band from -1.05 to +0.41; on the S\&P 400 by -0.26. There is no measurable difference on those two indices; on the S\&P 600 the bands excluded zero (+0.72 and -0.93). The default now keeps only one dividend rule, the current dividend, and the other is a switch.
+
+\textbf{Should a cheap price be the test of value?}
+
+\textbf{Midas:} Dropping the P/E and price-to-book rules raised the best ten on the S\&P 500 but lowered the broad ranking, and the missed winners were growth companies. That held on the S\&P 500 only, and I did not adopt it.
+
+\textbf{The Investor:} (1992) "Growth is always a component in the calculation of value." A low ratio of price to book value, a low price-earnings ratio or a high dividend yield are "far from determinative as to whether an investor is indeed buying something for what it is worth", and the opposite characteristics "are in no way inconsistent with a 'value' purchase". Yet "business growth, per se, tells us little about value". (2013, Graham's adage, which Buffett quotes as "Ben's adage") "Price is what you pay, value is what you get."
+
+\textbf{Midas:} I tested a price-to-earnings-growth measure. On all three indices it widened the broad ranking a little and left the best ten slightly lower, within the noise. Used only for companies that pass the quality rule, return on equity, both rose on the S\&P 500 and the S\&P 400, by 0.3 to 1 point a year. That is small and adds complexity, so it is a switch and not the default.
+
+\textbf{Is it too good to be true?}
+
+\textbf{Midas:} The picks beat the index in every one of a set of repeated samples that each left out a random part of the companies. The samples share most of their companies, so that is not independent confirmation, and it still looks too good, so I removed the biggest winners as if they had never existed.
+
+\textbf{The Investor:} (1987) "When shortages exist, however, even commodity businesses flourish", and "whenever shortages appear, the typical manager simply can't wait to expand capacity". (1989) "Time is the friend of the wonderful business, the enemy of the mediocre."
+
+\textbf{Midas:} The 1987 passage is about insurance; I apply it to chip makers by analogy. With the three largest winners removed (Applied Materials, Lam Research and Micron) the wallet still beat the index by 3.7, 1.9 and 2.1 points a year for the investors who started in 2016, 2020 and 2023; with five removed, by 0.3 to 2.3 points. The edge is present in this sample of the S\&P 500 but thin, and it sits in chip and materials companies after 2009. On the S\&P 400 it disappears without its three largest winners. Treat it with care.
+
+\textbf{What the tests showed.} The results are for holding over years, not months: the picks are bought twice a year and not sold. The concentration is the main risk, and one or two big winners carry much of the gain, so they are treated as luck until tested the same way. The book holds ten companies, not five: ten was chosen for plausibility and diversification, although the five-company book scored higher in the tests. The tests cover the default ten rules; other switches were not tested as a set. This is what the tests showed, not advice; read the tests in Section \ref{sec:testing} before relying on a number.
+
+\section{Where to read more}
+\label{sec:reading}
+\begin{table}[H]
+\centering
+\small
+\caption{Strategy literature by risk profile.}\label{tab:reading}
+\begin{tabular}{l p{4.5cm} p{5.6cm}}
+\hline
+Profile & Idea & Reading \\
+\hline
+Defensive & Preserve capital; diversified, cheap, boring; index funds & Graham, The Intelligent Investor (the defensive investor); Bogle, The Little Book of Common Sense Investing \\
+Core & A wonderful company at a fair price, held for years & The Berkshire Hathaway shareholder letters; Dorsey, The Little Book That Builds Wealth \\
+Value with a margin of safety & Buy at a deep discount to value & Graham (the enterprising investor); Klarman, Margin of Safety \\
+Quality growth & Growth at a reasonable price, good management & Fisher, Common Stocks and Uncommon Profits; Lynch, One Up on Wall Street \\
+Systematic value & Rules, ranked & Greenblatt, The Little Book That Beats the Market; Piotroski (2000), the F-score; Novy-Marx (2013), gross profitability \\
+Risk awareness & Cycles and what can go wrong & Marks, The Most Important Thing; Lakonishok, Shleifer and Vishny (1994), contrarian investment \\
+\hline
+\end{tabular}
+\end{table}
+Planned, and not yet available: a member will be able to bring the strategy literature they like and ask for answers drawn from those pages, with the source named. The Berkshire Hathaway letters are free to read on the company's site. Books are copyrighted: use your own copy. The list below is grouped by the kind of risk each approach accepts. It is a starting point only: the titles are given from general knowledge and have not been checked against the books, so check each one before relying on it.
 
 \section{Conclusions}
-In this sample, the value picks bought twice a year and held are worth more today than the same money in the S\&P 500 or in Berkshire Hathaway for each of the four start years. That describes the past under rules and settings chosen while looking at it; it is not a test of the strategy. The lead is uneven: the 8 purchases of Micron Technology (MU) make up 50\% of the 2020 investor's value, and the purchases of July 2017, January 2018, July 2018 and January 2024 trail the index.
+In this sample, the value picks bought twice a year and held are worth more today than the same money in the S\&P 500 or in Berkshire Hathaway for each of the four start years. That describes the past under rules and settings chosen while looking at it; it is not a test of the strategy. The lead is uneven: the 8 purchases of Micron Technology (MU) make up 33\% of the 2020 investor's value, and the purchases of none trail the index.
 
 Before the strategy is used, three steps are needed: the companies that left the index must be added to the data, the score must be tested on more decisions (each quarter instead of each year), and trading costs and taxes must be included.
 
@@ -290,76 +415,146 @@ Before the strategy is used, three steps are needed: the companies that left the
 Year & Company & Sector & Weight & In & Bought at & Now & Sold & Kept & Return \\
 \hline
 \endhead
-2020-01 & NUE & Materials & 21\% & 21 & 55.12 & 273.87 &  & 120 & +463\% \\
-2020-01 & CTSH & Technology & 21\% & 21 & 61.92 & 65.11 &  & 25 & +17\% \\
-2020-01 & MU & Technology & 20\% & 20 & 55.39 & 884.74 &  & 326 & +1538\% \\
-2020-01 & SNA & Industrials & 20\% & 20 & 169.00 & 355.66 &  & 50 & +151\% \\
-2020-01 & CMI & Industrials & 18\% & 18 & 179.32 & 500.09 &  & 59 & +227\% \\
-2020-07 & CTSH & Technology & 21\% & 21 & 56.42 & 65.11 &  & 27 & +28\% \\
-2020-07 & NUE & Materials & 21\% & 21 & 40.38 & 273.87 &  & 156 & +652\% \\
-2020-07 & HAS & Discretionary & 20\% & 20 & 74.69 & 119.09 & 18 & 2 & +1\% \\
-2020-07 & MU & Technology & 19\% & 19 & 49.70 & 884.74 &  & 356 & +1726\% \\
-2020-07 & SNA & Industrials & 18\% & 18 & 134.12 & 355.66 &  & 58 & +212\% \\
-2021-01 & HAS & Discretionary & 21\% & 21 & 91.96 & 119.09 & 15 & 2 & -20\% \\
-2021-01 & NUE & Materials & 21\% & 21 & 52.51 & 273.87 &  & 117 & +468\% \\
-2021-01 & CTSH & Technology & 20\% & 20 & 79.42 & 65.11 &  & 18 & -10\% \\
-2021-01 & MU & Technology & 20\% & 20 & 74.05 & 884.74 &  & 240 & +1125\% \\
-2021-01 & HUM & Health care & 19\% & 19 & 412.19 & 414.50 &  & 20 & +6\% \\
-2021-07 & SNA & Industrials & 21\% & 21 & 223.42 & 355.66 &  & 38 & +83\% \\
-2021-07 & INTC & Technology & 20\% & 20 & 56.01 & 65.76 & 2 & 21 & +16\% \\
-2021-07 & CMI & Industrials & 20\% & 20 & 242.13 & 500.09 &  & 47 & +133\% \\
-2021-07 & MU & Technology & 20\% & 20 & 80.11 & 884.74 &  & 222 & +1033\% \\
-2021-07 & HUM & Health care & 19\% & 19 & 447.63 & 414.50 &  & 19 & -2\% \\
-2022-01 & MU & Technology & 21\% & 21 & 95.75 & 884.74 &  & 195 & +845\% \\
-2022-01 & SNA & Industrials & 20\% & 20 & 213.32 & 355.66 &  & 39 & +89\% \\
-2022-01 & CMI & Industrials & 20\% & 20 & 219.53 & 500.09 &  & 50 & +154\% \\
-2022-01 & HUM & Health care & 20\% & 20 & 465.45 & 414.50 &  & 18 & -6\% \\
-2022-01 & INTC & Technology & 19\% & 19 & 53.21 & 65.76 & 2 & 21 & +20\% \\
-2022-07 & NUE & Materials & 22\% & 22 & 105.64 & 273.87 &  & 60 & +175\% \\
-2022-07 & SNA & Industrials & 20\% & 20 & 198.24 & 355.66 &  & 40 & +101\% \\
-2022-07 & MU & Technology & 20\% & 20 & 53.65 & 884.74 &  & 335 & +1585\% \\
-2022-07 & INTC & Technology & 19\% & 19 & 36.34 & 65.76 & 3 & 30 & +73\% \\
-2022-07 & CMI & Industrials & 19\% & 19 & 194.11 & 500.09 &  & 54 & +183\% \\
-2023-01 & MU & Technology & 22\% & 22 & 50.37 & 884.74 &  & 384 & +1683\% \\
-2023-01 & NUE & Materials & 21\% & 21 & 131.06 & 273.87 &  & 46 & +120\% \\
-2023-01 & CTSH & Technology & 19\% & 19 & 57.59 & 65.11 &  & 23 & +21\% \\
-2023-01 & INTC & Technology & 19\% & 19 & 26.73 & 65.76 & 4 & 40 & +130\% \\
-2023-01 & SNA & Industrials & 19\% & 19 & 229.38 & 355.66 &  & 33 & +71\% \\
-2023-07 & STLD & Materials & 22\% & 23 & 110.78 & 250.80 &  & 53 & +137\% \\
-2023-07 & NUE & Materials & 21\% & 22 & 165.61 & 273.87 &  & 37 & +73\% \\
-2023-07 & MU & Technology & 21\% & 21 & 63.90 & 884.74 &  & 299 & +1303\% \\
-2023-07 & SNA & Industrials & 19\% & 20 & 286.86 & 355.66 &  & 27 & +35\% \\
-2023-07 & PKG & Materials & 18\% & 19 & 132.61 & 256.82 &  & 39 & +111\% \\
-2024-01 & STLD & Materials & 22\% & 22 & 118.91 & 250.80 &  & 47 & +119\% \\
-2024-01 & NUE & Materials & 21\% & 21 & 175.43 & 273.87 &  & 34 & +62\% \\
-2024-01 & SWKS & Technology & 20\% & 20 & 109.11 & 87.58 &  & 18 & -12\% \\
-2024-01 & SNA & Industrials & 19\% & 19 & 288.74 & 355.66 &  & 26 & +32\% \\
-2024-01 & CTSH & Technology & 18\% & 18 & 74.40 & 65.11 &  & 17 & -8\% \\
-2024-07 & NUE & Materials & 22\% & 25 & 157.00 & 273.87 &  & 46 & +80\% \\
-2024-07 & STLD & Materials & 20\% & 24 & 129.15 & 250.80 &  & 47 & +100\% \\
-2024-07 & SWKS & Technology & 20\% & 23 & 106.40 & 87.58 &  & 21 & -11\% \\
-2024-07 & SNA & Industrials & 20\% & 23 & 256.90 & 355.66 &  & 34 & +47\% \\
-2024-07 & BG & Staples & 19\% & 22 & 107.32 & 96.64 &  & 21 & -4\% \\
-2025-01 & NUE & Materials & 21\% & 23 & 114.48 & 273.87 &  & 56 & +145\% \\
-2025-01 & SWKS & Technology & 21\% & 22 & 88.45 & 87.58 &  & 23 & +5\% \\
-2025-01 & STLD & Materials & 20\% & 21 & 111.93 & 250.80 &  & 49 & +129\% \\
-2025-01 & BG & Staples & 19\% & 20 & 77.57 & 96.64 &  & 26 & +31\% \\
-2025-01 & AMAT & Technology & 19\% & 20 & 163.87 & 390.09 &  & 49 & +141\% \\
-2025-07 & SWKS & Technology & 22\% & 23 & 77.16 & 87.58 &  & 27 & +18\% \\
-2025-07 & ON & Technology & 21\% & 22 & 53.60 & 71.67 &  & 29 & +34\% \\
-2025-07 & SNA & Industrials & 20\% & 21 & 317.86 & 355.66 &  & 24 & +16\% \\
-2025-07 & AMAT & Technology & 19\% & 20 & 183.76 & 390.09 &  & 44 & +114\% \\
-2025-07 & STLD & Materials & 19\% & 20 & 130.16 & 250.80 &  & 38 & +95\% \\
-2026-01 & SWKS & Technology & 21\% & 23 & 64.40 & 87.58 &  & 32 & +39\% \\
-2026-01 & ON & Technology & 21\% & 23 & 56.70 & 71.67 &  & 28 & +26\% \\
-2026-01 & SNA & Industrials & 20\% & 22 & 350.95 & 355.66 &  & 22 & +3\% \\
-2026-01 & NUE & Materials & 19\% & 21 & 169.40 & 273.87 &  & 35 & +63\% \\
-2026-01 & CTSH & Technology & 19\% & 20 & 81.28 & 65.11 &  & 17 & -18\% \\
-2026-07 & CTSH & Technology & 21\% & 22 & 41.07 & 65.11 &  & 34 & +59\% \\
-2026-07 & SWKS & Technology & 20\% & 21 & 65.93 & 87.58 &  & 27 & +33\% \\
-2026-07 & SNA & Industrials & 20\% & 20 & 403.28 & 355.66 &  & 18 & -11\% \\
-2026-07 & RMD & Health care & 19\% & 20 & 201.10 & 229.94 &  & 23 & +15\% \\
-2026-07 & BF-B & Staples & 19\% & 20 & 25.83 & 28.71 &  & 22 & +12\% \\
+2020-01 & MU & Technology & 12\% & 12 & 55.39 & 884.74 &  & 198 & +1538\% \\
+2020-01 & NUE & Materials & 12\% & 12 & 55.12 & 273.87 &  & 66 & +463\% \\
+2020-01 & CTSH & Technology & 11\% & 11 & 61.92 & 65.11 &  & 13 & +17\% \\
+2020-01 & SNA & Industrials & 10\% & 10 & 169.00 & 355.66 &  & 25 & +151\% \\
+2020-01 & FAST & Industrials & 9\% & 9 & 18.61 & 51.91 &  & 31 & +232\% \\
+2020-01 & TPR & Discretionary & 9\% & 9 & 26.93 & 116.29 & 4 & 32 & +290\% \\
+2020-01 & AMAT & Technology & 9\% & 9 & 62.20 & 390.09 &  & 62 & +566\% \\
+2020-01 & PKG & Materials & 9\% & 9 & 110.72 & 256.82 &  & 26 & +183\% \\
+2020-01 & GILD & Health care & 9\% & 9 & 65.23 & 170.68 & 2 & 25 & +204\% \\
+2020-01 & LYB & Materials & 9\% & 9 & 93.86 & 68.64 &  & 10 & +12\% \\
+2020-07 & MU & Technology & 12\% & 12 & 49.70 & 884.74 &  & 217 & +1726\% \\
+2020-07 & NUE & Materials & 11\% & 11 & 40.38 & 273.87 &  & 86 & +652\% \\
+2020-07 & CTSH & Technology & 11\% & 11 & 56.42 & 65.11 &  & 14 & +28\% \\
+2020-07 & HAS & Discretionary & 10\% & 10 & 74.69 & 119.09 & 9 & 0 & -5\% \\
+2020-07 & HUM & Health care & 10\% & 10 & 391.55 & 414.50 &  & 11 & +12\% \\
+2020-07 & PKG & Materials & 10\% & 10 & 99.37 & 256.82 &  & 30 & +210\% \\
+2020-07 & SNA & Industrials & 9\% & 9 & 134.12 & 355.66 &  & 29 & +212\% \\
+2020-07 & FAST & Industrials & 9\% & 9 & 21.50 & 51.91 &  & 26 & +184\% \\
+2020-07 & TPR & Discretionary & 9\% & 9 & 12.97 & 116.29 & 9 & 64 & +699\% \\
+2020-07 & HSIC & Health care & 9\% & 9 & 58.86 & 84.88 &  & 13 & +44\% \\
+2021-01 & MU & Technology & 11\% & 12 & 74.05 & 884.74 &  & 142 & +1125\% \\
+2021-01 & NUE & Materials & 11\% & 11 & 52.51 & 273.87 &  & 64 & +468\% \\
+2021-01 & HUM & Health care & 10\% & 11 & 412.19 & 414.50 &  & 12 & +6\% \\
+2021-01 & CTSH & Technology & 10\% & 10 & 79.42 & 65.11 &  & 9 & -10\% \\
+2021-01 & AMAT & Technology & 10\% & 10 & 86.87 & 390.09 &  & 48 & +371\% \\
+2021-01 & HAS & Discretionary & 10\% & 10 & 91.96 & 119.09 & 7 & 0 & -24\% \\
+2021-01 & PKG & Materials & 10\% & 10 & 135.75 & 256.82 &  & 22 & +124\% \\
+2021-01 & LRCX & Technology & 9\% & 10 & 47.80 & 239.11 &  & 52 & +430\% \\
+2021-01 & GILD & Health care & 9\% & 10 & 60.11 & 170.68 & 3 & 28 & +217\% \\
+2021-01 & BIIB & Health care & 9\% & 10 & 242.95 & 253.62 &  & 10 & +4\% \\
+2021-07 & SNA & Industrials & 12\% & 13 & 223.42 & 355.66 &  & 23 & +83\% \\
+2021-07 & MU & Technology & 11\% & 12 & 80.11 & 884.74 &  & 138 & +1033\% \\
+2021-07 & HUM & Health care & 10\% & 11 & 447.63 & 414.50 &  & 11 & -2\% \\
+2021-07 & CMI & Industrials & 10\% & 11 & 242.13 & 500.09 & 0 & 25 & +132\% \\
+2021-07 & INTC & Technology & 10\% & 11 & 56.01 & 65.76 & 5 & 3 & -19\% \\
+2021-07 & FAST & Industrials & 10\% & 11 & 26.03 & 51.91 &  & 24 & +127\% \\
+2021-07 & NUE & Materials & 10\% & 11 & 96.65 & 273.87 &  & 32 & +206\% \\
+2021-07 & BBY & Discretionary & 9\% & 10 & 116.37 & 95.65 & 2 & 8 & -2\% \\
+2021-07 & HSIC & Health care & 9\% & 10 & 75.51 & 84.88 &  & 11 & +12\% \\
+2021-07 & CTSH & Technology & 9\% & 10 & 69.84 & 65.11 &  & 10 & +2\% \\
+2022-01 & SNA & Industrials & 11\% & 11 & 213.32 & 355.66 &  & 22 & +89\% \\
+2022-01 & MU & Technology & 11\% & 11 & 95.75 & 884.74 &  & 102 & +845\% \\
+2022-01 & HUM & Health care & 10\% & 10 & 465.45 & 414.50 &  & 10 & -6\% \\
+2022-01 & CMI & Industrials & 10\% & 10 & 219.53 & 500.09 & 0 & 26 & +153\% \\
+2022-01 & HSIC & Health care & 10\% & 10 & 77.43 & 84.88 &  & 11 & +10\% \\
+2022-01 & INTC & Technology & 10\% & 10 & 53.21 & 65.76 & 5 & 3 & -16\% \\
+2022-01 & NUE & Materials & 10\% & 10 & 113.04 & 273.87 &  & 25 & +159\% \\
+2022-01 & AMAT & Technology & 10\% & 10 & 159.93 & 390.09 &  & 24 & +154\% \\
+2022-01 & PKG & Materials & 9\% & 9 & 134.61 & 256.82 &  & 20 & +119\% \\
+2022-01 & CTSH & Technology & 9\% & 9 & 89.57 & 65.11 &  & 7 & -21\% \\
+2022-07 & SNA & Industrials & 11\% & 11 & 198.24 & 355.66 &  & 23 & +101\% \\
+2022-07 & NUE & Materials & 11\% & 11 & 105.64 & 273.87 &  & 30 & +175\% \\
+2022-07 & MU & Technology & 11\% & 11 & 53.65 & 884.74 &  & 179 & +1585\% \\
+2022-07 & AMAT & Technology & 10\% & 10 & 86.27 & 390.09 &  & 46 & +369\% \\
+2022-07 & SWKS & Technology & 10\% & 10 & 91.12 & 87.58 &  & 11 & +9\% \\
+2022-07 & GOOG & Communication & 10\% & 10 & 109.08 & 278.22 &  & 25 & +157\% \\
+2022-07 & GOOGL & Communication & 10\% & 10 & 108.74 & 279.84 &  & 25 & +160\% \\
+2022-07 & CMI & Industrials & 10\% & 10 & 194.11 & 500.09 & 0 & 27 & +182\% \\
+2022-07 & INTC & Technology & 10\% & 10 & 36.34 & 65.76 & 7 & 4 & +21\% \\
+2022-07 & CTSH & Technology & 9\% & 9 & 68.03 & 65.11 &  & 10 & +3\% \\
+2023-01 & MU & Technology & 11\% & 11 & 50.37 & 884.74 &  & 196 & +1683\% \\
+2023-01 & SNA & Industrials & 10\% & 11 & 229.38 & 355.66 &  & 19 & +71\% \\
+2023-01 & GOOG & Communication & 10\% & 11 & 89.70 & 278.22 &  & 34 & +213\% \\
+2023-01 & GOOGL & Communication & 10\% & 11 & 89.12 & 279.84 &  & 34 & +217\% \\
+2023-01 & NUE & Materials & 10\% & 11 & 131.06 & 273.87 &  & 24 & +120\% \\
+2023-01 & CTSH & Technology & 10\% & 11 & 57.59 & 65.11 &  & 13 & +21\% \\
+2023-01 & LRCX & Technology & 10\% & 10 & 41.43 & 239.11 &  & 60 & +497\% \\
+2023-01 & SWKS & Technology & 10\% & 10 & 90.50 & 87.58 &  & 11 & +9\% \\
+2023-01 & CMI & Industrials & 9\% & 10 & 241.04 & 500.09 & 0 & 22 & +124\% \\
+2023-01 & INTC & Technology & 9\% & 10 & 26.73 & 65.76 & 10 & 6 & +61\% \\
+2023-07 & STLD & Materials & 12\% & 12 & 110.78 & 250.80 &  & 29 & +137\% \\
+2023-07 & NUE & Materials & 11\% & 12 & 165.61 & 273.87 &  & 20 & +73\% \\
+2023-07 & SNA & Industrials & 11\% & 11 & 286.86 & 355.66 &  & 15 & +35\% \\
+2023-07 & MU & Technology & 10\% & 11 & 63.90 & 884.74 &  & 149 & +1303\% \\
+2023-07 & CF & Materials & 10\% & 10 & 70.43 & 123.30 &  & 19 & +88\% \\
+2023-07 & DD & Industrials & 10\% & 10 & 89.84 & 140.05 &  & 17 & +66\% \\
+2023-07 & CTSH & Technology & 10\% & 10 & 65.56 & 65.11 &  & 10 & +5\% \\
+2023-07 & LRCX & Technology & 9\% & 10 & 65.10 & 239.11 &  & 36 & +278\% \\
+2023-07 & SWKS & Technology & 9\% & 10 & 111.70 & 87.58 &  & 8 & -13\% \\
+2023-07 & GOOG & Communication & 9\% & 9 & 120.56 & 278.22 &  & 22 & +133\% \\
+2024-01 & STLD & Materials & 11\% & 11 & 118.91 & 250.80 &  & 25 & +119\% \\
+2024-01 & NUE & Materials & 11\% & 11 & 175.43 & 273.87 &  & 18 & +62\% \\
+2024-01 & SWKS & Technology & 11\% & 11 & 109.11 & 87.58 &  & 10 & -12\% \\
+2024-01 & SNA & Industrials & 11\% & 11 & 288.74 & 355.66 &  & 14 & +32\% \\
+2024-01 & CF & Materials & 10\% & 10 & 81.61 & 123.30 &  & 15 & +61\% \\
+2024-01 & DD & Industrials & 10\% & 10 & 97.29 & 140.05 &  & 15 & +52\% \\
+2024-01 & CTSH & Technology & 9\% & 10 & 74.40 & 65.11 &  & 9 & -8\% \\
+2024-01 & AMAT & Technology & 9\% & 9 & 154.37 & 390.09 &  & 24 & +158\% \\
+2024-01 & KEYS & Technology & 9\% & 9 & 155.49 & 307.20 &  & 19 & +98\% \\
+2024-01 & LRCX & Technology & 9\% & 9 & 74.93 & 239.11 &  & 30 & +226\% \\
+2024-07 & NUE & Materials & 11\% & 12 & 157.00 & 273.87 &  & 22 & +80\% \\
+2024-07 & SNA & Industrials & 11\% & 11 & 256.90 & 355.66 &  & 17 & +47\% \\
+2024-07 & STLD & Materials & 10\% & 11 & 129.15 & 250.80 &  & 23 & +100\% \\
+2024-07 & BG & Staples & 10\% & 11 & 107.32 & 96.64 &  & 11 & -4\% \\
+2024-07 & SWKS & Technology & 10\% & 11 & 106.40 & 87.58 &  & 10 & -11\% \\
+2024-07 & EOG & Energy & 10\% & 11 & 126.54 & 165.54 &  & 15 & +42\% \\
+2024-07 & CTSH & Technology & 10\% & 11 & 67.74 & 65.11 &  & 11 & +0\% \\
+2024-07 & CF & Materials & 9\% & 10 & 73.38 & 123.30 &  & 18 & +77\% \\
+2024-07 & ON & Technology & 9\% & 10 & 69.18 & 71.67 &  & 10 & +4\% \\
+2024-07 & EBAY & Discretionary & 9\% & 10 & 52.68 & 121.64 & 9 & 10 & +101\% \\
+2025-01 & NUE & Materials & 11\% & 12 & 114.48 & 273.87 &  & 29 & +145\% \\
+2025-01 & SWKS & Technology & 10\% & 11 & 88.45 & 87.58 &  & 11 & +5\% \\
+2025-01 & STLD & Materials & 10\% & 11 & 111.93 & 250.80 &  & 25 & +129\% \\
+2025-01 & BG & Staples & 10\% & 11 & 77.57 & 96.64 &  & 14 & +31\% \\
+2025-01 & SNA & Industrials & 10\% & 10 & 335.11 & 355.66 &  & 11 & +11\% \\
+2025-01 & EOG & Energy & 10\% & 10 & 124.71 & 165.54 &  & 15 & +42\% \\
+2025-01 & CTSH & Technology & 10\% & 10 & 76.41 & 65.11 &  & 9 & -12\% \\
+2025-01 & AMAT & Technology & 9\% & 10 & 163.87 & 390.09 &  & 24 & +141\% \\
+2025-01 & ON & Technology & 9\% & 10 & 61.71 & 71.67 &  & 11 & +16\% \\
+2025-01 & CF & Materials & 9\% & 10 & 85.83 & 123.30 &  & 14 & +49\% \\
+2025-07 & ON & Technology & 11\% & 13 & 53.60 & 71.67 &  & 17 & +34\% \\
+2025-07 & SWKS & Technology & 11\% & 13 & 77.16 & 87.58 &  & 15 & +18\% \\
+2025-07 & SNA & Industrials & 11\% & 13 & 317.86 & 355.66 &  & 15 & +16\% \\
+2025-07 & EW & Health care & 10\% & 12 & 77.18 & 92.01 &  & 14 & +19\% \\
+2025-07 & BG & Staples & 10\% & 11 & 80.25 & 96.64 &  & 14 & +25\% \\
+2025-07 & FSLR & Technology & 10\% & 11 & 162.96 & 174.40 &  & 12 & +7\% \\
+2025-07 & CTSH & Technology & 10\% & 11 & 80.44 & 65.11 &  & 9 & -17\% \\
+2025-07 & AMAT & Technology & 9\% & 11 & 183.76 & 390.09 &  & 23 & +114\% \\
+2025-07 & STLD & Materials & 9\% & 11 & 130.16 & 250.80 &  & 21 & +95\% \\
+2025-07 & EOG & Energy & 9\% & 11 & 121.19 & 165.54 &  & 15 & +43\% \\
+2026-01 & ON & Technology & 11\% & 13 & 56.70 & 71.67 &  & 16 & +26\% \\
+2026-01 & SNA & Industrials & 11\% & 12 & 350.95 & 355.66 &  & 13 & +3\% \\
+2026-01 & SWKS & Technology & 10\% & 12 & 64.40 & 87.58 &  & 16 & +39\% \\
+2026-01 & EW & Health care & 10\% & 12 & 85.33 & 92.01 &  & 13 & +8\% \\
+2026-01 & CPRT & Industrials & 10\% & 11 & 37.77 & 30.13 &  & 9 & -20\% \\
+2026-01 & CTSH & Technology & 10\% & 11 & 81.28 & 65.11 &  & 9 & -18\% \\
+2026-01 & BG & Staples & 10\% & 11 & 92.64 & 96.64 &  & 12 & +6\% \\
+2026-01 & EOG & Energy & 10\% & 11 & 107.27 & 165.54 &  & 17 & +59\% \\
+2026-01 & NUE & Materials & 10\% & 11 & 169.40 & 273.87 &  & 18 & +63\% \\
+2026-01 & STLD & Materials & 9\% & 10 & 176.06 & 250.80 &  & 15 & +44\% \\
+2026-07 & SNA & Industrials & 11\% & 12 & 403.28 & 355.66 &  & 11 & -11\% \\
+2026-07 & CTSH & Technology & 11\% & 12 & 41.07 & 65.11 &  & 19 & +59\% \\
+2026-07 & FSLR & Technology & 11\% & 11 & 232.08 & 174.40 &  & 9 & -25\% \\
+2026-07 & SWKS & Technology & 10\% & 11 & 65.93 & 87.58 &  & 15 & +33\% \\
+2026-07 & RMD & Health care & 10\% & 11 & 201.10 & 229.94 &  & 13 & +15\% \\
+2026-07 & EW & Health care & 10\% & 11 & 91.99 & 92.01 &  & 11 & +0\% \\
+2026-07 & BF-B & Staples & 10\% & 11 & 25.83 & 28.71 &  & 12 & +12\% \\
+2026-07 & PODD & Health care & 9\% & 10 & 159.79 & 149.68 &  & 9 & -6\% \\
+2026-07 & CF & Materials & 9\% & 10 & 108.16 & 123.30 &  & 11 & +15\% \\
+2026-07 & HUM & Health care & 9\% & 9 & 409.42 & 414.50 &  & 9 & +1\% \\
 \hline
 \end{longtable}}
 \section{Wallet contents by year}
@@ -372,26 +567,45 @@ Year & Company & Sector & Weight & In & Bought at & Now & Sold & Kept & Return \
 \hline
 Holding & 2020 & 2021 & 2022 & 2023 & 2024 & 2025 & 2026 & Now \\
 \hline
-CMI & 18 & 23 & 61 & 93 & 96 & 141 & 217 & 210 \\
-CTSH & 21 & 77 & 88 & 77 & 119 & 124 & 154 & 160 \\
-MU & 20 & 75 & 142 & 115 & 218 & 232 & 840 & 2,357 \\
-NUE & 21 & 69 & 151 & 226 & 351 & 274 & 433 & 706 \\
-SNA & 20 & 43 & 97 & 150 & 234 & 309 & 377 & 408 \\
-HAS &  & 47 & 53 & 33 & 25 & 5 & 5 & 5 \\
-HUM &  & 19 & 62 & 67 & 63 & 34 & 36 & 58 \\
-INTC &  &  & 39 & 54 & 99 & 42 & 67 & 112 \\
-PKG &  &  &  &  & 23 & 33 & 32 & 39 \\
-STLD &  &  &  &  & 46 & 86 & 164 & 236 \\
-SWKS &  &  &  &  & 20 & 59 & 87 & 148 \\
-BG &  &  &  &  &  & 36 & 45 & 48 \\
-AMAT &  &  &  &  &  & 20 & 63 & 92 \\
-ON &  &  &  &  &  &  & 46 & 58 \\
-BF-B &  &  &  &  &  &  &  & 22 \\
-RMD &  &  &  &  &  &  &  & 23 \\
+AMAT & 9 & 23 & 53 & 44 & 80 & 95 & 173 & 252 \\
+SNA & 10 & 22 & 53 & 82 & 128 & 178 & 218 & 236 \\
+PKG & 9 & 35 & 45 & 45 & 59 & 83 & 80 & 99 \\
+NUE & 12 & 38 & 105 & 149 & 225 & 170 & 266 & 434 \\
+MU & 12 & 45 & 84 & 66 & 122 & 130 & 471 & 1,321 \\
+LYB & 9 & 9 & 10 & 10 & 12 & 9 & 6 & 10 \\
+GILD & 9 & 18 & 23 & 24 & 24 & 28 & 37 & 53 \\
+FAST & 9 & 23 & 43 & 34 & 47 & 53 & 62 & 81 \\
+TPR & 9 & 31 & 30 & 29 & 30 & 53 & 105 & 96 \\
+CTSH & 11 & 40 & 67 & 63 & 103 & 130 & 163 & 152 \\
+HUM &  & 21 & 46 & 50 & 48 & 26 & 27 & 53 \\
+HSIC &  & 10 & 32 & 32 & 31 & 28 & 31 & 35 \\
+HAS &  & 23 & 25 & 16 & 9 & 1 & 1 & 1 \\
+BIIB &  & 10 & 10 & 11 & 11 & 6 & 7 & 10 \\
+LRCX &  & 10 & 15 & 19 & 55 & 53 & 138 & 178 \\
+INTC &  &  & 20 & 28 & 51 & 22 & 12 & 17 \\
+BBY &  &  & 9 & 8 & 8 & 7 & 5 & 8 \\
+CMI &  &  & 20 & 45 & 46 & 67 & 103 & 100 \\
+GOOGL &  &  &  & 19 & 29 & 40 & 67 & 59 \\
+GOOG &  &  &  & 19 & 40 & 55 & 91 & 81 \\
+SWKS &  &  &  & 20 & 45 & 58 & 66 & 107 \\
+CF &  &  &  &  & 21 & 45 & 43 & 78 \\
+STLD &  &  &  &  & 25 & 44 & 96 & 138 \\
+DD &  &  &  &  & 21 & 20 & 27 & 31 \\
+KEYS &  &  &  &  & 9 & 10 & 12 & 19 \\
+EOG &  &  &  &  &  & 21 & 39 & 62 \\
+BG &  &  &  &  &  & 19 & 48 & 51 \\
+ON &  &  &  &  &  & 19 & 43 & 55 \\
+EBAY &  &  &  &  &  & 12 & 10 & 10 \\
+FSLR &  &  &  &  &  &  & 19 & 20 \\
+EW &  &  &  &  &  &  & 25 & 38 \\
+CPRT &  &  &  &  &  &  & 11 & 9 \\
+BF-B &  &  &  &  &  &  &  & 12 \\
+PODD &  &  &  &  &  &  &  & 9 \\
+RMD &  &  &  &  &  &  &  & 13 \\
 \hline
 Put in & 100 & 300 & 500 & 700 & 900 & 1,100 & 1,300 & 1,400 \\
-Sold & 0 & 0 & 0 & 0 & 4 & 29 & 43 & 45 \\
-Total & 100 & 353 & 693 & 816 & 1,293 & 1,396 & 2,567 & 4,681 \\
+Sold & 0 & 4 & 13 & 18 & 23 & 36 & 66 & 74 \\
+Total & 100 & 358 & 691 & 809 & 1,276 & 1,480 & 2,503 & 3,927 \\
 \hline
 \end{tabular}
 \end{table}
@@ -405,30 +619,24 @@ Total & 100 & 353 & 693 & 816 & 1,293 & 1,396 & 2,567 & 4,681 \\
 \hline
 Rule & w\_r & w\_r beat & w\_r not & Pts beat & Pts not & Gap & Corr. \\
 \hline
-NN & 1.00 & 1.00 & 1.00 & 4.15 & 3.71 & +0.44 & -0.07 \\
-E6 & 0.99 & 0.99 & 1.00 & 4.55 & 3.47 & +1.08 & +0.51 \\
-G7 & 0.91 & 0.91 & 0.92 & 4.50 & 3.52 & +0.99 & +0.40 \\
-G6 & 0.88 & 0.87 & 0.88 & 4.62 & 3.57 & +1.05 & +0.36 \\
-G2b & 0.83 & 0.83 & 0.84 & 4.98 & 4.84 & +0.14 & +0.10 \\
-E2 & 0.82 & 0.81 & 0.82 & 4.98 & 4.84 & +0.14 & +0.10 \\
-B1 & 0.79 & 0.75 & 0.85 & 2.32 & 3.73 & -1.42 & -0.30 \\
-G2a & 0.76 & 0.76 & 0.77 & 4.90 & 4.65 & +0.25 & +0.22 \\
-E1 & 0.59 & 0.59 & 0.60 & 4.90 & 4.65 & +0.25 & +0.22 \\
-NI1 & 0.39 & 0.38 & 0.39 & 2.81 & 2.59 & +0.22 & -0.12 \\
-G4 & 0.37 & 0.37 & 0.37 & 0.52 & 1.92 & -1.40 & -0.19 \\
-G3 & 0.27 & 0.26 & 0.29 & 0.69 & 3.04 & -2.36 & -0.31 \\
-E5 & 0.25 & 0.25 & 0.25 & 3.55 & 2.75 & +0.81 & +0.24 \\
-E3 & 0.20 & 0.20 & 0.21 & 2.00 & 3.00 & -1.00 & -0.29 \\
-E4 & 0.19 & 0.19 & 0.19 & 1.84 & 2.00 & -0.16 & -0.07 \\
-G5 & 0.18 & 0.18 & 0.19 & 2.98 & 4.14 & -1.15 & +0.04 \\
+NN & 1.00 & 1.00 & 1.00 & 3.59 & 2.69 & +0.90 & -0.03 \\
+G7 & 0.91 & 0.91 & 0.91 & 3.67 & 3.54 & +0.14 & +0.13 \\
+G6 & 0.88 & 0.87 & 0.88 & 3.99 & 3.80 & +0.19 & +0.14 \\
+B1 & 0.84 & 0.84 & 0.84 & 3.24 & 3.56 & -0.32 & -0.09 \\
+G2b & 0.83 & 0.83 & 0.83 & 4.86 & 4.68 & +0.18 & -0.00 \\
+E2 & 0.82 & 0.81 & 0.82 & 4.86 & 4.68 & +0.18 & -0.00 \\
+G2a & 0.76 & 0.76 & 0.76 & 4.88 & 4.54 & +0.35 & +0.26 \\
+E1 & 0.59 & 0.59 & 0.60 & 4.88 & 4.54 & +0.35 & +0.26 \\
+G5 & 0.53 & 0.53 & 0.53 & 3.85 & 3.37 & +0.48 & +0.20 \\
+E4 & 0.19 & 0.19 & 0.19 & 2.04 & 2.29 & -0.25 & +0.01 \\
 \hline
 \end{tabular}
 \end{table}
-Each rule's points are multiplied by its weight, one less the share of companies passing it on the date, so a rule few companies pass counts more. A good weighting gives most weight to the rules whose points went with better returns. Table \ref{tab:weighting} sets each rule's mean weight on the dates the picks were made against two measures of how well it told the 110 picks apart: the gap between the mean points of the picks that beat the S\&P 500 and of those that did not, weighted by dollars as in Figure \ref{fig:rules}, and the rank correlation of the rule's points with each pick's return a year above the S\&P 500. Figure \ref{fig:weighting} plots weight against gap; a good weighting puts its rules on a rising line, with the heavy rules above zero.
+Each rule's points are multiplied by its weight, one less the share of companies passing it on the date, so a rule few companies pass counts more. A good weighting gives most weight to the rules whose points went with better returns. Table \ref{tab:weighting} sets each rule's mean weight on the dates the picks were made against two measures of how well it told the 220 picks apart: the gap between the mean points of the picks that beat the S\&P 500 and of those that did not, weighted by dollars as in Figure \ref{fig:rules}, and the rank correlation of the rule's points with each pick's return a year above the S\&P 500. Figure \ref{fig:weighting} plots weight against gap; a good weighting puts its rules on a rising line, with the heavy rules above zero.
 
-Across the rules, the rank correlation of weight and gap is +0.61, and of weight and correlation +0.49.
+Across the rules, the rank correlation of weight and gap is +0.02, and of weight and correlation -0.48.
 
-The weighting leans towards the rules that worked, though far from fully. Weighted heavily but with a negative gap: return on equity (B1). A positive gap but a light weight: current ratio (lenient) (E1), 4-year earnings growth (E5) and net income growth (NI1). A rule's weight hardly differs between the dates of winning and losing picks (columns w\_r beat and w\_r not), because it is set across all companies on a date, not per pick. These differences suggest where the weighting could be tuned; any change must be tested on years it was not fitted on.
+The weighting is unrelated to which rules worked. Weighted heavily but with a negative gap: return on equity (B1). A positive gap but a light weight: current ratio (G2a), 6-year earnings growth (G5), current ratio (lenient) (E1) and debt to working capital (lenient) (E2). Any change to the weights must be tested on years it was not fitted on.
 
 \begin{figure}[H]
 \centering
@@ -441,7 +649,7 @@ The weighting leans towards the rules that worked, though far from fully. Weight
 \begin{table}[H]
 \centering
 \small
-\caption{Truncation check: companies scored on the date, companies whose score differs when every input is cut at the date (per score), and whether the five picks are the same.}\label{tab:lookahead}
+\caption{Truncation check: companies scored on the date, companies whose score differs when every input is cut at the date (per score), and whether the picks are the same.}\label{tab:lookahead}
 \begin{tabular}{l r r r r r l}
 \hline
 Date & Companies & Score & Score 0 to 1 & Unweighted & Share passed & Same picks \\
@@ -454,9 +662,9 @@ Date & Companies & Score & Score 0 to 1 & Unweighted & Share passed & Same picks
 \end{table}
 A score must use only what was known on its date. Four guards are built in. A company's figures count from the day its annual report was filed with the SEC, and of all the figures filed for a year only the first reported is used, never a later restatement. Prices are the close on the scoring date and dividends are counted by their ex-date. Each January and July purchase uses the scores of the rebalance date two weeks before it. Rule weights come from the companies on the date alone.
 
-These guards are tested by cutting every input at a date as if it were that day (filings filed on or before it, prices and dividends up to it), scoring the companies again and comparing the scores with the full run (Table \ref{tab:lookahead}). Any difference means information from after the date reached a score. On 21 December 2018, 16 December 2022 and 19 December 2025 the picks were the same, and the scores were identical on 21 December 2018, 16 December 2022 and 19 December 2025. The same check runs as a unit test. A rule whose window reaches back further than a company's price history (the 20-year dividend record of a younger company) is not evaluated rather than failed.
+These guards are tested by cutting every input at a date as if it were that day (filings filed on or before it, prices and dividends up to it), scoring the companies again and comparing the scores with the full run (Table \ref{tab:lookahead}). Any difference means information from after the date reached a score. On 21 December 2018, 16 December 2022 and 19 December 2025 the picks were the same, and the scores were identical on 21 December 2018, 16 December 2022 and 19 December 2025. The same check runs as a unit test. A rule whose window reaches back further than a company's price history (a long dividend record of a younger company) is not evaluated rather than failed.
 
-Three sources of forward information are outside this test. Only today's S\&P 500 members are scored. Each company counts from the date it entered the index, as the index's list gives it. Companies that later left the index are missing, which flatters every result. Sectors are today's, used to leave out Financials and Real Estate in earlier years. And the score's design and settings were chosen while looking at 2016 to 2026, so no period tests it fairly: 2022 onwards, once meant as a held-out test, was used to choose between models.
+Three sources of forward information are outside this test. Only today's S\&P 500 members are scored. Each company counts from the date it entered the index, as the index's list gives it. Companies that later left the index are missing, which flatters every result. Sectors are today's, used to leave out Financials and Real Estate in earlier years. And the score's design and settings were chosen while looking at 2009 to 2026, so no period tests it fairly: 2022 onwards, once meant as a held-out test, was used to choose between models.
 
 \subsection{Companies missing from the data}
 \begin{table}[H]
@@ -488,20 +696,14 @@ Rule & Name & What it measures & Better & Passes when \\
 \hline
 G2a & current ratio & Current assets divided by current liabilities: what the company owns against what it owes within a year. & higher & at least 2.0 \\
 G2b & debt to working capital & Long-term debt divided by net current assets (current assets less current liabilities). & lower & at most 1.0 \\
-G3 & 10 years of profit & Number of the last 10 fiscal years with positive earnings per share. & higher & all 10 years \\
-G4 & 20 years of dividends & Number of the 20 calendar years before the decision in which a dividend was paid. & higher & all 20 years \\
-G5 & 10-year earnings growth & Average earnings per share of the last 3 years over the average of 3 years a decade earlier. & higher & at least 1.33 \\
+G5 & 6-year earnings growth & Average earnings per share of the last 3 years over the average of the 3 years before them, within a window of 6 years. & higher & at least 1.33 times the earlier average \\
 G6 & P/E & Price over the average earnings per share of the last 3 years. & lower & at most 15.0 \\
 G7 & P/E times P/B & P/E as in G6 times the price over book value per share. & lower & P/B at most 1.5, or the product at most 22.5 \\
 E1 & current ratio (lenient) & Current ratio, as G2a. & higher & at least 1.5 \\
 E2 & debt to working capital (lenient) & Long-term debt over net current assets, as G2b. & lower & at most 1.1 \\
-E3 & 5 years of profit & Number of the last 5 fiscal years with positive earnings per share. & higher & all 5 years \\
 E4 & current dividend & Dividends paid over the last 365 days, as a yield on the price. & higher & any dividend \\
-E5 & 4-year earnings growth & Change in earnings per share over 4 years, relative to the earlier figure. & higher & earnings per share grew \\
-E6 & price to tangible assets & Market value over net tangible assets (equity less goodwill and other intangible assets). & lower & at most 1.2 \\
 NN & net-net & Market value over net current asset value (current assets less all liabilities). & lower & at most 0.67 \\
-B1 & return on equity & Number of the last 10 years with return on equity (net income over equity) of at least 15\%. & higher & at least 7 years, and long-term debt at most 0.5 times equity \\
-NI1 & net income growth & Growth of net income from the year before to the latest year. & higher & net income grew \\
+B1 & return on equity & Number of the last 3 years with return on equity (net income over equity) of at least 15\%. & higher & at least 2 of those years, and long-term debt at most 0.5 times equity \\
 \hline
 \end{tabular}
 \end{table}
