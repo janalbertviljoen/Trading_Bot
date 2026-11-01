@@ -143,13 +143,18 @@ class Section:
 def escape(text: str) -> str:
     """Return ``text`` with LaTeX's special characters escaped.
 
-    ``$...$`` stays maths, and ``[[label]]`` becomes a reference to the labelled section.
+    ``$...$`` stays maths, ``[[label]]`` becomes a reference to the labelled section and
+    ``**...**`` is set in bold.
     """
-    parts = re.split(r"(\$[^$]+\$|\[\[[A-Za-z0-9:_-]+\]\])", text)
+    parts = re.split(r"(\$[^$]+\$|\[\[[A-Za-z0-9:_-]+\]\]|\*\*[^*]+\*\*)", text)
     out: list[str] = []
     for part in parts:
         if len(part) > 1 and part.startswith("$") and part.endswith("$"):
             out.append(part)
+        elif part.startswith("**") and part.endswith("**") and part != "****":
+            out.append(
+                "\\textbf{" + "".join(_SPECIAL.get(c, c) for c in part[2:-2]) + "}"
+            )
         elif part.startswith("[[") and part.endswith("]]"):
             out.append(f"\\ref{{{part[2:-2]}}}")
         else:

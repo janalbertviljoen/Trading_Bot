@@ -591,11 +591,13 @@ def pick_prices(  # noqa: PLR0913  one keyword per layout setting
         right_on=["symbol", "date"],
     )
     change = _price_change(prices)
+    columns = 4
     title = (
         f"Price over {years} years of the companies traded by the investor "
         f"from {scenario} and the next picks"
     )
     if len(change) > page:
+        columns = ends  # the best on the first row, the worst on the second
         change = pd.concat([change.head(ends), change.tail(ends)])
         title = (
             f"Price over {years} years: the {ends} best and {ends} worst of the "
@@ -612,6 +614,7 @@ def pick_prices(  # noqa: PLR0913  one keyword per layout setting
         point_styles={"buy": ("tab:green", "^"), "sell": ("tab:red", "v")},
         panel_order=[str(s) for s in change.index],
         panel_titles={str(s): f"{s}  {c:+.0%}" for s, c in change.items()},
+        columns=columns,
         title=title,
         ylabel="USD",
     )
@@ -620,7 +623,7 @@ def pick_prices(  # noqa: PLR0913  one keyword per layout setting
 def next_prices(
     prices: pd.DataFrame, trades: pd.DataFrame, next_picks: pd.DataFrame, years: int
 ) -> Figure:
-    """Plot each next pick's price in one row: earlier buys green, the next buy orange.
+    """Plot each next pick's price in rows of 5: earlier buys green, the next buy orange.
 
     Parameters
     ----------
@@ -636,7 +639,8 @@ def next_prices(
     Notes
     -----
     The potential buy is marked at the last price, the latest known before the next
-    decision. The tiles have the same size, one per pick, side by side.
+    decision. The tiles have the same size, one per pick, 5 to a row (10 picks: 2 rows
+    by 5 columns).
     """
     symbols = [str(s) for s in next_picks["symbol"]]
     own = prices[prices["symbol"].isin(symbols)]
@@ -666,7 +670,7 @@ def next_prices(
         },
         panel_order=symbols,
         panel_titles={str(s): f"{s}  {c:+.0%}" for s, c in change.items()},
-        columns=max(1, len(symbols)),
+        columns=min(5, max(1, len(symbols))),
         title=f"The next picks: price over {years} years",
         ylabel="USD",
     )

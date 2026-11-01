@@ -187,11 +187,13 @@ def g5_earnings_growth(
     average_years: int,
     min_growth: float,
 ) -> pd.DataFrame:
-    """G5, spec §2.1: recent average EPS at least ``min_growth`` * the one 10 years before.
+    """G5, spec §2.1: recent average EPS at least ``min_growth`` * the earlier average.
 
-    The recent average covers lags 0 to ``average_years - 1``, the old one the last
-    ``average_years`` of ``years`` (lags 10 to 12 by default). Fails when the old average
-    is zero or negative; not evaluable until all ``years`` years are filed.
+    The recent average covers lags 0 to ``average_years - 1``, the earlier one the last
+    ``average_years`` of ``years`` (lags ``years - average_years`` to ``years - 1``: 3 to 5
+    with the configured 6 years and 3-year averages; Graham's 13 years give lags 10 to 12).
+    Fails when the earlier average is zero or negative; not evaluable until all ``years``
+    years are filed.
     """
     eps = inputs.history("eps_diluted", years)
     recent = eps.iloc[:, :average_years].mean(axis=1)

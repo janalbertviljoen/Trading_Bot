@@ -1,0 +1,111 @@
+# The default calibration study (S_202611_003, VI_202611_001). A DRAFT: no code reads this
+# file yet; the format is fixed when the study reader is built. Every range and floor below
+# is a proposal for the user to set (S_202611_003, "Open decisions"). The rules G3, E3, E5 and G4 are
+# commented out of rules.toml (the default is ten rules), so an override of their years also switches
+# the rule on. Parameters are
+# dotted paths into config/rules.toml; a scenario overrides the base configuration there.
+
+[study]
+name = "default"
+seed = 1
+# Calibrate on the S&P 500; the S&P 400 and 600 are the independent check of the chosen
+# specification. Results and checks only, no report for them (user, 2026-11-01).
+calibration_index = "sp500"
+check_indices = ["sp400", "sp600"]
+
+[sample]
+# The company test sample (VI_202611_001): a fixed 10% of the companies, stratified by
+# market capitalisation, never seen by a fit or by the choice between runs.
+test_fraction = 0.10
+stratify = "market_cap"
+# The chosen specification is rerun on this many fresh stratified draws for the bands
+# (12, user, 2026-11-01; it fits the layout better).
+validation_reruns = 12
+# The sample depends on the size of the universe (user, 2026-11-01): for tiny sets use a
+# smaller sample, consider dropping the weighting, and fewer draws so that each holds more
+# companies. None of these numbers is fixed; the defaults below are proposals.
+min_test_companies = 20
+small_universe_below = 150
+
+[search]
+# Seeded random sampling over the ranges below (scipy.stats.qmc, Sobol). The response
+# surface is fitted to the same runs; its optimum is checked with a real run.
+searcher = "random"
+samples = 10
+
+[objective]
+# Never tuned (user, 2026-11-01). Industry-standard annualised excess return over the
+# benchmark of the top `names` held 36 months (the report's reference horizon),
+# unweighted over the years, on the training companies. The 12, 24 and 60 month results
+# are reported beside it as diagnostics; the 60 month one with its count of independent
+# windows.
+measure = "annualised_excess_return"
+horizon_months = 36
+diagnostic_horizons_months = [12, 24, 60]
+
+[fixed]
+# Held by the study, not searched.
+"schedule.months" = [3, 6, 9, 12]
+"score.min_available" = 5
+"universe.excluded_sectors" = ["Financials", "Real Estate"]
+"report.decision_months" = [1, 7]
+
+# Searched parameters. Integers are sampled uniformly from min to max; `floor` is the
+# smallest value the study may ever try, because very short windows overfit.
+
+[parameters."wallet.names"]
+# The picks held at a decision; the report shows 10 (user, 2026-11-01).
+type = "choice"
+values = [5, 10, 20]
+
+[parameters."score.buckets"]
+# The grades of the binned score (now 6).
+type = "int"
+min = 4
+max = 10
+floor = 4
+
+[parameters."valuation.average_years"]
+# Years of earnings averaged in the P/E and P/B (now 3).
+type = "int"
+min = 2
+max = 7
+floor = 2
+
+[parameters."rules.G3.years"]
+# Years of positive earnings (now 3; Graham 10).
+type = "int"
+min = 2
+max = 6
+floor = 2
+
+[parameters."rules.E3.years"]
+type = "int"
+min = 3
+max = 7
+floor = 3
+
+[parameters."rules.E5.years"]
+type = "int"
+min = 3
+max = 6
+floor = 3
+
+[parameters."rules.B1.years"]
+# Years of return on equity (now 3). min_years_passed follows as
+# max(2, round(0.7 * years)), not searched.
+type = "int"
+min = 3
+max = 7
+floor = 3
+
+[parameters."rules.G4.years"]
+# Years of dividends (now 3; Graham 20).
+type = "int"
+min = 3
+max = 10
+floor = 3
+
+# Not searched in this study: the learned rule weights (score_ic), the gates and the point
+# curves (VI_202611_001, "Tried and not used" and "Optimisation candidates"); the rule
+# ablation (remove one rule, rank by impact) is a separate sweep over the same nodes.

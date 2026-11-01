@@ -504,13 +504,14 @@ def _report(args: argparse.Namespace) -> int:
         start_years=start_years,
         end=end,
     )
-    upcoming = evaluation.ranked_positions(table, [end], model)
-    upcoming = upcoming[upcoming["side"] == "buy"].merge(
+    now = evaluation.ranked_positions(table, [end], model)
+    now = now.merge(
         table[["symbol", "date", "gics_sector", str(settings["share_column"])]],
         left_on=["symbol", "score_date"],
         right_on=["symbol", "date"],
-    )
-    upcoming = upcoming.rename(columns={str(settings["share_column"]): "score_share"})
+    ).rename(columns={str(settings["share_column"]): "score_share"})
+    upcoming = now[now["side"] == "buy"]
+    worst = now[now["side"] == "sell"].sort_values(["score", "symbol"])
     changes = read_table(index.members / "changes.parquet")
     paths = pd.concat([held.paths, managed.paths], ignore_index=True)
 
@@ -556,10 +557,12 @@ def _report(args: argparse.Namespace) -> int:
     managed.holdings.to_csv(folder / "holdings.csv", index=False, float_format="%.4f")
     weighting.to_csv(folder / "weighting.csv", index=False, float_format="%.4f")
     upcoming.to_csv(folder / "next_picks.csv", index=False, float_format="%.4f")
+    worst.to_csv(folder / "worst_stocks.csv", index=False, float_format="%.4f")
     inputs = report.ReportInputs(
         held=held,
         managed=managed,
         next_picks=upcoming,
+        worst=worst,
         profile=profile,
         weighting=weighting,
         peers=peer_view,
