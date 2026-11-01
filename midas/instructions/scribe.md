@@ -34,6 +34,12 @@ The PDF reports' text lives in `config/report_*.toml` (the market analysis:
 numbered sections with a sub-section per GICS sector, numbered figure captions, short
 factual descriptions.
 
+A report shares the weights and the techniques, so that the work can be independently
+verified: the rules, their thresholds and the method of each test. It does not state the fine
+calibration details used to enhance the signal: the exact bin widths (the number of buckets), the
+number of samplings or draws and the fraction each leaves out, the size of any perturbation, the
+seeds (user, 2026-11-01).
+
 ## Documents for members
 
 Documents a member of Project Assay reads through the MCP server (the research

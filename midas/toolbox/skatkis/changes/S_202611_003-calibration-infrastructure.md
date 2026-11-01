@@ -89,6 +89,14 @@ infrastructure, so the parts are interfaces with small built-in implementations.
   the test companies never enter the choice).
 - 2026-11-01 (user): the final sampling bands use 12 stratified draws, not 10 (it fits
   the layout better); `validation_reruns = 12` in the draft studies.
+- 2026-11-01 (user, answering the Warden's finding B3): only the results used in the final
+  analysis are kept, and the engine reproduces them; the scratch scripts are not committed. The
+  results are deterministic given their seeds (the stratified split 1, the company draws 2 to
+  13, the random books 7, the bootstrap 5, the random subsets 11), so the engine must carry the
+  seeds and match the recorded numbers. The reference scripts and logs of the final set are
+  kept locally, git-ignored, in `data/private/vi_202611_001_reference/` (an index by check
+  number in its README) as the source of the numbers to match. Until the engine reproduces
+  them, the accreditation results are provisional.
 - 2026-11-01 (user): two tiers of optimisation. The general run searches only the
   sensitive parameters (found by the first studies: the earnings averaging years and the
   buckets; E5 years mildly), with the number of picks fixed per tier; speed is essential,

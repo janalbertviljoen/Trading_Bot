@@ -2,11 +2,11 @@
 
 | Field | Value |
 |---|---|
-| Status | agreed |
+| Status | in progress (first light, 2026-11-01) |
 | Priority | high |
 | Kind | methodology |
 | Depends on | S_202611_003 |
-| Branch | its own, after S_202611_003 (`feature/value-investing/vi-202611-001-model-calibration`) |
+| Branch | `feature/skatkis/s-202611-003-calibration-infrastructure` (a deviation: a methodology change gets its own branch, `developer.md`, "Branches"; whether to split is the user's decision) |
 | Raised | 2026-11-01 |
 
 ## Description
@@ -19,9 +19,89 @@ broad signal (every company with `score` of at least 0.6, held 12 months) is fla
 2022 (-0.4% a year). The two test different strategies: the report's outperformance
 comes from five names by `score_binned_weighted` held for good, a concentrated book.
 
-The final product is the report with its five picks (user, 2026-11-01). The model
+The final product is the report with its ten picks (user, 2026-11-01; five at first, ten
+from the rerun on the ten default rules). The model
 specification is calibrated to suit the client; once the client accepts the result,
 that specification is frozen as their version. A recalibration makes a new version.
+
+## First light: the prototype sign-off (2026-11-01)
+
+**Version.** This is the first prototype of the value model, "first light": the model of the commit
+that carries this section, with the settings fingerprint `0e57a832bd87`
+(`value_investing.__main__.model_fingerprint`). No earlier prototype was frozen, so there is nothing
+to compare it with, and this state is the baseline for every later comparison (user, 2026-11-01).
+Versioning and auditability come first; accreditation tests and the engine follow.
+
+**What it is.** The ten default rules (G6, G2A, G7, G2B, E2, NN, E1, G5, B1, E4) with 3-year windows
+(G3 and G4 off; G5 6 years; B1 3 years with 2 at the minimum), 10 picks, exact-n books (a tie broken by
+symbol), the score `score_binned_weighted`, buckets 6, earnings averaged over 3 years, 36 months the
+reference horizon. Delivered from this change: the windows, the ten rules, 10 names, exact-n, the
+protocol (`quant.md`), the report sections. Still open: the inner fit (signed weights, point curves,
+fitted cut-offs), the engine that reproduces the checks (S_202611_003), the composite universe
+(MD_202611_001).
+
+**Baseline: the report's value wallet, money-weighted return a year, at first light** (start years
+2016, 2020, 2023, 2025; the fund in brackets):
+
+| Index | 2016 | 2020 | 2023 | 2025 |
+|---|---|---|---|---|
+| S&P 500 (`^SP500TR`) | 24.9% (15.3%) | 28.9% (15.9%) | 34.9% (18.7%) | 27.0% (15.6%) |
+| S&P 400 (IJH) | 12.4% (10.6%) | 14.0% (10.9%) | 16.6% (12.0%) | 31.4% (10.5%) |
+| S&P 600 (IJR; 2016 and 2020 coincide) | 17.0% (10.6%) | 17.0% (10.6%) | 7.6% (13.1%) | 11.3% (14.8%) |
+
+**The unsigned state before it** (commit 01832d6: 10-year windows, 5 picks, 16 rules; not a
+prototype, kept for reference): S&P 500 26.0%, 33.9%, 43.7%, 41.0%; S&P 400 12.6%, 15.0%, 11.4%, 11.4%;
+S&P 600 8.9%, 8.9%, 7.7%, 10.4%. Steps on the S&P 500 (from the checks above): 3-year windows with 5
+picks and 16 rules 27.2%, 34.2%, 41.9%, 24.7%; then 10 picks 29.8%, 29.3%, 35.0%, 31.5%; then the ten
+rules 24.9%, 28.9%, 34.9%, 27.0%. The fall in the report's wallet with ten rules was not investigated
+beyond this attribution: check 27 measured the 36-month top-10 objective, which moved little, not the
+wallet's money-weighted return, which is one path of a few names (Warden finding S2).
+
+**Adoptions outside the adoption rule** (`quant.md`, step 5), each a user decision and so a deliberate
+exception: the 3-year windows (for lack of data), 10 names (plausibility and diversification), the ten
+default rules (simplification and speed, no measured cost on the objective).
+
+**G5, and the strictness of the shortened windows** (Warden finding S3; user: G5 was shortened to
+include more data over a shorter period, and if it changes the strictness this must be noted and taken
+into account in the calibration). `min_growth = 1.33` now applies between averages 3 years apart
+instead of about 10, about 10% a year of EPS growth instead of Graham's 2.9%, so G5 is a much stricter
+test of growth at first light. The same holds for the shortened G3, G4 and B1: a 3-year record is easier
+to meet than a 10-year one, in the other direction. Not changed at first light (a methodology change).
+Open for the calibration: scale `min_growth` to the window (1.33 over 10 years is 1.09 over 3 for the same
+annual rate), or search it, with every shortened window.
+
+**Spent tests** (Warden finding S1). The seed-1 test companies of the S&P 500 are spent (check 12, and the
+windows were adopted right after it); the later checks ran on all companies, so a fresh split of the
+S&P 500 is no longer never-seen. The S&P 400 and 600, meant as independent (check 16), were used to judge
+designs (checks 20, 25, 27 to 30), and check 27 used them in keeping ten rules. The clean tests that
+remain: a forward record from a frozen, dated specification, and a universe not yet looked at (the
+rule-based US universe, MD_202610_004); the composite universe (MD_202611_001) reuses companies already seen.
+
+**The count of designs** (Warden finding B2), recounted from the record by family. The running totals
+quoted in checks 14 to 30 (42, 44, 52, 49, 50) were inconsistent and are superseded.
+
+| Family | Designs that informed a choice (S&P 500 selection data) | Checks |
+|---|---|---|
+| Rule weighting (floored, signed, shrunk) | 3 | 1 |
+| Ordered analysis and gated designs (D1 to D5b) | 6 | 7 to 9 |
+| Parameter samples and grids (names, buckets, averaging, windows) | 49 | 13 to 17 |
+| Rule cascade (each rule and group dropped) | 22 | 25 |
+| Rule subsets (16 single-rule values, 2 chosen subsets) | 18 | 27 |
+| Price designs (drop G6 and G7; PEG; routing) | 7 | 28 to 30 |
+| **Total** | **about 105** | |
+
+Not counted as designs, diagnostics: the horizons and lags looked at (checks 2 to 6), the 12 company draws,
+the heavy hitters removed, the missed winners, dispersion, the S&P reach, the two periods, the unseen
+test, and the same designs rerun on the S&P 400 and 600. No multiple-testing correction was applied; the
+adoption decisions of the future use Holm or Bonferroni over each family, or a reality check over the paired
+differences. The engine will count exactly. The report states "more than 100 designs".
+
+**Other notes.** `score.min_available = 5` now means 5 of 10 rules (5 of 16 before), so the coverage needed
+rose. `[schedule] history_years = 13` is more than the active rules need and is kept for the rules that
+can be switched on. `holdings.csv` keeps `sell_fraction`, now not shown in the report. Ties at a score of
+0 are broken alphabetically (44 dates have companies at 0). The default number of picks for new users, 5,
+against the report's 10, is open. Evidence policy: only the results used in the final analysis are kept
+and the engine reproduces them (`S_202611_003`, `accreditation.md`); until then they are provisional.
 
 ## Agreed approach
 
@@ -884,7 +964,7 @@ floors), the learning window and its decay, the number of names.
   points of the winners against the universe: E4 -0.72, G2B -0.36, G7 -0.32, G6 -0.08; our picks score
   4.43 on G2B (universe 2.14), 3.86 on G7 and 3.99 on G6. Sector, winners against our picks: S&P 400
   health care 17% against 3%, industrials 29% and 39%; S&P 600 energy 24% against 2%.
-- Reading: the 3-month horizon shows no edge; the 12-month horizon, the one the score
+- Reading at check 4 (superseded by "First light"): the 3-month horizon shows no edge; the 12-month horizon, the one the score
   is configured for, shows a possible one, concentrated in recent years. The earlier
   "no edge" reading is withdrawn; the weighting, bucket and universe checks are to be
   rerun at 12 months. Calibration stays open.
@@ -905,6 +985,317 @@ tied; at the cut of the 10 worst, 8 dates, 2 companies; so the effect on the pic
 effect on the plots, `lookahead.truncation_check` (compares the sets of the `top` best, so it is
 unaffected), and `layers/*` for ratios only the removed rules produce (none found when the
 pipeline and the report ran on the ten rules).
+
+## Warden report
+
+Warden run of 2026-11-01 on commit `8d4d0b2` (branch `feature/skatkis/s-202611-003-calibration-infrastructure`), written here unchanged; its headings are demoted two levels to fit this file.
+
+### Warden report: VI_202611_001, VI_202611_002, S_202611_003 (with MD_202611_001)
+
+The branch should not go to a pull request yet. The code is small and clean. The problems are in what the report tells readers and in the evidence behind it. There are 3 blocking findings: the report claims out-of-sample testing that was not done; the count of designs tried is inconsistent and too low; and the scripts behind every number exist only in a temporary scratchpad. There are also 14 should-fix findings and a list of notes.
+
+#### 1. Header
+
+| Field | Value |
+|---|---|
+| Changes | VI_202611_001 (model calibration, methodology), VI_202611_002 (report, new capability), S_202611_003 (calibration infrastructure: decisions and two draft study files only), MD_202611_001 (postponed, records only) |
+| Date | 2026-11-01 |
+| Commit reviewed | `8d4d0b2`, branch `feature/skatkis/s-202611-003-calibration-infrastructure` |
+| Base | `main` (three commits on top: bbb510f records, 180d1a3 code, 8d4d0b2 results) |
+| Tree | Dirty, in records only: `midas/toolbox/skatkis/changes/S_202611_002-midas-investor-hat.md` is staged and was not reviewed |
+| Builds on | The Inspector's first run (01832d6 to working tree: 0 blocking, 5 should fix), logged in VI_202611_001, "Inspections" |
+| Checks (from `warden_checks.txt`) | Black, ruff and pyright clean; pytest 15 passed; `regression_check` not run because it covers only the BTC harness, so the value tool's baselines are the reports in git |
+
+#### 2. Findings
+
+##### Blocking
+
+**B1. The section "How the model was tested" claims testing the evidence does not support.**
+- **Where:** `config/report_value_investing.toml`, `[testing] text` and `[dialogue] text`.
+- **Rules:** `AGENTS.md`, "Prohibited" (judging a strategy on in-sample results only); `quant.md`, opening paragraph ("Anything less is a diagnostic") and steps 2, 3 and 5.
+- **What the text says:** "The score is judged only on what it did not know: companies and dates that were held out, against random picks of the same size, with the uncertainty stated and the number of designs tried counted."
+- **What the evidence shows:**
+  - Every number in that section is in-sample. The ten-rule reruns of AT-1 and AT-2 (`midas/accreditation.md`) regrade all companies, and the configuration was chosen on them. VI_202611_001, check 21 says so itself: "the draws are in-sample for the configuration".
+  - Those runs compare with the index, not with random books of the same size.
+  - No count of designs appears anywhere in the report.
+  - The only held-out result (AT-3) is on the 16-rule score and is marked "To rerun".
+  - The report's own limits paragraph says "no period here is out of sample", so the report contradicts itself.
+- **Overclaim:** "The edge is real on this index but thin" (testing) and "The edge is real on the S&P 500 but thin" (dialogue) state as a finding something the protocol counts only as a diagnostic.
+- **Fix:** rewrite the opening paragraph to say these are in-sample stress and sampling diagnostics, compared with the index. Print the number of designs tried (see B2). Replace "real" with "present in-sample".
+
+**B2. The count of designs tried is inconsistent, too low, and not reported.**
+- **Where:** VI_202611_001, checks 14 to 30.
+- **Rules:** `quant.md` step 2; `researcher.md` point 5.
+- **The running totals go backwards:** 42 (check 14), 44 (15), 52 (17), then 49 (29) and 50 (30).
+- **Check 15:** it adds one combination to 42 but records 44.
+- **Left out entirely:**
+  - check 25: 22 rule drops on each of 3 indices, 44 paired tests per index;
+  - check 27: the two chosen subsets;
+  - check 28: three designs.
+- **Even on the narrow definition:** "since check 13" comes to at least 83 on the S&P 500 (52 + 22 + 2 + 3 + 3 + 1).
+- **Before check 13:** the pre-check-13 designs are uncounted (horizons, the gated designs D1 to D5b, three weighting variants, two strict scores, the 3-year windows themselves).
+- **Multiple testing:** no correction is applied anywhere. With 44 tests per index at 99%, about 0.4 false positives per index are expected. The G6 and G7 bands that exclude zero in check 25, and the S&P 400 band in check 30, are of that order.
+- **Fix:**
+  - The Secretary recounts from the record, by family (parameter sets, rule drops, rule subsets, gate and price designs, horizons), and writes one table into the change file.
+  - The report states the total beside its results.
+  - Name the correction to be used for future adoption decisions, for example Holm or Bonferroni over each family, or a reality check over the paired differences (White's Reality Check, or Hansen's SPA test).
+
+**B3. The evidence cannot be reproduced from the repository.**
+- **Rule:** `quant.md`, opening paragraph ("Each step below is evidence an auditor can ask for").
+- **Where the scripts are:** all 37 analysis scripts sit only in this session's scratchpad (`/private/tmp/claude-501/-Users-jan-albert-Documents-Personal-Trading-Bot/f99e96b6-32d9-4893-9f3c-b1462ca213d9/scratchpad/*.py`). That covers `strict_scores.py`, `sampling_bands.py`, `heavy_hitters.py`, `index_stress.py`, `ablation.py`, `subset_test.py`, `missed_winners_ten.py`, `quick_study*.py`, `grid_run.py`, `peg_test.py`, `route_test.py` and the rest. The scratchpad does not outlive the session.
+- **Two spot-checks** (`sampling_bands.py`, `heavy_hitters.py`) found:
+  - they read the live `config/rules.toml`;
+  - they write to a hard-coded scratchpad path;
+  - they import production functions whose behaviour has since changed (exact-n `book_weights`).
+- **Consequence:** the same script produced the 16-rule and the ten-rule numbers under different configurations, and nothing records which configuration or commit produced which check. `midas/accreditation.md` says "working tree on top of 01832d6, uncommitted".
+- **How serious:**
+  - For an accreditation it is disqualifying. No AT test can be marked pass when an auditor cannot rerun it.
+  - For this pull request it is blocking because it is urgent: once the session ends the code is gone, and the report already publishes the numbers.
+- **What to do now, before merging:**
+  - Commit the scripts unchanged in substance under an exploratory home such as `Toolbox/SandBox/vi_202611_001_checks/`.
+  - Make the output folder an argument.
+  - Add a short index mapping check number to script and output.
+  - Have each script write the hash of `config/rules.toml`, the data as-of date and the git commit beside its CSV.
+- **Then:** fold the strict scores, the time bootstrap, the sampling bands, the heavy-hitter removal and the missed-winners analysis into the engine as S_202611_003 plans, as tested modules (`quant.md`, "In this repository", already promises this).
+
+##### Should fix
+
+**S1. The independent indices and the "never seen" test companies are spent, and the records do not say so.**
+- **Rule:** `quant.md` steps 3 and 10.
+- **The S&P 400 and 600 are no longer independent:**
+  - Check 16 was meant as their single independent check.
+  - They were then used to judge designs in checks 20, 25 and 27 to 30.
+  - Check 27 used them in the decision to keep ten rules ("do not hurt the other two").
+- **The S&P 500 test companies are spent too:**
+  - The seed-1 test split was spent in check 12, and the 3-year windows were adopted right after it.
+  - Checks 21, 22, 31 and the regenerated reports ran on all companies, and the choices that followed (10 names, ten rules, the advice text) came after seeing them.
+  - A "fresh" split of S&P 500 companies is therefore no longer never-seen in the protocol's sense.
+- **Fix:**
+  - Record both facts in VI_202611_001 and against AT-3 and AT-4 in `midas/accreditation.md`.
+  - Name the remaining clean tests: a prospective forward record from a frozen, dated specification; and a universe not yet looked at (the rule-based US universe, MD_202610_004).
+  - Note that MD_202611_001's composite universe reuses the companies already seen.
+
+**S2. Three adoptions were made without the adoption rule of `quant.md` step 5, and a recorded fall was not investigated.**
+- **Rules:** `quant.md` step 5 (adopt only if the paired band excludes zero); `developer.md`, "Financial logic" ("a difference is investigated first").
+- **The three adoptions:**
+  - the ten-rule default: check 27 itself says "by the adoption rule nothing changes";
+  - the 3-year windows: adopted for data reasons;
+  - 10 names: adopted for plausibility.
+- **What is missing:** the user approved each one, but the change file does not record them as deliberate exceptions to step 5.
+- **The unexplained fall:** with ten rules the report's wallet fell from 29.8% to 24.9% a year (2016 investor) and from 31.5% to 27.0% (2025). That contradicts "a simplification at no measured cost" (check 27 measured the 36-month top-10 objective, not the report's wallet). It was not investigated.
+- **Fix:** add a decision line per adoption naming the exception, and investigate or explain the fall.
+
+**S3. G5's threshold changed meaning, and the change is not recorded.**
+- **Where:** `config/rules.toml` `[rules.G5] years = 6`.
+- **Rule:** `AGENTS.md`, "Methodology vs refactor" (a change to a rule threshold).
+- **The effect:** `min_growth = 1.33` now applies over 3 years instead of about 10. That is roughly 10% a year of EPS growth instead of Graham's roughly 2.9%, so G5 has become a much stricter, short-horizon growth test.
+- **Fix:** record it as a decision and confirm it is intended. The spec (§2.1: "10 years earlier", 13y) and the G5 docstring's "spec §2.1" reference no longer agree with the config. The same goes for G3 (10 years in the spec), G4 (20) and B1 (10, "most"); see Documentation.
+
+**S4. The 400 and 600 have no before and after, and no attribution by step.**
+- **Rule:** `developer.md`, "Financial logic".
+- **What happened:** the S&P 400 and 600 reports jumped straight from the 2026-10-31 state (10-year windows, 5 names, 16 rules) to the ten-rule state.
+- **What is missing:** the summaries before and after are not in the change file, and the effect of the exact-n change on any report is stated as negligible without numbers.
+- **Fix:** record the report summaries for each index before and after, from the git history of `results/`.
+
+**S5. The static numbers in the report will go stale silently.**
+- **Where:** `config/report_value_investing.toml` `[missed]`, `[testing]` and `[dialogue]`, and the hard-coded "runs on 1 November 2026" and "data as of 31 October 2026".
+- **Rule:** `AGENTS.md`, "Determinism" (inputs are explicit).
+- **Why it matters:**
+  - The text appears in all three reports.
+  - It goes stale on any change to `rules.toml`, on any new data pull, and on any member's rule switch (Assay).
+  - The command will print it as if current.
+- **Cheap guard until S_202611_003 computes these:**
+  - Store in the TOML the `rules.toml` hash and the data as-of date the numbers were produced with.
+  - Have `_report` print a visible "static figures from an earlier configuration" line in the PDF, and a warning, when either differs.
+- **Longer term:** the committed scripts of B3 write a results file that the report fills as placeholders.
+
+**S6. The worst-list tiers contradict the report's own sell rule and read as untested advice.**
+- **Where:** `Toolbox/value_investing/report.py` `_tier`; `[selling] worst_title` and `worst_text`.
+- **The contradiction:** the section above says a holding at or below the threshold (0.4) is sold in part, by (0.4 − s)/0.4. The tier for that range says "avoid; hold it if you have it".
+- **Untested:** the sell side was never tested in this change; no check measures the forward return of the lowest scores.
+- **Wording that overstates:**
+  - "To sell or short" invites a short position that the text itself calls untested.
+  - "not worth anything" describes the company, but a score of 0 means only that no rule awarded points.
+- **Hard-coded threshold:** the half-threshold cut-off (`threshold / 2`) is fixed in report code, not in config.
+- **Fix:**
+  - Align the tier text with the sell rule.
+  - Retitle to something like "Lowest scores in the index".
+  - Say that the sell signal is untested.
+  - Move the half-threshold to `config/rules.toml`.
+
+**S7. The report gives advice.**
+- **Where:** `[dialogue]`, "What this suggests for you" ("Hold for years… Hold ten companies and not five… Switch rules on or off…"), together with the tier labels.
+- **Decided:** VI_202611_002 records that the section "advises the reader".
+- **Still open:** `midas/assay/notes.md`, "Advice or tool", is unresolved (FAIS Act and FSCA; picks tailored to a person count as advice "whatever the disclaimer says").
+- **Fix:** frame it as what the tests showed, not as instructions to the reader, until that question is settled. "Hold ten and not five" also runs against check 13, where 5 names scored higher; the 10 was chosen for plausibility and diversification, and the text should say that.
+
+**S8. The persona exception conflicts with `AGENTS.md`, and the report uses Midas outside it.**
+- **The conflict:** `writing.md` grants one exception (the Q&A). `AGENTS.md` line 44 still says "nothing written for others carries the persona", and `writing.md` defers to `AGENTS.md` where they differ.
+- **Fix in the instructions:** add the exception to `AGENTS.md`.
+- **Outside the exception:** `[reading] text` uses Midas outside the Q&A ("Midas can work from the documents you give it… it will answer from those pages and name the source"). That describes a feature that does not exist yet (Assay member chat). Rephrase.
+
+**S9. The limits paragraph misstates the period looked at.**
+- **Where:** `config/report_value_investing.toml` line 54, "chosen while looking at the whole period from 2016".
+- **The record:** the calibration looked at data from December 2009 (checks 4 to 32).
+- **Fix:** "from 2009".
+
+**S10. The duplicate rules in the default are not disclosed.**
+- **Where:** method text, "Ten rules … G2a and E1 (current ratio), G2b and E2 (debt)".
+- **The facts:** G2a ranks on the same value as E1, and G2b on the same value as E2 (check 2; check 27: "the duplicates count twice"). The ten rules are eight concepts, two of them counted twice.
+- **Fix:** say so in the text.
+
+**S11. The missed-winners text claims more than the checks show.**
+- **Where:** `[missed] text`.
+- **The dividend claim:** "Dropping the dividend rules made no measurable difference" is a 16-rule result (check 25), unqualified. On the S&P 600 both bands excluded zero (+0.72 and −0.93).
+- **The price-rule claim:** "the price rules are the more likely cause" overstates check 28, which held on the S&P 500 only, showed nothing on the 400, was contradicted by the 600, and was not adopted.
+- **The growth claim:** "the score undervalues growth" is a hypothesis from check 31.
+- **Fix:** qualify all three.
+
+**S12. Several records are stale.**
+- **VI_202611_001, the record itself:**
+  - The status is `agreed` and the CHANGELOG still lists only the planned items, though the work is built.
+  - Its title, Description and Agreed approach (signed weights, point curves, fitted cut-offs) no longer describe what was delivered (windows, ten rules, 10 names, exact-n).
+  - Lines 22 and 67 ("five picks") and 132 are superseded.
+  - Lines 600 to 604 leave "(open: the default number of picks for new users, 5, against the report's 10)" unresolved against `names = 10`.
+  - The closing "Reading" (lines 887 to 890) dates from check 4.
+  - Most decisions after line 132 sit under Notes, not Decisions.
+- **VI_202611_001, the branch:**
+  - The Branch field names a branch that was never used.
+  - It depends on S_202611_003, which built no engine.
+  - **Recommendation:** split. Close the delivered methodology as its own record and keep the inner fit and the cut-offs open.
+- **VI_202611_002:**
+  - The Branch field says "not yet".
+  - The agreed approach and the decision say 5 names, against 10 now.
+  - The Notes say the testing and missed-winners text is "the same in all three reports", which is true and is a reason for S5.
+- **`midas/accreditation.md`:**
+  - AT-9 still says "to enter the report".
+  - The status table for AT-3 and AT-5 does not mark them "16-rule; to rerun".
+  - The code-state line is out of date.
+  - The ten-rule reruns of AT-1 and AT-2 live only here, not in the change file.
+- **`notes.md`, "Tried and not used":** checks 15, 17, 28, 29 and 30 and the rule drops are missing (`researcher.md` point 5). "Optimisation candidates" is numbered 7, 9, 8.
+
+**S13. The rank weights would silently turn the wallet into a 5-name book.**
+- **Where:** `config/rules.toml` `rank_weights` has 5 entries while `names = 10`.
+- **The trap:** if the rank weighting is switched on, `book_weights` (`evaluation.py` lines 528 to 530) gives ranks 6 to 10 a weight of 0, a 5-name book labelled "top 10".
+- **Rule:** `AGENTS.md`, "Contracts and gates".
+- **Fix:** add an input gate requiring the length to equal `names`, or derive the weights.
+
+**S14. Ties at a score of 0 are broken alphabetically.**
+- **Where:** `evaluation.py` line 526; `__main__.py` line 515.
+- **The effect:** 44 dates have companies at a score of exactly 0 (Inspections note). The worst list and the sell book then take the alphabetically first of them.
+- **Fix:** state it in the worst-list text, or show every company tied at the cut-off on the worst list (that list is information, not a book).
+
+##### Notes
+
+- **Dead code:** `skatkis/report.py` line 19, `part != "****"`. The regex `[^*]+` can never produce it.
+- **Duplicated default:** `plots.py` line 594, `columns = 4` repeats the default of `skatkis.analysis`. `min(5, …)` is a layout constant; acceptable.
+- **Dead weight:** `holding.Managed.holdings["sell_fraction"]` is now read only by `holdings.csv`, since `_sell_check_table` is gone. Keep it deliberately or remove it.
+- **CSV columns:** `worst_stocks.csv` carries `weight` and `amount` of the hypothetical sell book, which can be misread as a recommended sale.
+- **Coverage threshold:** `score.min_available = 5` now means 5 of 10 rules instead of 5 of 16, so the coverage needed rose quietly. Record it.
+- **History length:** `[schedule] history_years = 13` may exceed what the active rules need (G5 now 6, G4 off). Confirm what still needs 13.
+- **"Worst in the index":** the worst list excludes Financials, Real Estate and under-covered companies. "Lowest scores in the {index}" should say "of the scored companies".
+- **Quotes:** I verified six of the Q&A quotes in `data/interim/berkshire_letters` (1984, 1987 twice, 1989, 1992 twice, 2013).
+  - The 1987 "shortages" passage is about insurance and is applied to chip makers by analogy; say so.
+  - The 2013 line is "Ben's adage", Graham's words quoted by Buffett.
+- **The 12 draws:** each draw shares about 90% of its companies with the full set, so "12 of 12" is not 12 independent confirmations. Say so where it is quoted.
+- **AT-1:** its pass criterion (3 removed) was registered after the first run (check 23 follows 22). Record when each AT criterion was fixed. The `quant.md` step 9 case of removing 1 company is missing from the ten-rule rerun.
+- **Letters reading:** the `AGENTS.md` rule to read the letters before a methodology change was met for the windows (holding horizon) and for G4/E4 (1984). The other rules dropped by the ten-rule default (G3, E3, E5, E6, NI1) were chosen by data alone.
+- **Horizon:** `score_horizon_months = 12` remains, against the 3-year reference horizon decided in VI_202611_001. It is still an open candidate.
+- **Inspection closed:** all 5 should-fix findings of the Inspector's run are fixed in the diff: the Wallet docstring, the `rank_weights` comment, the one comment block, the study-draft notes, the "five"/"Sixteen" wording and the G3/G4 rule names. "five" remains only where it is correct.
+- **Determinism and ownership:** no clock, unseeded randomness or hidden reads in the diff. Ownership boundaries are kept. Production identifiers are unchanged.
+- **Branch name:** the methodology change rode on S_202611_003's branch, against `developer.md`, "Branches" (a big methodology change gets its own branch labelled with its change ID). Record it as a deviation.
+
+#### 3. Not checked
+
+- The logic of the 37 scratchpad scripts. I only spot-checked the imports and config reads of `sampling_bands.py` and `heavy_hitters.py`. I did not check that the test companies were really dropped before scoring, or the bootstrap code.
+- The 103 regenerated files in `results/` and the PDFs, including whether the report's computed numbers agree with the static text.
+- Notebooks and `.claude/`.
+- The staged `S_202611_002` change.
+- The branch's diffs to the instruction files line by line. I read the current `AGENTS.md`, `warden.md`, `inspector.md`, `quant.md`, `researcher.md`, `writing.md`, `developer.md` and `secretary.md`, but not `scribe.md`, `guard.md`, the `midas.md` decision log, or `assay/notes.md` beyond the advice and reading-list parts.
+- The reading-list titles against their sources. They match my general knowledge, and the text already says they are unchecked.
+- `regression_check`: not applicable here. pytest, Black, ruff and pyright are taken as reported in `warden_checks.txt`.
+- The effect of exact-n ties on the plots.
+
+#### 4. Documentation to update (for the Scribe)
+
+1. `docs/value_investing_bot_spec.md` §2.1 table (G3 10 → 3 years, G4 20 → 3 and off by default, G5 13 → 6 years with the meaning of 1.33 over 3 years, B1 10 years "most" → 3 with 2) and §2.2 (B1). Also the ten-rule default with six rules off, the exact-n rule with ties broken by symbol, `names = 10`, decision 7 and the `optimise.py` line of §7 (company test sample, from VI_202611_001 "Done when").
+2. `Toolbox/value_investing/layers/graham.py`: the G5 docstring's "spec §2.1" reference once the spec is updated. G3 and G4 docstrings, if they name 10 or 20 years.
+3. `Toolbox/value_investing/report.py` module docstring, lines 7 to 10: "the sell check" is gone (now the worst list, the missed-winners, testing, dialogue and reading sections). "which the secretary writes" should be the Scribe.
+4. `ReportInputs.worst` docstring: the actual columns.
+5. `plots.pick_prices` docstring: the 2-row layout (best `ends` on the first row, worst on the second).
+6. `config/report_value_investing.toml`:
+   - B1, the opening of the testing section, and the count of designs tried;
+   - S6, the tier text and title;
+   - S7, the advice wording;
+   - S8, the Midas mention in the reading section;
+   - S9, "from 2009";
+   - S10, the duplicate rules;
+   - S11, the qualifications in the missed-winners text;
+   - the 1987 analogy and the attribution of Graham's adage;
+   - a "static figures as of" stamp (S5).
+7. `Toolbox/market_data/README.md` line 76 ("10, 13 or 20 years"): check against the new windows.
+
+#### 5. Tests to write (for the Tester)
+
+1. `evaluation.book_weights`:
+   - exactly `names` companies on both sides;
+   - ties at the cut-off broken alphabetically (buy and sell);
+   - fewer scored than `names`;
+   - an empty input;
+   - all scores 0 give equal weights;
+   - the rank weighting with ties inside the book;
+   - the rank weighting when `rank_weights` is shorter than `names` (pin the current behaviour, or the new gate of S13).
+2. `evaluation.ranked_positions`: the buy and sell sides on one date, and that `score_date` is the latest date on or before the decision.
+3. `report._tier`: each boundary (share 0, exactly threshold/2, exactly threshold, above it), for threshold 0.4 and one other value.
+4. `report._worst_table`: rows in score order, the "none" row when empty, the column spec.
+5. `report._static_table`: header, rows and columns taken from a TOML-shaped mapping, with cells cast to strings.
+6. `skatkis.report.escape`:
+   - `**bold**` becomes `\textbf{}` with special characters escaped inside;
+   - `$…$` is left alone;
+   - `[[label]]` becomes `\ref`;
+   - mixed text;
+   - an unmatched `**` is escaped as plain text.
+7. `layers.graham.g5_earnings_growth` with `years = 6` and `average_years = 3`: lags 0 to 2 against 3 to 5; fails when the earlier average is 0 or below; not evaluable until 6 years are filed. Plus one case with `years = 13`, the earlier lags 10 to 12.
+8. `_report` integration on a small fixture: `worst_stocks.csv` is written, and the report builds with the new sections (missed, testing, dialogue, reading) from a minimal text TOML.
+9. `plots.next_prices` and `plots.pick_prices` grid shapes: 10 picks give 2 × 5; more than `page` companies give 2 × `ends`.
+
+#### 6. Draft outcome (for the Secretary, drawn from the change files)
+
+*VI_202611_001 (delivered part; signed weights, point curves and fitted cut-offs remain open).* On 2026-11-01 the value model's methodology was changed in four steps, each approved by the user and applied to `config/rules.toml` and `evaluation.py`:
+
+1. **Shorter windows.** The long-history rules were cut for lack of EDGAR history: G3 3 years, G4 3, G5 6, B1 3 years with 2 at the minimum.
+2. **Ten picks.** `names` rose from 5 to 10, for plausibility and diversification.
+3. **Exact-n books.** A book now holds exactly `names` companies, with ties broken by symbol.
+4. **Ten default rules.** The default became ten rules (G6, G2a, G7, G2b, E2, NN, E1, G5, B1, E4), with G3, G4, E3, E5, E6 and NI1 switched off.
+
+**How it was explored.** 32 recorded checks on S&P 500 training companies used strict training-only grades, time-bootstrap bands and random-book baselines:
+- the probes of `quant.md` step 15: heavy hitters removed, two periods, independent indices, dispersion, missed winners;
+- conversations with the letters (1984, 1987, 1989, 1992, 2013).
+
+**Considered and not used:**
+- signed and shrunk weights;
+- the gates D1 to D5b;
+- other buckets and averaging years (checks 15 and 17: no paired band excluded zero);
+- dropping the price rules (check 28);
+- PEG (check 29);
+- PEG routed by B1 (check 30: +0.3 to +1 point a year, the strongest candidate, kept as a switch).
+
+**Key results**, in-sample:
+- With ten rules the S&P 500 wallet beats `^SP500TR` in all 12 company draws.
+- With its three largest winners removed (MU, LRCX, AMAT) it still leads by 3.7, 1.9 and 2.1 points a year for the 2016, 2020 and 2023 starts, and by 0.3 to 2.3 with five removed.
+- The S&P 400 and 600 do not reproduce the edge (AT-1 fails), and their tables are biased by index migration.
+- The one held-out test (check 12, 16-rule score) was positive but rested on two companies.
+
+**What the record must still carry.** The ten-rule, window and 10-name adoptions were user decisions outside the step-5 adoption rule. The S&P 500 test split and the S&P 400 and 600 as independent checks are spent. The count of designs tried is [to be recounted, B2].
+
+**Inspections:** one Inspector run (0 blocking, 5 should fix, all fixed). One Warden run, 2026-11-01, on `8d4d0b2`.
+
+*VI_202611_002.* The per-holding sell check was replaced by:
+- the wallet's sales shown as its cash flows;
+- a general list of the lowest scores, as many as the picks, with tiers taken from the sell threshold;
+- new sections on missed winners, how the model was tested, the Q&A between Midas and the Investor, and a reading list. Their figures are static text from the runs of 2026-11-01.
+
+*S_202611_003.* Decisions only: two-stage uncertainty, 12 validation draws, two optimisation tiers, the ranges of the draft studies. No engine was built; the draft study files are not read by any code.
 
 ## Kickoff prompt
 

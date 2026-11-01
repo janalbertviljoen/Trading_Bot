@@ -250,13 +250,13 @@ Collected for the first study (user, 2026-11-01):
 7. **Segment-selected rule sets** (user, 2026-11-01): with the ten default rules as the
    base, the optimisation may choose which rules apply to which company type (sector, size,
    dividend payer), tied to the switches of `assay/notes.md`; a studio-tier option.
+8. **Price against value including growth** (the investor's answer, VI_202611_001, check
+   28): a growth-adjusted P/E, later owner earnings, in place of the absolute P/E and
+   price-to-book tests.
 9. **Rule routing by a gate** (user, 2026-11-01: "if the gate says this, use this rule or
    that"): the best candidate so far is the price slot graded by PEG where B1 passes and by
    G6 elsewhere (VI_202611_001, check 30), +0.3 to +1 point a year, not yet adopted; a base
    for the segment-selected approach (candidate 7).
-8. **Price against value including growth** (the investor's answer, VI_202611_001, check
-   28): a growth-adjusted P/E, later owner earnings, in place of the absolute P/E and
-   price-to-book tests.
 
 ### The sample starts after the 2008 crisis (2026-11-01, open → VI_202611_001)
 
@@ -302,6 +302,12 @@ short and was looked at.
 | 2026-11-01 | Ordered analysis (check 7) | G3, B1, G2B gates, then lowest G6, top 5 | trails the index at every horizon |
 | 2026-11-01 | Gates then score, D1 to D3 (check 8) | G3 (10 y), or G3 + B1 + G2B, or G3 + G6 ceiling + B1 rank | below the plain score at every horizon |
 | 2026-11-01 | Gates at 3-year windows, D5a and D5b (check 9) | G3; G3 + B1 + G2B at 3-year windows | no different from the plain score |
+| 2026-11-01 | Buckets 10 with earnings averaged over 2 years (check 15) | other settings as the first light | +0.6 [-0.5, +1.0] points a year at 36 months, paired band includes zero |
+| 2026-11-01 | A 3 by 3 grid of buckets (6, 8, 10) and averaging years (2, 3, 4) (check 17) | 8 paired comparisons, 99% band | none excludes zero; the surface is flat |
+| 2026-11-01 | Dropping the price rules G6 and G7 (check 28) | on the ten rules | +5.3 [+1.2, +11.7] on the S&P 500 top 10 only; nothing on the 400, contradicted on the 600 |
+| 2026-11-01 | PEG replacing or added to P/E (check 29) | three designs | not distinguishably more sensitive than G6 and G7 separately; the broad spread rises, the top 10 falls |
+| 2026-11-01 | PEG routed by the quality gate B1 (check 30) | PEG where B1 passes, G6 elsewhere | +0.3 to +1 point a year; the strongest candidate, kept as a switch, not default |
+| 2026-11-01 | Dropping one rule or group at a time (check 25) | 22 drops on three indices | the dividend rules make no measurable difference on the 500 and 400; no drop adopted |
 
 ### Unevaluable rules cost points in the binned score (2026-11-01, open → optimisation)
 

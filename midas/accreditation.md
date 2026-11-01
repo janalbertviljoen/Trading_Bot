@@ -5,7 +5,22 @@ the evidence is. The protocol they follow is `instructions/quant.md`, "Testing a
 optimising a model"; the numbers are in
 [VI_202611_001](toolbox/value_investing/changes/VI_202611_001-model-calibration.md). A test
 that fails is kept, with its date, not removed. Code state of the runs: the working tree
-on top of commit 01832d6, uncommitted; data as of 2026-10-31.
+on top of commit 01832d6 before the first-light commit (settings fingerprint `0e57a832bd87`; see
+VI_202611_001, "First light"); data as of 2026-10-31.
+
+## Formalisation pending
+
+The user will specify the accreditation tests exactly, in the form wanted (2026-11-01). Until then
+this register is provisional in its tests as well as in its results, and is not to be reshaped.
+
+## Evidence policy
+
+Only the results used in the final analysis are kept, and the engine (S_202611_003) reproduces
+them; the scratch scripts are not committed (user, 2026-11-01). The results are deterministic
+given their seeds. Until the engine reproduces them, every result below is provisional, and no
+test is marked passed for an audit. The Warden's finding B3 (the evidence cannot be rerun from
+the repository) stands until then. The reference scripts are kept locally in
+`data/private/vi_202611_001_reference/`.
 
 ## Status
 
@@ -18,12 +33,12 @@ open until the composite universe exists (MD_202611_001).
 |---|---|---|---|
 | AT-1 | Heavy hitters removed (stress) | The value wallet still beats its benchmark, for every start year, with the 3 largest contributors removed from the universe and the rest regraded; the result with 5 removed is reported | S&P 500 pass; S&P 400 fail; S&P 600 fail |
 | AT-2 | Company sampling bands | 12 stratified draws, each dropping 10% of the companies; the spread is reported and the wallet beats the benchmark in every draw | S&P 500 pass (12 of 12); 400 and 600: not in every draw |
-| AT-3 | Unseen test companies, once | A frozen specification scored once on a seeded, stratified 10% never used; reported whatever it shows | S&P 500 done, positive, 99% from two companies |
+| AT-3 | Unseen test companies, once | A frozen specification scored once on a seeded, stratified 10% never used; reported whatever it shows | S&P 500 done, positive, 99% from two companies (16-rule score; to rerun; the seed-1 companies are spent) |
 | AT-4 | Independent indices | The frozen configuration beats random books of its own universe on the S&P 400 and 600 | Open: not reproduced; the universe is biased (migration) |
-| AT-5 | Two periods | The edge appears in 2009 to 2016 and in 2017 to 2026 | S&P 500 pass |
+| AT-5 | Two periods | The edge appears in 2009 to 2016 and in 2017 to 2026 | S&P 500 pass (16-rule score; to rerun) |
 | AT-6 | Survivorship | The gap from companies that left the index is measured and stated | Open (MD_202610_002, MD_202611_001) |
 | AT-8 | Scenario tests (Midas's wrath, S_202610_008) | Input tests respond in the expected direction; the survivorship experiment measures what the missing members flatter | Open |
-| AT-9 | Missed winners | The ex-post winners, the share the score picks and their score percentile are reported for every index, with what they scored low on | Done for the three indices (check 24); to enter the report |
+| AT-9 | Missed winners | The ex-post winners, the share the score picks and their score percentile are reported for every index, with what they scored low on | Done on ten rules for the three indices (checks 24 and 32); in the report |
 | AT-7 | Reconcile with the real world | Results compared with market events and institutional logic, discrepancies named (`quant.md`, step 14) | Open |
 
 ## Rerun on the default of ten rules (2026-11-01)

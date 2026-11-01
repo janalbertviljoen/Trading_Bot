@@ -6,7 +6,7 @@
 | Priority | medium |
 | Kind | new capability (the report's content; no change to the scores) |
 | Depends on | VI_202610_006 |
-| Branch | not yet |
+| Branch | `feature/skatkis/s-202611-003-calibration-infrastructure` (shared with VI_202611_001) |
 | Raised | 2026-11-01 |
 
 ## Description
@@ -21,15 +21,16 @@ stocks of the universe, independent of any holdings.
 
 - The wallet with sells keeps its trades (`buy_and_sell`); its sells are shown as cash
   flows of that wallet only.
-- The worst stocks are a general list of the 5 lowest-scoring companies on the latest date
+- The worst stocks are a general list of the 10 lowest-scoring companies on the latest date
   (the same count as the picks, `[wallet] names`), by `score_binned_weighted` and its 0-to-1
   share (`score_weighted_share`), for everyone.
-- The list is tiered by the share, with the tier edges taken from the cut-offs in use
-  (today `sell_threshold = 0.4`; the fitted cut-offs of VI_202611_001 later):
-  1. at the sell threshold (0.4): **avoid**; hold it if you already have it;
-  2. at half of it (0.2): **start thinking about selling**;
-  3. at 0: it is not worth anything any more.
-  The numbers are not fixed; they follow the cut-offs.
+- The list is coloured by the share (user, 2026-11-01: Green, Amber, Red, instead of the
+  words "avoid" and "start thinking about selling"), with the edges taken from the cut-offs
+  in use (today `sell_threshold = 0.4`; the fitted cut-offs of VI_202611_001 later). Proposed
+  mapping, to confirm with the user: **Green** above the sell threshold (0.4); **Amber** from
+  half of it (0.2) up to the threshold; **Red** below half of it, down to 0, where the stock
+  is not worth anything any more. The legend is explained in the report's notes, and the list
+  is "not a recommendation". The numbers are not fixed; they follow the cut-offs.
 - Later, if the optimistic reading holds out-of-sample, a short position on this basis.
 - The per-holding sell check is removed from the reader-facing text.
 - A section on winning picks we missed, as opportunities (user, 2026-11-01): the companies
@@ -63,8 +64,19 @@ stocks of the universe, independent of any holdings.
 - 2026-11-01 (user): the report carries the approach and the accreditation results, and a
   Q&A between Midas and the Investor (above). This is the one place the two voices appear in
   something written for others (`writing.md`).
-- 2026-11-01 (user): the list has 5 companies, the same as the picks; tiers as above; a
-  short position is a later step.
+- 2026-11-01 (user): the list has as many companies as the picks (5 then, 10 from the rerun on the ten default rules); tiers as above; a
+  short position is a later step. Superseded the same day: 10 companies, the picks' count
+  (the report already has 10), and colours in place of the tier wording (below).
+- 2026-11-01 (user, after the business-model review): the tiers become Green, Amber and
+  Red, with the legend explained in the notes; 10 picks for now.
+
+- 2026-11-01 (user, confirmed in the session that built the report): the tiers are Green, Amber
+  and Red because it reads better, is intuitive and is the colour code of trading candles; the
+  earlier wording tiers (0, 0.2, 0.4) are superseded. The change was made in the code by the other
+  session after its business-model review (`_tier`, `_worst_table`, `fills` in `skatkis.report`) and
+  is part of the first-light state. Reports share the weights and techniques but not the exact bin
+  widths or the number of samplings (`scribe.md`, "Reports"): the text of the testing and the Q&A
+  sections is to be cleaned of them.
 
 ## Notes
 
@@ -98,6 +110,30 @@ stocks of the universe, independent of any holdings.
   reports were still the old ones of 2026-10-31 10:00; regenerated with the ten default rules
   (results and sections as the S&P 500's; the testing and missed-winners text is the same in all
   three reports and describes all three indices).
+
+- 2026-11-01 (business-model review): the Scribe has written the report text
+  (`config/report_value_investing.toml`, unstaged): the section "The lowest scores" defines
+  Green (above the threshold), Amber (the tier edge up to the threshold) and Red (below the
+  edge), says "not a recommendation to buy, sell or sell short", carries the no-endorsement
+  paragraph, qualifies "out-of-sample", and gives the ten-rule figures (2020 start 27.7% a year
+  against 15.9%; MU 24% and LRCX 16% of the 2016 investor's gain). The investor profile
+  (`docs/investor/starting_investor_profile.md`, unstaged) is aligned: a worked example, the
+  chat sticks to Graham. The business proposal v2 doc is updated (figures, concentration,
+  free-chat scope); its PDF export is not yet regenerated.
+- 2026-11-01 (user): the colours are accepted, with the reading "Green is good, so buy,
+  Amber is uncertain and Red is sell". This is wider than the report text, which says the
+  list is not a recommendation, and it is the advice question of `assay/notes.md`, "Advice
+  or tool": the report text is unchanged until the user decides which wording stands.
+- 2026-11-01: built. `skatkis.report.Table` has `fills` (cell text to a background colour,
+  `\cellcolor`, with `xcolor` `table` in the preamble); `value_investing.report._tier`
+  returns Green (above the threshold), Amber (from the edge up to and including the
+  threshold) or Red (strictly below the edge, down to 0); the column is headed "Colour". The
+  `tier_ratio` docstring, its comment in `config/rules.toml` and the placeholder list in the
+  report TOML are aligned. Black, ruff and pyright pass on the two report modules; 76 tests
+  pass. The three value reports (S&P 500, 400, 600, as of 2026-10-31) were regenerated and
+  compiled (tectonic outside the sandbox: inside it a certificate error stops the font
+  download); in each, the worst ten are all Red. Unit tests for `fills` and `_tier` are for
+  the Tester.
 
 ## Kickoff prompt
 

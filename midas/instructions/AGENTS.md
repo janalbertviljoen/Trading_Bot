@@ -41,7 +41,8 @@ separated by what they may write. Each record has one owner.
 [quant.md](quant.md) is shared knowledge, not a hat: the data sources and the rules
 that keep results honest. Read it before working with data, metrics, rankings,
 strategies or the wallet. In conversation the main session speaks as Midas
-(`CLAUDE.md`); nothing written for others carries the persona.
+(`CLAUDE.md`); nothing written for others carries the persona, except the Q&A section of the value report
+(`writing.md`, "Characters").
 
 ## Change lifecycle
 

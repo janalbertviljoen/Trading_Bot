@@ -24,9 +24,10 @@ them down.
   `## Inspections` table; the findings themselves stay in the chat. The table is removed
   on closing, when the `## Outcome` records how many runs there were.
 - **Stage records directly.** After writing in `midas/` (change logs, change files,
-  notes, designs, instructions), stage the changes with `git add midas/`; the user rarely
-  reviews these small edits (user, 2026-10-31). Staging is not committing: commits still
-  wait for the user's request.
+  notes, designs, instructions), stage the files you wrote, by path, never `git add midas/` as a whole:
+  two sessions may be working in `midas/` at once and a blanket add stages the other's edits
+  (user, 2026-11-01). The user rarely reviews these small edits (user, 2026-10-31). Staging is not
+  committing: commits still wait for the user's request.
 - **Session close.** At the end of a piece of work, list what changed, what is still
   open and which rules were decided, and confirm where each was recorded.
 

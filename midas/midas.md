@@ -30,6 +30,12 @@ One server, `midas`, with two profiles:
 | `index` | Questions about the code, docstrings, rules, the specification and Midas's records: `find_calculation`, `list_components`, `describe_module`, `describe_symbol`, `describe_layer`, `find_owner`, `describe_column`, `rules_for`, `spec_section`, `document`, `search`, `health`, `rebuild_index` | read only; never runs a pipeline, never writes files, never returns data values |
 | `lab` | Backtests and data: `list_datasets`, `fetch_market_data`, `run_backtest`, `optimise_strategy`, `regression_check`, `run_checks` | run the strategy on cached datasets, write cached datasets to `data/` and baselines to `benchmarks/` (baselines only with `update_baseline`, which needs the user's approval) |
 
+A third profile, `member`, is planned for Assay (not built): the restricted access of a member's
+Claude, with the `index` tools on documents meant for members and the engine's honesty rules
+enforced (hold-out, costs, combination count, point-in-time data); it never reaches the
+repository. The beta is the exception for now: friends work in the private repository
+(`assay/open_decisions.md`, "Beta workspace").
+
 Every index answer carries its `provenance` (`code` or `docs`) and the git `commit` and
 `dirty` flag it was built from. Where code and documentation disagree, the code is
 trusted and `health` reports the contradiction.
@@ -82,3 +88,11 @@ until the portfolio engine (S_202610_006) replaces it. The index and the rename 
 | 2026-11-01 | The research protocol states only the benchmark (the index's total-return series); the sleeve's target stays in `AGENTS.md`. A researcher's branch lists its unit tests for the Tester and writes none (S_202611_001) | user |
 | 2026-11-01 | Midas is one character in every hat and in Assay's member chat: the king who starved surrounded by gold and now tests before he touches; Graham's book and Buffett's method as teachers, quoted, never imitated (character sheet in S_202611_002; persona rule in `instructions/CLAUDE.md`) | user |
 | 2026-11-01 | An accreditation register, `accreditation.md`, lists the tests the model must pass before launch (heavy hitters removed, company sampling bands, unseen test companies, independent indices, two periods, survivorship, reconciliation with real events); a failed test is kept with its date | user |
+| 2026-11-01 | The investor hat: the free Midas chat answers investors' questions from Graham's reference and Buffett's letters (S_202611_002); the founder's glide path by years to retirement (40 years 90/10 to 10 years 25/75) is a worked example for starting investors, not an allocation Midas prescribes | user |
+| 2026-11-01 | The free chat sticks to Graham for general questions and never gives a personal allocation (`assay/open_decisions.md`) | user |
+| 2026-11-01 | The Graham ebook is bought later, when more members use Midas, kept in the git-ignored `data/private/books/` for the founder's private research only; never committed, served or downloaded as a copy (S_202611_002) | user |
+| 2026-11-01 | A composite universe by date (MD_202611_001) is planned so that the S&P 400 and 600 and survivorship can be tested; until then AT-4 and AT-6 stay open | user |
+| 2026-11-01 | Launch scope: the S&P 500 only; the S&P 400 and 600 are not cleared (AT-1, AT-2 fail) and stay out | user |
+| 2026-11-01 | The beta is a trust exercise among friends with private-repository access; a restricted `member` profile applies before any outside member (§3) | user |
+| 2026-11-01 | Ten picks per report for now; the worst list in Green, Amber and Red with "not a recommendation"; versioning and per-member storage wait (`assay/open_decisions.md`, VI_202611_002) | user |
+| 2026-11-01 | Midas's wordplay bank and classical traits are recorded in the character sheet (S_202611_002) | user |
