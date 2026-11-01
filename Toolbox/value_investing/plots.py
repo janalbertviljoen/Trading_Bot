@@ -616,7 +616,6 @@ def pick_prices(  # noqa: PLR0913  one keyword per layout setting
         point_size="usd",
         point_styles={"buy": ("tab:green", "^"), "sell": ("tab:red", "v")},
         panel_order=[str(s) for s in change.index],
-        panel_titles={str(s): f"{s}  {c:+.0%}" for s, c in change.items()},
         columns=columns,
         title=title,
         ylabel="USD",
@@ -659,7 +658,6 @@ def next_prices(
         ],
         ignore_index=True,
     )
-    change = _price_change(own)
     return plot_small_multiples(
         own,
         x="date",
@@ -672,7 +670,6 @@ def next_prices(
             "potential buy": ("tab:orange", "o"),
         },
         panel_order=symbols,
-        panel_titles={str(s): f"{s}  {c:+.0%}" for s, c in change.items()},
         columns=min(5, max(1, len(symbols))),
         title=f"The next picks: price over {years} years",
         ylabel="USD",

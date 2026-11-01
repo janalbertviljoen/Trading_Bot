@@ -488,15 +488,6 @@ def build_report(
                         label="tab:sales",
                     ),
                 ),
-                Section(
-                    title=fill(text["selling"]["worst_title"]),
-                    text=fill(text["selling"]["worst_text"]),
-                    table=replace(
-                        _worst_table(inputs),
-                        caption=fill(text["selling"]["worst_caption"]),
-                        label="tab:worst",
-                    ),
-                ),
             ],
             label="sec:selling",
         ),
@@ -568,6 +559,16 @@ def build_report(
                 "tab:missed",
             ),
             label="sec:missed",
+        ),
+        Section(
+            title=fill(text["selling"]["worst_title"]),
+            text=fill(text["selling"]["worst_text"]),
+            table=replace(
+                _worst_table(inputs),
+                caption=fill(text["selling"]["worst_caption"]),
+                label="tab:worst",
+            ),
+            label="sec:worst",
         ),
         Section(
             title=fill(text["testing"]["title"]),

@@ -105,7 +105,7 @@ just under {threshold}. Holdings are sold, never sold short. The proceeds are ad
 table_caption = "Sales of the investor who started in {first_start}: share of each holding sold, its score on the 0-to-1 scale, and the proceeds."
 sold_title = "Sold in the wallet"
 sold_text = """Table [[tab:sales]] lists the {sales} sales of the investor who started in {first_start}, worth {sold_usd} USD in \
-all. They are the wallet's own cash flows; the list below does not depend on what anyone holds."""
+all. They are the wallet's own cash flows."""
 worst_title = "Lowest scores in the index"
 worst_caption = "The {worst_count} lowest-scoring of the companies scored on the latest score date: sector, score, score on the 0-to-1 scale and colour (Green, Amber or Red; not a recommendation)."
 worst_text = """These are the {worst_count} lowest scores, as many as the picks, among the companies of the {index} that \
