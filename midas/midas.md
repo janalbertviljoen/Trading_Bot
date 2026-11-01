@@ -11,8 +11,8 @@ Midas helps build and maintain a deterministic value-investing research system:
 S&P 500 fundamentals extracted point-in-time, Graham / Buffett / Munger rules, a
 quarterly top 10 and bottom 10, and a backtest wallet that evaluates and optimises
 strategies. The aim is a value-investing sleeve for about 10% of new investments that
-beats the S&P 500 by a margin, traded quarterly; the S&P 500 total-return index is the
-benchmark for every strategy. It assists; it does not approve. The user decides methodology, data
+beats the S&P 500 total-return index by about 2% a year and at minimum does not do
+worse, traded quarterly; that index is the benchmark for every strategy. It assists; it does not approve. The user decides methodology, data
 sources and anything marked `DECISION REQUIRED` in the specification.
 
 ## 2. The hats
@@ -72,3 +72,4 @@ until the portfolio engine (S_202610_006) replaces it. The index and the rename 
 | 2026-10-31 | Pure renames and moves are staged and committed directly, on their own, without asking; other commits still wait for the user (`AGENTS.md`, Working rules) | user |
 | 2026-10-31 | Reliability is tested on a broader US universe from the same EDGAR and Yahoo sources (S&P 1500 first, then a rule-based universe), not on other exchanges; the survey of exchanges is in `toolbox/market_data/notes.md` | user |
 | 2026-11-01 | Project Assay: a consumer app planned on this research, with Midas as its chat assistant; a product only after a strategy proves itself out-of-sample; drafts in `assay/notes.md` | user |
+| 2026-11-01 | The sleeve's target is about 2% a year above the S&P 500 total-return index, with not doing worse as the minimum; strategies are also judged on how often and how far they trail the index over rolling periods; results may be reported as CPI + x% (`AGENTS.md`, `researcher.md`) | user |

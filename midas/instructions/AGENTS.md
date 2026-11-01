@@ -32,8 +32,10 @@ A trading bot: a deterministic, contract-gated value-investing system. S&P 500
 fundamentals and prices are extracted point-in-time, scored with rules from Graham,
 Buffett and Munger, ranked each quarter, and fed to a backtest wallet that evaluates and
 optimises combinations of quarterly trading strategies. The goal is a sleeve for about
-10% of new investments that beats the S&P 500 by a margin, so every strategy is judged
-on out-of-sample excess return over the S&P 500 total-return index.
+10% of new investments that beats the S&P 500 total-return index by about 2% a year,
+with not doing worse than the index as the minimum (user, 2026-11-01). Every strategy
+is judged out-of-sample on its excess return over that index and on how often and how
+far it trails it; results may also be reported as inflation plus a margin (CPI + x%).
 
 - `Toolbox/skatkis/`: shared infrastructure with no tool-specific domain knowledge:
   pipeline contracts, registry and validation, IO, general financial mathematics

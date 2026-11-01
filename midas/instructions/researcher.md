@@ -15,8 +15,9 @@ deviation signals, single-asset wallet). Once the value-investing pipeline exist
 same rules apply to its strategies, with the specification's controls (spec §3.7):
 walk-forward with a hold-out period, a small parameter grid, and explicit transaction
 costs. For value strategies the benchmark is the S&P 500 total-return index, and the
-primary measure is out-of-sample excess return over it: the aim is to beat the S&P 500
-by a margin, not to maximise return at any risk.
+primary measures are out-of-sample: excess return over it, and how often and how far
+the strategy trails it over rolling periods. The aim is about 2% a year above the index,
+and not doing worse is the minimum (user, 2026-11-01), not maximum return at any risk.
 
 ## Judge the model before tuning it
 

@@ -19,9 +19,11 @@ explicit transaction costs.
 ## Objective (user, 2026-10-31)
 
 The user holds mostly the S&P 500 and wants to put about 10% of new investments into a
-value-investing sleeve. The sleeve only needs to beat the S&P 500 by a margin, so the
-benchmark is the S&P 500 itself (total return, e.g. SPY with dividends) and the primary
-measure is out-of-sample excess return over it, with drawdown and turnover alongside.
+value-investing sleeve. The sleeve aims to beat the S&P 500 by about 2% a year, and
+not doing worse is the minimum (user, 2026-11-01), so the benchmark is the S&P 500
+itself (total return, e.g. SPY with dividends) and the primary measures are
+out-of-sample excess return over it and how often and how far it trails it over rolling
+periods, with drawdown and turnover alongside. Results may also be reported as CPI + x%.
 The wallet tracks many strategy combinations side by side so they can be compared and
 optimised on that measure.
 

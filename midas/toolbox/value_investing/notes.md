@@ -5,11 +5,19 @@
 ### Objective (2026-10-31, open → S_202610_006)
 
 A trading bot, not a risk model. The user holds mostly the S&P 500 and wants about 10%
-of new investments in a value-investing sleeve that beats the S&P 500 by a margin.
-Trades are quarterly, across S&P 500 companies; the wallet tracks combinations of
-strategies, judged on out-of-sample excess return over the S&P 500 total-return index.
-The API matters because backtesting and optimising the metrics needs point-in-time
-fundamentals over many years.
+of new investments in a value-investing sleeve that beats the S&P 500 total-return
+index by about 2% a year; not doing worse than the index is the minimum (user,
+2026-11-01). Trades are quarterly, across S&P 500 companies; the wallet tracks
+combinations of strategies, judged out-of-sample on excess return over the index and on
+how often and how far they trail it over rolling periods. Results may also be reported
+as CPI + x% (which CPI, US or South African, is open). The API matters because
+backtesting and optimising the metrics needs point-in-time fundamentals over many years.
+
+- Hypothesis (user, 2026-11-01): the sleeve leads the index more often than it trails
+  it, and is safer in a correction of overvalued stocks (an AI bubble), because the
+  rules exclude expensive stocks by design. To test: the same exclusion makes value
+  trail during a bubble's run-up (1998–2000, 2019–2021), so the rolling comparison
+  should show both phases.
 
 ### Open owner decisions from the spec (2026-10-31, open)
 
@@ -58,6 +66,25 @@ The user's plan after VI_202610_002, in order:
    portfolio performance out-of-sample. The optimisation follows the pattern of the
    BTC VWAP work in `notebooks/optimise_strategies.ipynb` (high-frequency triggers
    there; one quarterly decision here). → S_202610_006
+
+### Roadmap after closing the per-index branch (2026-11-01, open)
+
+The user's order of work (2026-11-01):
+
+1. **Close out** the branch `feature/value-investing/vi-202610-007-pick-price-history`
+   (committed; the user pushes it and opens the pull request).
+2. **Optimise Midas**: the agent set-up itself (instructions, index server S_202610_002,
+   guard S_202610_004); scope to agree at the start.
+3. **Unit tests**, high priority: VI_202610_009.
+4. **Documentation**: the tool README and the spec departures, the `market_data` README
+   and the skatkis reference (sections 4 of both warden reports); then VI_202610_002 to
+   006 close.
+5. **A first version (V1) of the pipeline**: what V1 contains is to agree; candidates are
+   the two strategies (VI_202610_008), the survivorship experiment (S_202610_008) and
+   the historical membership (MD_202610_002).
+
+Open decisions carried over: the delisted-lot accounting (VI_202610_006, N2) and the
+deferral of the DAG engine (spec §9.6).
 
 ### The process so far: from proof of concept to judging a model (2026-10-31, open)
 
