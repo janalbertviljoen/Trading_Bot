@@ -20,13 +20,9 @@ them down.
 - **Warden's report.** Write each report the warden returns into the change file,
   unchanged, under `## Warden report`, headed with its date and the commit reviewed. It
   is removed on closing, when the `## Outcome` records the date and commit of the run.
-- **Report writer.** The secretary owns the PDF reports' writing and formatting (user,
-  2026-10-31): the title, abstract, section descriptions and captions, and the academic
-  layout (numbered sections and sub-sections per GICS sector, numbered figure captions,
-  short factual descriptions, no persona). The text lives in `config/report_*.toml` (for
-  the market analysis: `config/report_market_analysis.toml`), which the secretary edits;
-  the developer builds the code that renders it to LaTeX and PDF
-  (`skatkis.report`, `market_data.report`).
+- **Inspections.** After each inspector run, add its log line to the change file's
+  `## Inspections` table; the findings themselves stay in the chat. The table is removed
+  on closing, when the `## Outcome` records how many runs there were.
 - **Stage records directly.** After writing in `midas/` (change logs, change files,
   notes, designs, instructions), stage the changes with `git add midas/`; the user rarely
   reviews these small edits (user, 2026-10-31). Staging is not committing: commits still
@@ -52,7 +48,7 @@ user steer. Do not run checks or tests when picking up or discussing a change.
 | `toolbox/<component>/notes.md` | Drafts: ideas, questions and observations kept over time |
 | [toolbox/_template.md](../toolbox/_template.md) | Copy this to add a change |
 | [assay/notes.md](../assay/notes.md) | Drafts for Project Assay, the consumer app planned on this research |
-| `instructions/` | The agent instructions: `AGENTS.md`, one file per hat, `writing.md`, `guard.md` and `CLAUDE.md` |
+| `instructions/` | The agent instructions: `AGENTS.md`, one file per hat, `quant.md`, `writing.md` and `CLAUDE.md` |
 
 ## Naming convention for changes
 

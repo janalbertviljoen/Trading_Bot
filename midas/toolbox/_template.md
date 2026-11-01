@@ -30,6 +30,13 @@ Dated and attributed, while the change is open.
 
 Dated progress, while the change is open.
 
+## Inspections
+
+One line per inspector run, on a big branch (`inspector.md`).
+
+| Date | Commits | Findings | Open |
+|---|---|---|---|
+
 ## Kickoff prompt
 
 The prompt to start the work in a new session.

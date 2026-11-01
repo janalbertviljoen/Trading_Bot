@@ -1,7 +1,8 @@
 # Midas
 
 Midas is this repository's AI development assistant: one agent persona that wears
-different hats (developer, secretary, researcher, warden, guard), plus a component
+different hats (developer, secretary, researcher, inspector, warden, scribe, tester,
+guard), plus a component
 index served over MCP. This file is its governing description: what it is, what it may
 do, and the decisions that shaped it.
 
@@ -73,3 +74,7 @@ until the portfolio engine (S_202610_006) replaces it. The index and the rename 
 | 2026-10-31 | Reliability is tested on a broader US universe from the same EDGAR and Yahoo sources (S&P 1500 first, then a rule-based universe), not on other exchanges; the survey of exchanges is in `toolbox/market_data/notes.md` | user |
 | 2026-11-01 | Project Assay: a consumer app planned on this research, with Midas as its chat assistant; a product only after a strategy proves itself out-of-sample; drafts in `assay/notes.md` | user |
 | 2026-11-01 | The sleeve's target is about 2% a year above the S&P 500 total-return index, with not doing worse as the minimum; strategies are also judged on how often and how far they trail the index over rolling periods; results may be reported as CPI + x% (`AGENTS.md`, `researcher.md`) | user |
+| 2026-11-01 | Instructions slimmed: `AGENTS.md` keeps only what guards every edit; the layout and branches move to `developer.md`, the persona to `CLAUDE.md`; the stale pre-layout agents are removed (S_202611_001) | user |
+| 2026-11-01 | New hats: the inspector (Sonnet) reviews code at milestones on big branches, incrementally; the warden (Opus) runs once per branch before the pull request and builds on the inspections; neither runs on records-only, rename-only or tests-only branches. Both check for dead weight (S_202611_001) | user |
+| 2026-11-01 | The scribe writes the official documentation after the warden and the PDF report text (moved from the secretary), and documents for members; the tester writes the unit tests last (S_202611_001) | user |
+| 2026-11-01 | The research protocol in `researcher.md` names nothing internal, so it can be served to members' Claude; the honesty rules for members are enforced by the engine, not by instructions (S_202611_001) | user |
