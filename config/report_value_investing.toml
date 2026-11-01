@@ -9,7 +9,7 @@
 # {best_company_share} (the company worth most across its purchases, and its share of the
 # 2016 investor's value); {winners}, {losers}, {winner_rules}, {loser_rules} (named from
 # [rule_names]), {loss_years}; the wallet with sells: {managed_s}, {managed_rate_s},
-# {threshold}, {first_start}, {sales}, {sold_usd}; next year: {next_score_date},
+# {threshold}, {tier_edge} (the Red/Amber edge), {first_start}, {sales}, {sold_usd}; next year: {next_score_date},
 # {next_picks}, {worst_count}, {worst_list}. Inline maths between $...$;
 # write { and } inside texts as {{ and }}.
 
@@ -41,9 +41,10 @@ Financials and Real Estate sectors.
 Ten rules from Graham and Buffett grade every company: G6 and G7 (price against earnings and book \
 value), G2a and E1 (current ratio), G2b and E2 (debt), NN (net-net), G5 (earnings growth), B1 \
 (return on equity) and E4 (current dividend). Six more (G3, G4, E3, E5, E6 and NI1) are switched \
-off and can be switched on. For each rule, \
-the companies are ranked by the rule's value and placed in six equal groups, from 5 points for the \
-best sixth to 0 for the worst; each rule's points are multiplied by its weight, one less the share \
+off and can be switched on. The ten are eight concepts, because G2a and E1 (current ratio) and G2b \
+and E2 (debt cover) measure the same thing and so count twice. For each rule, \
+the companies are ranked by the rule's value and placed in equal-sized groups, from the most points for \
+the best group to none for the worst; each rule's points are multiplied by its weight, one less the share \
 of companies that pass the rule's threshold, so rules few companies pass count more. The score is \
 the sum. On the first trading day of January and of July, the {picks} highest-scoring companies are bought \
 for {amount} USD, each in proportion to its score.
@@ -51,9 +52,14 @@ for {amount} USD, each in proportion to its score.
 Three limits apply to every number in this report. Companies that left the index are missing from \
 the data, which flatters the results. The score's design and every setting of this report (the \
 rules and their weighting, the number of picks, the decision months, the sell threshold, the start years) were \
-chosen while looking at the whole period from 2016, so no period here is out of sample: the \
+chosen while looking at the whole period from 2009, so no period here is out of sample: the \
 results describe how these rules would have done, not evidence that they will do so. There are no \
-trading costs or taxes."""
+trading costs or taxes.
+
+Neither Benjamin Graham nor Berkshire Hathaway or Warren Buffett has endorsed, reviewed or approved this \
+score or this report. The rules are our reading of Graham's books; the quotations from Berkshire's \
+published letters to shareholders are cited by year and show where a question was taken, not what any of \
+them would say about these results."""
 
 [picks]
 title = "Picks per half-year"
@@ -100,13 +106,23 @@ table_caption = "Sales of the investor who started in {first_start}: share of ea
 sold_title = "Sold in the wallet"
 sold_text = """Table [[tab:sales]] lists the {sales} sales of the investor who started in {first_start}, worth {sold_usd} USD in \
 all. They are the wallet's own cash flows; the list below does not depend on what anyone holds."""
-worst_title = "To sell or short"
-worst_caption = "The {worst_count} lowest-scoring companies on the latest score date, as many as the picks: sector, score, score on the 0-to-1 scale and what the score suggests."
-worst_text = """These are the {worst_count} lowest scores in the {index} on {next_score_date}, as many as the picks, whether \
-or not anyone holds them: {worst_list} (Table [[tab:worst]]). The last column reads each score on the 0-to-1 scale \
-against the sell threshold of {threshold}. At or below the threshold, the company is one to avoid, and to \
-hold only if you already own it. At or below half of the threshold, it is one to start thinking about selling. \
-At zero, the score is not worth anything. The cut-offs are those the score uses today and are not fixed. The \
+worst_title = "Lowest scores in the index"
+worst_caption = "The {worst_count} lowest-scoring of the companies scored on the latest score date: sector, score, score on the 0-to-1 scale and colour (Green, Amber or Red; not a recommendation)."
+worst_text = """These are the {worst_count} lowest scores, as many as the picks, among the companies of the {index} that \
+are scored on {next_score_date}, whether or not anyone holds them: {worst_list} (Table [[tab:worst]]). \
+Financials, Real Estate and companies with too few rules to score are not scored and so cannot appear. \
+Companies with the same score are ordered by symbol, so when several share the last place, the \
+alphabetically first are shown. The list shows where the score ranks these companies today; it is not a \
+recommendation to buy, sell or sell short anything. A score of 0 means only that no rule awarded the \
+company any points; it says nothing about what the company is worth.
+
+The last column colours each score on the 0-to-1 scale against the sell threshold of {threshold}. Green is \
+a score above {threshold}. Amber is a score from {tier_edge} up to and including {threshold}: a company one \
+would not buy, and would hold only if already owned. Red is a score below {tier_edge}: a company one \
+might start to think about selling. The colours are not the rule of the wallet with sells. That rule is \
+mechanical: at or below {threshold} it sells part of a holding, the more the lower the score, and at 0 all \
+of it, whatever the colour. The sell signal on these companies has not been tested: no test has measured \
+what the lowest scores did afterwards. The cut-offs are those the score uses today and are not fixed. The \
 wallet never sells short; a short position on these companies is a later step and has not been tested."""
 
 [contents]
@@ -141,7 +157,7 @@ so few picks, these differences describe this sample; they do not establish whic
 Appendix [[app:rules]] explains each rule, and Appendix [[app:weighting]] tests whether the rule \
 weights favour the rules that told winners from losers."""
 table_caption = "Dollars ahead of the same money in the {index}, per pick: total, average and median of the picks that beat the index and of those that lagged it."
-figure = "Mean points per rule (0 to 5) of the picks that beat the {index} since purchase and of those that did not, each pick weighted by its dollars ahead or behind the index."
+figure = "Mean points per rule of the picks that beat the {index} since purchase and of those that did not, each pick weighted by its dollars ahead or behind the index."
 list_title = "The rules"
 list_caption = "The rules: what each measures, the better direction and when a company passes."
 list_text = """Table [[tab:rules]] explains each rule: what it measures, whether a higher or a lower value \
@@ -198,7 +214,7 @@ from 2020 ({peer_rate_2020}) and {peer_2025} USD from 2025 ({peer_rate_2025}), a
 {wallet_2016}, {wallet_2020} and {wallet_2025} USD in the value wallet. The comparison picks the \
 {peer_label} with hindsight: they are named for having been the winners of these years."""
 table_caption = "The Magnificent 7 on the score: score and score on the 0-to-1 scale on the latest score date, rank among the companies scored then, and median rank on the dates of the decisions since 2016."
-figure = "Mean points per rule (0 to 5) of the Magnificent 7 and of our picks on the decision dates since 2016, the rules ordered by how many more points the picks scored."
+figure = "Mean points per rule of the Magnificent 7 and of our picks on the decision dates since 2016, the rules ordered by how many more points the picks scored."
 
 [history]
 title = "Price history of the picks"
@@ -223,6 +239,15 @@ with the earlier purchases of the investor who started in {pick_scenario} and th
 at today's price."""
 table_caption = "The next picks on the latest score date: score, score on the 0-to-1 scale, weight and USD of each 100 USD."
 prices_figure = "Share price of each next pick (USD, split-adjusted, dividends excluded) over the last {pick_years} years: earlier purchases of the investor who started in {pick_scenario} in green, the potential purchase at the latest price in orange."
+[static_figures]
+# The figures written out in the sections below ([missed], [testing], [dialogue]) are not computed by the
+# report command. They were produced on `produced`, with the model configuration of `model_fingerprint`
+# (`value_investing.__main__.model_fingerprint`) and the data of `data_as_of`; when either differs the report
+# says so before them. Refresh all three together (VI_202611_001, Warden finding S5).
+produced = "2026-11-01"
+model_fingerprint = "0e57a832bd87"
+data_as_of = "2026-10-31"
+
 [missed]
 title = "Winning picks we missed"
 text = """No score picks every winner, and a winner is only known afterwards. Here the winners are the ten \
@@ -236,14 +261,17 @@ platforms: Amazon 0.08, Netflix 0.23 and Constellation Brands 0.32. On the S&P 4
 median (0.42): Paylocity 0.03, Repligen 0.16, Tenet 0.17 and Qualys 0.20. Health care is 17% of the winners \
 there and 3% of our picks. On the S&P 600 energy companies are 24% of the winners and 2% of our picks.
 
-The likely cause is in the rules. They are Graham's and Buffett's, and they reward cheap, low-debt, asset-rich \
+A possible cause is in the rules. They are Graham's and Buffett's, and they reward cheap, low-debt, asset-rich \
 companies. Many winners of the period were growth and quality companies that pay no dividend and trade at \
 higher multiples. On the S&P 400 they score 0.7 points lower than the average company on the dividend rule and \
-0.4 lower on debt cover, while our picks score 4.4 on debt cover against 2.1 for the average company. Dropping \
-the dividend rules made no measurable difference, so they are not what holds the score back; the price rules \
-are the more likely cause (Section [[sec:dialogue]]). Companies that S&P later added to the S&P 500 scored \
-lower than its existing members before they joined (0.42 against 0.51 on a scale from 0 to 1), which points the \
-same way: the score undervalues growth."""
+0.4 lower on debt cover, while our picks score 4.4 on debt cover against 2.1 for the average company. On the earlier \
+sixteen-rule score, dropping the dividend rules made no measurable difference on the S&P 500 and the S&P 400, so \
+they are not what holds the score back there; on the S&P 600 the bands excluded zero (+0.72 and -0.93). The price \
+rules are one more possible cause: dropping them raised the best ten on the S&P 500, but that held on the S&P 500 \
+only, showed nothing on the S&P 400 and was contradicted on the S&P 600, so it was not adopted (Section \
+[[sec:dialogue]]). Companies that S&P later added to the S&P 500 scored lower than its existing members before \
+they joined (0.42 against 0.51 on a scale from 0 to 1), which fits the hypothesis that the score undervalues \
+growth; it is a hypothesis, not a tested result."""
 table_caption = "Winners over the next 36 months that the score missed, by index: the share of winners held (by chance), their mean score and examples with their score on a scale from 0 to 1."
 
 [missed.table]
@@ -259,8 +287,10 @@ rows = [
 title = "Midas and the Investor"
 text = """Every result in this report was questioned before it was believed. When something looked wrong, too \
 good, different between indices or against what a long-term investor would say, Midas, who reads the numbers, \
-put the question to the Investor. The Investor answers only from Warren Buffett's letters to shareholders and \
-names the year. Midas then tested the answer and reported back. Three of the exchanges follow.
+put the question to the Investor. The Investor answers only from Berkshire Hathaway's published letters to shareholders and \
+names the year; the quotations imply no endorsement by Berkshire or Mr Buffett. Midas then tested the answer and reported back. Three of the exchanges follow. The figures in them are \
+in-sample stress and sampling diagnostics, compared with the index and not with random books, on a configuration \
+chosen on this data (Section [[sec:testing]]).
 
 **Is the dividend rule holding the score back?**
 
@@ -273,17 +303,17 @@ been contrary to the financial interest of shareholders, large or small."
 
 **Midas:** I dropped the two dividend rules from the sixteen-rule score and compared. On the S&P 500 the best ten \
 changed by -0.03 points a year, with a 99% band from -1.05 to +0.41; on the S&P 400 by -0.26. There is no \
-measurable difference. The default now keeps only one dividend rule, the current dividend, and the other is a switch.
+measurable difference on those two indices; on the S&P 600 the bands excluded zero (+0.72 and -0.93). The default now keeps only one dividend rule, the current dividend, and the other is a switch.
 
 **Should a cheap price be the test of value?**
 
 **Midas:** Dropping the P/E and price-to-book rules raised the best ten on the S&P 500 but lowered the broad \
-ranking, and the missed winners were growth companies.
+ranking, and the missed winners were growth companies. That held on the S&P 500 only, and I did not adopt it.
 
 **The Investor:** (1992) "Growth is always a component in the calculation of value." A low ratio of price to book \
 value, a low price-earnings ratio or a high dividend yield are "far from determinative as to whether an investor \
 is indeed buying something for what it is worth", and the opposite characteristics "are in no way inconsistent \
-with a 'value' purchase". Yet "business growth, per se, tells us little about value". (2013) "Price is what you pay, \
+with a 'value' purchase". Yet "business growth, per se, tells us little about value". (2013, Graham's adage, which Buffett quotes as "Ben's adage") "Price is what you pay, \
 value is what you get."
 
 **Midas:** I tested a price-to-earnings-growth measure. On all three indices it widened the broad ranking a little \
@@ -293,26 +323,30 @@ so it is a switch and not the default.
 
 **Is it too good to be true?**
 
-**Midas:** The picks beat the index in all 12 samples that each left out a random tenth of the companies. That \
+**Midas:** The picks beat the index in every one of a set of repeated samples that each left out a random part of the \
+companies. The samples share most of their companies, so that is not independent confirmation, and it still \
 looks too good, so I removed the biggest winners as if they had never existed.
 
 **The Investor:** (1987) "When shortages exist, however, even commodity businesses flourish", and "whenever \
 shortages appear, the typical manager simply can't wait to expand capacity". (1989) "Time is the friend of the \
 wonderful business, the enemy of the mediocre."
 
-**Midas:** With the three largest winners removed (Applied Materials, Lam Research and Micron) the wallet \
+**Midas:** The 1987 passage is about insurance; I apply it to chip makers by analogy. With the three largest winners removed (Applied Materials, Lam Research and Micron) the wallet \
 still beat the index by 3.7, 1.9 and 2.1 points a year for the investors who started in 2016, 2020 and 2023; with \
-five removed, by 0.3 to 2.3 points. The edge is real on the S&P 500 but thin, and it sits in chip and materials \
+five removed, by 0.3 to 2.3 points. The edge is present in this sample of the S&P 500 but thin, and it sits in chip and materials \
 companies after 2009. On the S&P 400 it disappears without its three largest winners. Treat it with care.
 
-**What this suggests for you.** Hold for years, not months. Hold ten companies and not five, since the concentration \
-is the main risk. Treat one or two big winners as luck until they have been tested the same way. Switch rules on or \
-off for the kind of company you want, and read the tests in Section [[sec:testing]] before relying on a number."""
+**What the tests showed.** The results are for holding over years, not months: the picks are bought twice a \
+year and not sold. The concentration is the main risk, and one or two big winners carry much of the gain, so they \
+are treated as luck until tested the same way. The book holds ten companies, not five: ten was chosen for \
+plausibility and diversification, although the five-company book scored higher in the tests. The tests cover the \
+default ten rules; other switches were not tested as a set. This is what the tests showed, not advice; read the \
+tests in Section [[sec:testing]] before relying on a number."""
 
 [reading]
 title = "Where to read more"
-text = """Midas can work from the documents you give it. Download or bring the strategy literature you like, tell \
-Midas the style, and it will answer from those pages and name the source. The Berkshire Hathaway letters are free \
+text = """Planned, and not yet available: a member will be able to bring the strategy literature they like and ask for \
+answers drawn from those pages, with the source named. The Berkshire Hathaway letters are free \
 to read on the company's site. Books are copyrighted: use your own copy. The list below is grouped by the kind of \
 risk each approach accepts. It is a starting point only: the titles are given from general knowledge and have \
 not been checked against the books, so check each one before relying on it."""
@@ -332,17 +366,25 @@ rows = [
 
 [testing]
 title = "How the model was tested"
-text = """The score is judged only on what it did not know: companies and dates that were held out, against random \
-picks of the same size, with the uncertainty stated and the number of designs tried counted. The tests follow a \
-written protocol, and a test that failed is shown as failed. The numbers are from runs on 1 November 2026 on \
-the ten default rules, with data as of 31 October 2026.
+text = """This is a prototype, "first light": the first version of the model that is frozen and dated, with nothing \
+earlier to compare it with. The figures below are in-sample stress and sampling diagnostics, compared with the \
+index and not with random books of the same size, on a configuration that was chosen on this data after more \
+than 100 designs were tried. The bands cover the sampling of companies only: they do not allow for the number of \
+designs tried (multiple testing) or for the period, which the designs were chosen while looking at, so no \
+result here is out of sample. The one held-out test, on companies the score never used, is on the earlier \
+sixteen-rule score and is marked to rerun. The tests follow a written protocol, and a test that failed is \
+shown as failed. The model has not cleared them: the tests below are open or failed in part. The numbers are from \
+runs on 1 November 2026 on the ten default rules, with data as of 31 October 2026.
 
-On the S&P 500 the picks beat the index in all 12 samples that each left out a random tenth of the companies, \
+On the S&P 500 the picks beat the index in every one of a set of repeated samples that each left out a random part of the \
+companies (the samples share most of their companies, so this is not independent confirmation), \
 by 9 to 15 points a year on average depending on the start year, and by about 5 points in the worst sample. \
+The investor who started in 2020 earns 27.7% a year against 15.9% in the index. The gain is concentrated: \
+Micron makes up 24% and Lam Research 16% of the 2016 investor's gain. \
 They still beat it with the three largest winners removed as if they had never existed (Applied Materials, \
 Lam Research and Micron): by 3.7, 1.9 and 2.1 points a year for the investors who started in 2016, 2020 and \
 2023, and by 8.9 for 2025. With five removed (adding Nucor and Nvidia) the margin shrinks to 0.3 to 2.3 points \
-for the first three. The edge is real on this index but thin, and concentrated in chip and materials companies \
+for the first three. The edge is present in this sample of the index but thin, and concentrated in chip and materials companies \
 that did well in a long bull market after 2009.
 
 The other two indices do not confirm it. On the S&P 400 the picks beat their fund by 2 to 5 points a year for the \
@@ -358,9 +400,9 @@ table_caption = "The tests the model must pass before launch, and where each sta
 header = ["Test", "What is checked", "Result", "Status"]
 columns = "l p{3.6cm} p{4.6cm} p{2.3cm}"
 rows = [
-  ["Winners removed", "The wallet still beats its index with the 3 largest winners removed", "S&P 500: yes, by 1.9 to 3.7 points (2016 to 2023 starts). S&P 400: no. S&P 600: mixed", "S&P 500 passed; others not"],
-  ["Company samples", "12 samples, each leaving out a random tenth of the companies", "S&P 500: ahead of the index in 12 of 12", "Passed on the S&P 500"],
-  ["Unseen companies", "The score frozen, then run once on a tenth of the companies never used", "Positive, but two companies gave 99% of the gain (earlier sixteen-rule score)", "To rerun"],
+  ["Winners removed", "The wallet still beats its index with the 3 largest winners removed", "S&P 500: yes, by 1.9 to 3.7 points (2016 to 2023 starts). S&P 400: no. S&P 600: mixed", "S&P 500 passed in-sample; others not"],
+  ["Company samples", "Repeated samples, each leaving out a random part of the companies", "S&P 500: ahead of the index in every sample (the samples share most of their companies)", "Passed on the S&P 500, in-sample"],
+  ["Unseen companies", "The score frozen, then run once on a part of the companies never used", "Positive, but two companies gave 99% of the gain (earlier sixteen-rule score)", "To rerun"],
   ["Other indices", "The score beats random picks of its own index on the S&P 400 and 600", "Not reproduced", "Open"],
   ["Two periods", "The edge appears before and after 2017", "Yes on the S&P 500 (earlier sixteen-rule score)", "To rerun"],
   ["Missed winners", "Which winners the score missed, and why", "Section [[sec:missed]]", "Done"],
@@ -492,13 +534,13 @@ comparing the scores with the full run (Table [[tab:lookahead]]). Any difference
 information from after the date reached a score. On {lookahead_dates} the picks were \
 {lookahead_picks}, and the scores were identical on {lookahead_clean}. The same check \
 runs as a unit test. A rule whose window reaches back further than a company's price history \
-(the 20-year dividend record of a younger company) is not evaluated rather than failed.
+(a long dividend record of a younger company) is not evaluated rather than failed.
 
 Three sources of forward information are outside this test. Only today's {index} members \
 are scored. {membership} Companies that later left the index are missing, which flatters every \
 result. Sectors are \
 today's, used to leave out Financials and Real Estate in earlier years. And the score's \
-design and settings were chosen while looking at 2016 to 2026, so no period tests it fairly: \
+design and settings were chosen while looking at 2009 to 2026, so no period tests it fairly: \
 2022 onwards, once meant as a held-out test, was used to choose between models."""
 survivors_title = "Companies missing from the data"
 survivors_text = """Table [[tab:survivors]] counts the companies that left the {index} after each \

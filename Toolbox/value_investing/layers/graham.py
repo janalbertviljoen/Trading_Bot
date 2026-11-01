@@ -40,15 +40,17 @@ debt to net current assets, debt cover : g2b_debt_cover, e2_debt_cover
     (G2b k = 1.0, E2 k = 1.10); value LTD / NCA, missing when NCA <= 0. The rule then
     fails, except at NCA = 0 with no long-term debt, which passes.
 earnings stability : g3_earnings_stability, e3_earnings_stability
-    Pass when diluted EPS > 0 in each of the last n fiscal years (G3 10, E3 5); value
+    Pass when diluted EPS > 0 in each of the last n fiscal years (G3 3 as configured,
+    Graham's 10; E3 5); value
     the number of those years with EPS > 0; not evaluable until n consecutive years are
     filed.
 dividend record : g4_dividend_record
-    Count of the n calendar years before the rebalance year (G4 n = 20) with at least
-    one dividend ex-date; pass when it equals n.
+    Count of the n calendar years before the rebalance year (G4 n = 3 as configured,
+    Graham's 20) with at least one dividend ex-date; pass when it equals n.
 earnings growth (Graham) : g5_earnings_growth
-    g = mean EPS of lags 0 to a-1 / mean EPS of lags n-a to n-1 (a = 3, n = 13); pass
-    when the older mean is > 0 and g >= 1.33.
+    g = mean EPS of lags 0 to a-1 / mean EPS of lags n-a to n-1 (a = 3, n = 6 as
+    configured, Graham's 13); pass when the older mean is > 0 and g >= 1.33. Over 3
+    years apart 1.33 is about 10% a year, over Graham's 10 about 2.9% a year.
 current dividend : e4_current_dividend
     Trailing dividend yield over ``window_days``; pass when > 0.
 earnings growth (enterprising) : e5_earnings_growth
@@ -122,14 +124,19 @@ def g2b_debt_cover(
 def g3_earnings_stability(
     inputs: RuleInputs, ratios: pd.DataFrame, *, years: int
 ) -> pd.DataFrame:
-    """G3, spec §2.1: positive diluted EPS in each of the last ``years`` (10) years."""
+    """G3, spec §2.1: positive diluted EPS in each of the last ``years`` years.
+
+    Configured at 3 years (Graham: 10); off by default.
+    """
     return _earnings_stability(inputs, years)
 
 
 def g4_dividend_record(
     inputs: RuleInputs, ratios: pd.DataFrame, *, years: int
 ) -> pd.DataFrame:
-    """G4, spec §2.1: a dividend in each of the ``years`` (20) calendar years before.
+    """G4, spec §2.1: a dividend in each of the ``years`` calendar years before.
+
+    Configured at 3 years (Graham: 20); off by default.
 
     Parameters
     ----------

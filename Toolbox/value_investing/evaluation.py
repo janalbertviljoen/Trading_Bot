@@ -521,7 +521,18 @@ def book_weights(scores: pd.Series, wallet: Wallet, *, side: str) -> pd.Series:
         Weights summing to 1, indexed by symbol, in rank order: exactly ``wallet.names``
         companies (fewer when fewer are scored); a tie at the last place is broken by
         symbol, in alphabetical order.
+
+    Raises
+    ------
+    ValueError
+        When the weighting is ``rank`` and ``wallet.rank_weights`` has fewer entries than
+        ``wallet.names``.
     """
+    if wallet.weighting == "rank" and len(wallet.rank_weights) < wallet.names:
+        raise ValueError(
+            f"rank weighting needs {wallet.names} rank_weights, got "
+            f"{len(wallet.rank_weights)}: ranks beyond them would get no money"
+        )
     ordered = scores.sort_index().sort_values(ascending=side == "sell", kind="stable")
     chosen = ordered.iloc[: wallet.names]
     if wallet.weighting == "rank":

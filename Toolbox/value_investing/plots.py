@@ -583,7 +583,10 @@ def pick_prices(  # noqa: PLR0913  one keyword per layout setting
     Notes
     -----
     A trade is drawn at the price on its decision date, its marker's area in proportion
-    to the USD traded; a trade without a price that day is not drawn.
+    to the USD traded; a trade without a price that day is not drawn. Up to ``page``
+    companies are drawn in 4 columns; with more, the figure has 2 rows of ``ends``
+    columns: the best ``ends`` price changes on the first row and the worst ``ends``
+    on the second.
     """
     points = trades.merge(
         prices,

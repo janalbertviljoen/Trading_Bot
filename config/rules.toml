@@ -205,6 +205,10 @@ peer_label = "Magnificent 7"
 # each of these rebalance dates and compares them with the full run.
 lookahead_dates = [2018-12-21, 2022-12-16, 2025-12-19]
 sell_threshold = 0.4
+# The worst list: below this share of sell_threshold a score is Red, from there up to
+# sell_threshold Amber, above it Green (the user's 0.2 against 0.4); not fixed, to follow
+# the fitted cut-offs (VI_202611_002).
+tier_ratio = 0.5
 # Price history of the picks (VI_202610_007, user, 2026-10-31): the companies the
 # investor from pick_scenario traded and the next picks, over the last pick_years years.
 # The weighting test's verdict: above verdict_band the rule weights favour the rules

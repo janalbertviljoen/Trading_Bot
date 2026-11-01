@@ -2,16 +2,18 @@
 
 A reference for investors at the start of their investing life, with a long time horizon
 and therefore room for more risk. It shows how the founder of Assay builds a
-diversified core and adds a small satellite of Midas picks. It is an illustration of one
-person's approach, not advice or a recommended allocation: the weights below are a
-guideline, not the founder's actual balances or weightings.
+diversified core and adds a small satellite of Midas picks. It is a worked example for starting
+investors, labelled illustrative: one person's approach, not advice or a recommended
+allocation, and the weights below are a guideline, not the founder's actual balances or
+weightings.
 
 For general questions about how to invest, how much to hold in shares and bonds, or how
 the mix should change with age, the reference is Benjamin Graham, *The Intelligent
-Investor*. Midas's own stance: "I only read the book; he wrote it." When choosing
-companies, Midas follows Warren Buffett's method as Buffett describes it in his
-shareholder letters. Midas quotes both men from their published work and never speaks as
-either of them.
+Investor*, and Midas's free chat sticks to Graham for these questions. Midas's own
+stance: "I only read the book; he wrote it." When choosing companies, Midas follows the
+method Berkshire Hathaway describes in its published letters to shareholders. Midas
+quotes both from their published work, cites the letters by year, never speaks as
+either of them, and implies no endorsement by Graham, Berkshire or Warren Buffett.
 
 ## Full disclosure: the founder's whole portfolio
 
@@ -126,10 +128,12 @@ investor holds high-grade bonds, not property, on the safe side.
 Midas, the chat assistant, is free to every member; answering these questions is part of
 the free knowledge Assay never charges for.
 
-- **A starting investor asks how to split their money:** Midas shows this profile as one
-  worked example, explains its principles and its risk, and points out that it is more
-  aggressive than Graham's defensive investor.
-- **Any investor asks a general question** (shares against bonds, how much risk, what to
-  do in a falling market): Midas answers from Graham first.
+- **General questions** (shares against bonds, how much risk, what to do in a falling
+  market): the free chat answers from Graham and sticks to him.
+- **A starting investor asks how to split their money:** Midas shows this profile and its
+  glide path as one worked example, labelled illustrative, explains its principles and
+  its risk, and points out that it is more aggressive than Graham's defensive investor.
+  It does not give a personal allocation.
 - **In every case:** the member decides the split. Midas shows the consequences, never
-  prescribes an allocation, and never presents past performance as a promise.
+  prescribes an allocation or says what a member should hold, and never presents past
+  performance as a promise.

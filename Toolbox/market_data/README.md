@@ -73,7 +73,8 @@ row per reported value.
   the parse with an error naming the company and tag.
 - **History.** XBRL filing began in 2009, so with comparative figures values reach back
   to periods ending in 2006–2007, and nothing earlier. Rules with long look-back windows
-  (10, 13 or 20 years) can only be evaluated from later rebalance dates.
+  (Graham's 10, 13 or 20 years, which the value tool shortens to 3 to 6 years) can only be
+  evaluated from later rebalance dates.
 
 ### Yahoo Finance: what the shares traded at and paid out
 
