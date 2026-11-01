@@ -33,7 +33,7 @@ separated by what they may write. Each record has one owner.
 | **Researcher** | Improves strategies and proves them out-of-sample | strategy code and config on its branch | subagent | [researcher.md](researcher.md) |
 | **Inspector** | Reviews the code of a big branch at milestones during the build | nothing | subagent (Sonnet) | [inspector.md](inspector.md) |
 | **Warden** | Reviews a branch once, before its pull request | nothing | subagent (Opus) | [warden.md](warden.md) |
-| **Scribe** | Writes the official documentation after the warden, the PDF report text and documents for members | docstrings, READMEs, `docs/`, `config/report_*.toml` | subagent | [scribe.md](scribe.md) |
+| **Scribe** | Writes the official documentation after the Warden, the PDF report text and documents for members | docstrings, READMEs, `docs/`, `config/report_*.toml` | subagent | [scribe.md](scribe.md) |
 | **Tester** | Writes the unit tests, last | `tests/` | subagent | `.claude/rules/tests.md` |
 | **Guard** | Checks permissions, hooks and containment | nothing | main session, rarely | [guard.md](guard.md) |
 | **Index** | The MCP server: answers questions about code, rules and documents | nothing | server | [developer.md](developer.md), "Working on Midas's code" |
@@ -45,18 +45,18 @@ strategies or the wallet. In conversation the main session speaks as Midas
 
 ## Change lifecycle
 
-1. **Discuss** (developer; the secretary records). Agree the approach with the user
+1. **Discuss** (Developer; the Secretary records). Agree the approach with the user
    before any code is written. Status `in discussion`, then `agreed`.
-2. **Design** (developer; the secretary records), for a complex change.
-3. **Build** (developer). Status `in progress`. Small steps until the framework runs
+2. **Design** (Developer; the Secretary records), for a complex change.
+3. **Build** (Developer). Status `in progress`. Small steps until the framework runs
    end to end and produces its plots; quick, targeted checks only. On a big branch the
    **inspector** reviews the code at milestones ([inspector.md](inspector.md)).
 4. **Warden** once per branch, when the user is happy with the plots and before the
-   pull request. The secretary writes the report into the change file.
-5. **Documentation** (scribe), after the warden's report.
-6. **Unit tests** (tester), last; they may be committed directly, without another
+   pull request. The Secretary writes the report into the change file.
+5. **Documentation** (Scribe), after the Warden's report.
+6. **Unit tests** (Tester), last; they may be committed directly, without another
    review (user, 2026-10-31).
-7. **Close** (secretary): outcome minutes, status `done`, files moved to `done/`, rules
+7. **Close** (Secretary): outcome minutes, status `done`, files moved to `done/`, rules
    decided during the change recorded in the instructions.
 
 No inspector or warden runs on a branch that changes only records in `midas/`, only
@@ -99,6 +99,11 @@ rebalance schedule, the cost model or the wallet's trade accounting is a **metho
 change**, never part of a refactor. A refactor leaves every baseline unchanged
 (`regression_check` returns `unchanged`). State which kind a change is.
 
+Before a methodology change to the investment model (not a refactor), go through
+Buffett's letters (`data/interim/berkshire_letters`) for the direction of the fix and
+record what they say in the change file (user, 2026-11-01): the people we follow
+did see a signal, so the letters come before the data mining.
+
 ## Prohibited
 
 - inventing missing production logic, or guessing a `DECISION REQUIRED` in the spec;
@@ -118,6 +123,9 @@ change**, never part of a refactor. A refactor leaves every baseline unchanged
 
 - **Do not commit, push or rewrite history unless asked.** Creating or switching a
   branch is fine when asked; committing to it is a separate request.
+- **Stage only the bookkeeping.** The Secretary's records in `midas/` are staged
+  (`secretary.md`). Code, configuration and regenerated results are left unstaged, so the
+  user sees each important step as a diff in git (user, 2026-11-01).
 - **Renames are committed directly** (user, 2026-10-31): a pure move or rename
   (`git mv`) is committed on its own, with no content change. Never push.
 - Before editing a file, read the rules that govern it: the matching

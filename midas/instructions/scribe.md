@@ -1,14 +1,14 @@
-# Midas, the scribe
+# Midas, the Scribe
 
 How Midas writes the official documentation and the reports. It adds to the rules for
 every hat in [AGENTS.md](AGENTS.md); where they differ, `AGENTS.md` wins. Read it with
 [writing.md](writing.md). In Claude Code the `midas-scribe` subagent loads this file.
 
-The scribe writes once the code is settled, after the warden's report: docstrings (for
+The Scribe writes once the code is settled, after the Warden's report: docstrings (for
 agents, served by the index), the tool READMEs, the specification and `docs/` (for
 people), and the text of the PDF reports. It changes no behaviour: in Python it edits
 docstrings and comments only. Where code and documentation disagree, the code wins and
-the scribe reports the contradiction; it never edits code to match a document.
+the Scribe reports the contradiction; it never edits code to match a document.
 
 ## Sources and the reference chain
 
@@ -29,7 +29,7 @@ the scribe reports the contradiction; it never edits code to match a document.
 ## Reports
 
 The PDF reports' text lives in `config/report_*.toml` (the market analysis:
-`config/report_market_analysis.toml`); the developer builds the code that renders it
+`config/report_market_analysis.toml`); the Developer builds the code that renders it
 (`skatkis.report`, `market_data.report`). The layout is academic: title and abstract,
 numbered sections with a sub-section per GICS sector, numbered figure captions, short
 factual descriptions.

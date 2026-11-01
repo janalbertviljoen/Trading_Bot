@@ -1,11 +1,11 @@
-# Midas, the secretary
+# Midas, the Secretary
 
 How Midas keeps its records in `midas/`: notes, change logs, change files, designs and
 the agent instructions. It adds to the rules for every hat in [AGENTS.md](AGENTS.md);
 where they differ, `AGENTS.md` wins. Read it with [writing.md](writing.md).
 
-The secretary is the only hat that writes in `midas/`. The developer and the researcher
-draft design content, decisions, results and instruction wording; the secretary writes
+The Secretary is the only hat that writes in `midas/`. The Developer and the Researcher
+draft design content, decisions, results and instruction wording; the Secretary writes
 them down.
 
 ## Duties
@@ -17,7 +17,7 @@ them down.
   change being designed.
 - **Problem, then design.** Record the agreed approach in the change file and the design
   in `design/`.
-- **Warden's report.** Write each report the warden returns into the change file,
+- **Warden's report.** Write each report the Warden returns into the change file,
   unchanged, under `## Warden report`, headed with its date and the commit reviewed. It
   is removed on closing, when the `## Outcome` records the date and commit of the run.
 - **Inspections.** After each inspector run, add its log line to the change file's
@@ -69,7 +69,7 @@ user steer. Do not run checks or tests when picking up or discussing a change.
 
 ## Working on a change
 
-The statuses follow `AGENTS.md`, "Change lifecycle"; the secretary sets them.
+The statuses follow `AGENTS.md`, "Change lifecycle"; the Secretary sets them.
 
 1. **Pick** a row whose status is `ready` and whose dependencies are `done`. Read its
    change file in full and, for a tool change, the tool's `notes.md`.
@@ -78,7 +78,7 @@ The statuses follow `AGENTS.md`, "Change lifecycle"; the secretary sets them.
    approach.
 3. **Build.** Keep dated decisions under `## Decisions` and progress under `## Notes`.
    Implementation detail belongs in the commit.
-4. **Close**, once the user is happy, the tests have passed and the warden's report is
+4. **Close**, once the user is happy, the tests have passed and the Warden's report is
    in the change file: replace `## Agreed approach`, `## Decisions` and `## Notes` with
    one `## Outcome` written as minutes (conclusion, alternatives considered and why
    they were not taken, key results, dates); set the status to `done` with the date;
@@ -102,5 +102,5 @@ for every hat in `AGENTS.md`, a developer rule in `developer.md`, a note-keeping
 here, a writing rule in `writing.md`, a rule for one hat in that hat's file
 (`researcher.md`, `inspector.md`, `warden.md`, `scribe.md`, `guard.md`), a Claude Code
 mechanic in `CLAUDE.md`. An area rule for a path outside `midas/` goes in the matching
-`.claude/rules/*.md`, which the developer writes. Once the index exists
+`.claude/rules/*.md`, which the Developer writes. Once the index exists
 (S_202610_002), call `rebuild_index` so it serves the new rule.

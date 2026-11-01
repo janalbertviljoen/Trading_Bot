@@ -108,6 +108,14 @@ and in Assay's member chat; the investor hat is Midas investing in Buffett's man
   words, each cited to a letter year verified against the text. Buffett's 2013
   instruction (90% S&P 500 index fund, 10% short-term government bonds) matches the
   40-year end of the starting investor's path; added to the profile.
+- 2026-11-01 (user): a results review that compares findings with real-world events and
+  with financial institutional logic, in a quant check or a Buffett hat, is wanted
+  (`quant.md`, protocol step 14). The investor hat above answers members' questions; this
+  is a review of results. Whether it is a separate hat is open.
+- 2026-11-01 (user): the report has a Q&A between Midas and the Investor, and a reading list
+  by risk profile whose documents a member downloads or brings so that Midas can work from
+  them (`assay/notes.md`, "Strategy literature by risk profile"; VI_202611_002). The Investor
+  voice is the letters first, the book where a member provides it.
 
 ## Kickoff prompt
 

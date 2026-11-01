@@ -1,13 +1,13 @@
-# Midas, the warden
+# Midas, the Warden
 
 How Midas reviews a branch before its pull request. It adds to the rules for every hat
 in [AGENTS.md](AGENTS.md); where they differ, `AGENTS.md` wins. In Claude Code the
 `midas-warden` subagent (Opus) loads this file.
 
-The warden applies the rules strictly to a finished change and gives the user a
+The Warden applies the rules strictly to a finished change and gives the user a
 pre-merge report. It runs **once per branch**, when the user is happy with the plots,
 separately from the developer. It writes nothing and runs no commands. Where the
-[inspector](inspector.md) has already reviewed commits, the warden builds on its log
+[inspector](inspector.md) has already reviewed commits, the Warden builds on its log
 instead of reviewing them again. The branches it skips are listed in
 [AGENTS.md](AGENTS.md), "Change lifecycle".
 
@@ -28,10 +28,10 @@ never as passed.
 Read the change file (with its `## Inspections` log), its design and, for a tool
 change, the tool's `notes.md` first. Cite the rule for each finding.
 
-1. **Code on uninspected commits**: the inspector's checklist, items 1–7.
+1. **Code on uninspected commits**: the Inspector's checklist, items 1–7.
 2. **Inspections closed**: every blocking and should-fix finding in the log is fixed
    or carries a recorded reason.
-3. **Dead weight across the branch**: the inspector's item 8, applied to every file on
+3. **Dead weight across the branch**: the Inspector's item 8, applied to every file on
    the branch list, including instructions and `.claude/`.
 4. **Reference chain**: every rule definition the change touches goes source → spec or
    README section → docstring.

@@ -172,6 +172,9 @@ Decided 2026-10-31, recorded in VI_202610_002: dividend history from the price s
 the windows as explicit parameters (Graham's and Buffett's values by default), and
 rules phased in until their window is full. G4's phase-in was built on 2026-11-01.
 
+User, 2026-11-01: G3 is to be reduced from 10 to 3 years for lack of data; 3 years
+corresponds to the investment horizon. Not applied yet (→ VI_202611_001).
+
 ### Universe looks ahead: today's members scored in the past (2026-10-31, open)
 
 Found in VI_202610_004. The buyability table scores today's S&P 500 members on every
@@ -205,6 +208,109 @@ the S&P 500 by more than a threshold) would address it, but it is a methodology
 change: a new rule, to be tested as a hypothesis out-of-sample (the researcher, on
 the broader universe of MD_202610_004), not set by looking at today's picks. The price
 history in the report (VI_202610_007) shows the problem first.
+
+### Rule weighting strategies (2026-11-01, open, priority low → VI_202611_001)
+
+Gating belongs here too (user, 2026-11-01): the plain score stays; gates and weights are
+later work. Gate designs 1 to 6 added nothing to the plain score on the S&P 500
+(VI_202611_001, checks 7 to 9); G3 at 3 years passes 86% of companies, so it is hardly a gate.
+
+Weights stay floored at 0 (user, 2026-11-01). To revisit, simple and complex: signed
+weights, stability shrinkage, best-k by stability, weights by sector or regime, a
+regression of excess return on the points. First look at signed weights (training
+companies only, 3-month excess, 12 closed windows): no variant had a score correlation above 0.01,
+because no single rule's mean rank correlation exceeds 0.02. Point curves per rule come
+first, since a rank correlation misses a rule that rewards the middle of its range.
+
+### Sell analysis at 2.5 years (2026-11-01, open, → VI_202611_001)
+
+The strategy is buy and hold (Buffett; user, 2026-11-01), judged over 5 years. A 2.5-year
+look at each pick would show whether to sell one that is crashing out earlier. A separate
+analysis, after the buy side is settled: it needs a sell rule fixed beforehand and
+tested out-of-sample like any other.
+
+### Optimisation candidates (2026-11-01, open → S_202611_003, VI_202611_001)
+
+Collected for the first study (user, 2026-11-01):
+
+1. **More names per decision.** Telling people to buy two or three mega-caps is of little
+   use, and the picks barely change between decisions. Search the number of names
+   (`[wallet] names`, now 5; 10 and 20 to compare) and whether the signal lifts. If it does
+   not, lengthen the time threshold (hold longer) so that more underdogs are picked.
+2. **Rule ablation.** Remove one rule at a time and measure the change in the result; list
+   the 10 rules with the highest impact. G2A equals E1, G2B equals E2 and G6 equals
+   `pe_average`, so their joint effect is measured as one.
+3. **Mean points per evaluable rule** in place of the sum (see the note above).
+4. **Gates and weights**, filed under "Tried and not used" and "Rule weighting strategies".
+5. **Rule windows**, with floors, as in VI_202611_001.
+6. **Sector-neutral grades, and quality and growth in the rule set.** From the missed-winners
+   check (VI_202611_001, check 24): the winners lacked dividends and traded at higher
+   multiples, and our picks sit in the sectors that did not win (no health care on the S&P
+   400, no energy on the 600). Hypotheses, to be tested on fresh data.
+7. **Segment-selected rule sets** (user, 2026-11-01): with the ten default rules as the
+   base, the optimisation may choose which rules apply to which company type (sector, size,
+   dividend payer), tied to the switches of `assay/notes.md`; a studio-tier option.
+9. **Rule routing by a gate** (user, 2026-11-01: "if the gate says this, use this rule or
+   that"): the best candidate so far is the price slot graded by PEG where B1 passes and by
+   G6 elsewhere (VI_202611_001, check 30), +0.3 to +1 point a year, not yet adopted; a base
+   for the segment-selected approach (candidate 7).
+8. **Price against value including growth** (the investor's answer, VI_202611_001, check
+   28): a growth-adjusted P/E, later owner earnings, in place of the absolute P/E and
+   price-to-book tests.
+
+### The sample starts after the 2008 crisis (2026-11-01, open → VI_202611_001)
+
+User, 2026-11-01: the first scored date is December 2009, just after the financial crisis,
+a period of extreme stress when smaller companies became more unpredictable. Measured on
+the S&P 500 (training companies, 36-month windows): the equal-weight universe beat the
+total-return index by 3.7% a year over the dates 2009 to 2016 and by -0.3% over 2017 to
+2026, and a random 10-name book beat the index in 73% of the 2009 to 2016 windows and 45%
+of the later ones. So the early part of the sample is flattered, by the rebound or by the
+current members (survivorship), and the later part is not. Hypotheses to test, not
+findings: the rebound from the March 2009 low, the stress on smaller companies, falling
+rates, and survivorship; the result without the early dates; each period separately. The
+conclusions of VI_202611_001 must carry this note. The comparison of results with market
+events and institutional logic is step 14 of the protocol in `quant.md`; whether a
+separate reviewing hat (a Buffett hat) is needed is open (user).
+
+### Index migration biases the 400 and 600 tables (2026-11-01, open → MD_202610_004)
+
+A company is scored in an index's table only if it is a member of that index today (from its
+`date_added`). One that grew from the S&P 600 into the 400 or 500 is missing from the 600
+table in its small-cap years, and one that moved from the 500 to the 400 is in the 400 from
+its listed date. So the 400 and 600 tables lose their best performers to the larger index
+and the 500 keeps them from the date they joined; the indices' own lists give no entry
+dates and flatter random books by size on top (VI_202611_001, check 20). The change
+histories show 212 symbols in both the 500 and 400 lists. A combined S&P 1500 universe with
+the index of each date (MD_202611_001) is the clean test of the same rules on smaller
+companies. The 400's membership starts in 2012 and the 600's in 2019 (the first dates of
+their change lists), which is why they have 47 and 28 scored dates against the 500's 68.
+The data (prices, EDGAR facts) is already fetched for all three indices together; the
+membership by date across them is what is missing. Postponed as a larger refactor (user,
+2026-11-01).
+
+### Tried and not used (2026-11-01, standing list → VI_202611_001)
+
+Modifications that were tried and failed to add to the plain score are labelled *tried and
+not used*, with their design, and are re-tested once the optimisation framework exists
+(S_202611_003; user, 2026-11-01). They are not rejected for good: the S&P 500 sample is
+short and was looked at.
+
+| Date | Modification | Design (fixed before the run) | Result on the S&P 500 training companies |
+|---|---|---|---|
+| 2026-11-01 | Signed rule weights, also shrunk by instability | weights learned on training companies, 12 closed windows | no variant had a score correlation above 0.01 |
+| 2026-11-01 | Ordered analysis (check 7) | G3, B1, G2B gates, then lowest G6, top 5 | trails the index at every horizon |
+| 2026-11-01 | Gates then score, D1 to D3 (check 8) | G3 (10 y), or G3 + B1 + G2B, or G3 + G6 ceiling + B1 rank | below the plain score at every horizon |
+| 2026-11-01 | Gates at 3-year windows, D5a and D5b (check 9) | G3; G3 + B1 + G2B at 3-year windows | no different from the plain score |
+
+### Unevaluable rules cost points in the binned score (2026-11-01, open → optimisation)
+
+`score_binned` is the sum of points, so a company on which a rule cannot be evaluated
+earns nothing there, and the score grows with the number of evaluable rules
+(`scoring.py`). With the long windows it favoured companies with long histories: NVDA and
+MSFT lost the G5 points in 2019 (VI_202611_001). The 3-year windows reduce the effect but
+do not remove it. Candidate for the optimisation: the mean points per evaluable rule, or a
+fixed rule set per date. A methodology change.
 
 ### Tag choice looks ahead (2026-10-31, resolved 2026-11-01 in MD_202610_002)
 

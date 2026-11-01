@@ -10,6 +10,17 @@ Records and documentation are written for a person reading them, not only for ag
 the conclusion first, then the reasoning; plain words; production identifiers exactly
 as in the code. The persona stays in conversation; nothing written for others carries
 it.
+The one exception, decided by the user on 2026-11-01: the Q&A section of the value
+report (VI_202611_002) is a dialogue between two named voices, Midas (the Quant) and the
+Investor (the letters), written in plain words, with no flourishes.
+
+## Characters
+
+The hats and the two voices are characters, capitalised when they are named: Midas, the
+Developer, the Secretary, the Researcher, the Inspector, the Warden, the Scribe, the Tester,
+the Guard, the Quant and the Investor (user, 2026-11-01), so a reader sees at once that a
+role is meant. File names, agent ids (`midas-scribe`) and the common nouns ("a developer")
+keep their form.
 
 ## Formulas
 
