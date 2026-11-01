@@ -1,11 +1,11 @@
-decision_date,score_date,symbol,score,side,weight,amount,date,gics_sector,score_share
-2026-10-30,2026-09-18,FUN,0.5287,sell,0.1000,10.0000,2026-09-18,Consumer Discretionary,0.0203
-2026-10-30,2026-09-18,LZ,0.5287,sell,0.1000,10.0000,2026-09-18,Industrials,0.0227
-2026-10-30,2026-09-18,QTWO,0.5287,sell,0.1000,10.0000,2026-09-18,Information Technology,0.0227
-2026-10-30,2026-09-18,SONO,1.4139,sell,0.1000,10.0000,2026-09-18,Consumer Discretionary,0.0608
-2026-10-30,2026-09-18,SPHR,1.4139,sell,0.1000,10.0000,2026-09-18,Communication Services,0.1040
-2026-10-30,2026-09-18,AHCO,1.4190,sell,0.1000,10.0000,2026-09-18,Health Care,0.0414
-2026-10-30,2026-09-18,ALGT,1.4190,sell,0.1000,10.0000,2026-09-18,Industrials,0.0414
-2026-10-30,2026-09-18,COTY,1.4190,sell,0.1000,10.0000,2026-09-18,Consumer Staples,0.0414
-2026-10-30,2026-09-18,EYE,1.4190,sell,0.1000,10.0000,2026-09-18,Consumer Discretionary,0.0414
-2026-10-30,2026-09-18,FTRE,1.4190,sell,0.1000,10.0000,2026-09-18,Health Care,0.0465
+symbol,gics_sector,score,score_share,score_date
+FUN,Consumer Discretionary,0.5287,0.0203,2026-09-18
+LZ,Industrials,0.5287,0.0227,2026-09-18
+QTWO,Information Technology,0.5287,0.0227,2026-09-18
+SONO,Consumer Discretionary,1.4139,0.0608,2026-09-18
+SPHR,Communication Services,1.4139,0.1040,2026-09-18
+AHCO,Health Care,1.4190,0.0414,2026-09-18
+ALGT,Industrials,1.4190,0.0414,2026-09-18
+COTY,Consumer Staples,1.4190,0.0414,2026-09-18
+EYE,Consumer Discretionary,1.4190,0.0414,2026-09-18
+FTRE,Health Care,1.4190,0.0465,2026-09-18

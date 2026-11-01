@@ -7,6 +7,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{longtable}
+\usepackage[table]{xcolor}
 \captionsetup{font=small,labelfont=bf}
 \setlength{\parskip}{0.5em}
 \setlength{\parindent}{0pt}
@@ -23,9 +24,11 @@ Each January and July since 2016, a rule-based value score picks 10 S\&P MidCap 
 \section{Method}
 Company fundamentals are the values first reported in each annual report (10-K) to the SEC, used from the day they were filed. When a company reports an item under more than one label, the label it used most recently by the date is taken, so later filings never decide it (Appendix \ref{app:lookahead}). Prices and dividends are from Yahoo Finance; returns include reinvested dividends and are in US dollars. On each date, only companies already in the S\&P MidCap 400 are considered, outside the Financials and Real Estate sectors.
 
-Ten rules from Graham and Buffett grade every company: G6 and G7 (price against earnings and book value), G2a and E1 (current ratio), G2b and E2 (debt), NN (net-net), G5 (earnings growth), B1 (return on equity) and E4 (current dividend). Six more (G3, G4, E3, E5, E6 and NI1) are switched off and can be switched on. For each rule, the companies are ranked by the rule's value and placed in six equal groups, from 5 points for the best sixth to 0 for the worst; each rule's points are multiplied by its weight, one less the share of companies that pass the rule's threshold, so rules few companies pass count more. The score is the sum. On the first trading day of January and of July, the 10 highest-scoring companies are bought for 100 USD, each in proportion to its score.
+Ten rules from Graham and Buffett grade every company: G6 and G7 (price against earnings and book value), G2a and E1 (current ratio), G2b and E2 (debt), NN (net-net), G5 (earnings growth), B1 (return on equity) and E4 (current dividend). Six more (G3, G4, E3, E5, E6 and NI1) are switched off and can be switched on. The ten are eight concepts, because G2a and E1 (current ratio) and G2b and E2 (debt cover) measure the same thing and so count twice. For each rule, the companies are ranked by the rule's value and placed in equal-sized groups, from the most points for the best group to none for the worst; each rule's points are multiplied by its weight, one less the share of companies that pass the rule's threshold, so rules few companies pass count more. The score is the sum. On the first trading day of January and of July, the 10 highest-scoring companies are bought for 100 USD, each in proportion to its score.
 
-Three limits apply to every number in this report. Companies that left the index are missing from the data, which flatters the results. The score's design and every setting of this report (the rules and their weighting, the number of picks, the decision months, the sell threshold, the start years) were chosen while looking at the whole period from 2016, so no period here is out of sample: the results describe how these rules would have done, not evidence that they will do so. There are no trading costs or taxes.
+Three limits apply to every number in this report. Companies that left the index are missing from the data, which flatters the results. The score's design and every setting of this report (the rules and their weighting, the number of picks, the decision months, the sell threshold, the start years) were chosen while looking at the whole period from 2009, so no period here is out of sample: the results describe how these rules would have done, not evidence that they will do so. There are no trading costs or taxes.
+
+Neither Benjamin Graham nor Berkshire Hathaway or Warren Buffett has endorsed, reviewed or approved this score or this report. The rules are our reading of Graham's books; the quotations from Berkshire's published letters to shareholders are cited by year and show where a question was taken, not what any of them would say about these results.
 
 \section{Picks per half-year}
 \begin{table}[H]
@@ -160,29 +163,31 @@ Year & Sold: share of the holding (score) & Proceeds, USD \\
 \end{table}
 Table \ref{tab:sales} lists the 48 sales of the investor who started in 2020, worth 175 USD in all. They are the wallet's own cash flows; the list below does not depend on what anyone holds.
 
-\subsection{To sell or short}
+\subsection{Lowest scores in the index}
 \begin{table}[H]
 \centering
 \small
-\caption{The 10 lowest-scoring companies on the latest score date, as many as the picks: sector, score, score on the 0-to-1 scale and what the score suggests.}\label{tab:worst}
+\caption{The 10 lowest-scoring of the companies scored on the latest score date: sector, score, score on the 0-to-1 scale and colour (Green, Amber or Red; not a recommendation).}\label{tab:worst}
 \begin{tabular}{p{4.4cm} p{3cm} r r p{3cm}}
 \hline
-Company & Sector & Score & Score 0 to 1 & What it suggests \\
+Company & Sector & Score & Score 0 to 1 & Colour \\
 \hline
-Chewy (CHWY) & Consumer Discretionary & 1.2 & 0.09 & start thinking about selling \\
-Avis Budget Group (CAR) & Industrials & 1.3 & 0.04 & start thinking about selling \\
-DigitalOcean (DOCN) & Information Technology & 1.3 & 0.04 & start thinking about selling \\
-Talen Energy (TLN) & Utilities & 1.4 & 0.07 & start thinking about selling \\
-Okta, Inc. (OKTA) & Information Technology & 2.4 & 0.17 & start thinking about selling \\
-Docusign (DOCU) & Information Technology & 2.9 & 0.12 & start thinking about selling \\
-SiriusXM (SIRI) & Communication Services & 3.0 & 0.09 & start thinking about selling \\
-UGI Corp (UGI) & Utilities & 3.0 & 0.09 & start thinking about selling \\
-Guidewire Software (GWRE) & Information Technology & 3.4 & 0.14 & start thinking about selling \\
-Hims \& Hers Health (HIMS) & Health Care & 3.4 & 0.24 & avoid; hold it if you have it \\
+Chewy (CHWY) & Consumer Discretionary & 1.2 & 0.09 & \cellcolor[HTML]{F4B6B6}Red \\
+Avis Budget Group (CAR) & Industrials & 1.3 & 0.04 & \cellcolor[HTML]{F4B6B6}Red \\
+DigitalOcean (DOCN) & Information Technology & 1.3 & 0.04 & \cellcolor[HTML]{F4B6B6}Red \\
+Talen Energy (TLN) & Utilities & 1.4 & 0.07 & \cellcolor[HTML]{F4B6B6}Red \\
+Okta, Inc. (OKTA) & Information Technology & 2.4 & 0.17 & \cellcolor[HTML]{F4B6B6}Red \\
+Docusign (DOCU) & Information Technology & 2.9 & 0.12 & \cellcolor[HTML]{F4B6B6}Red \\
+SiriusXM (SIRI) & Communication Services & 3.0 & 0.09 & \cellcolor[HTML]{F4B6B6}Red \\
+UGI Corp (UGI) & Utilities & 3.0 & 0.09 & \cellcolor[HTML]{F4B6B6}Red \\
+Guidewire Software (GWRE) & Information Technology & 3.4 & 0.14 & \cellcolor[HTML]{F4B6B6}Red \\
+Hims \& Hers Health (HIMS) & Health Care & 3.4 & 0.24 & \cellcolor[HTML]{FFEB9C}Amber \\
 \hline
 \end{tabular}
 \end{table}
-These are the 10 lowest scores in the S\&P MidCap 400 on 18 September 2026, as many as the picks, whether or not anyone holds them: Chewy (CHWY), Avis Budget Group (CAR), DigitalOcean (DOCN), Talen Energy (TLN), Okta, Inc. (OKTA), Docusign (DOCU), SiriusXM (SIRI), UGI Corp (UGI), Guidewire Software (GWRE) and Hims \& Hers Health (HIMS) (Table \ref{tab:worst}). The last column reads each score on the 0-to-1 scale against the sell threshold of 0.4. At or below the threshold, the company is one to avoid, and to hold only if you already own it. At or below half of the threshold, it is one to start thinking about selling. At zero, the score is not worth anything. The cut-offs are those the score uses today and are not fixed. The wallet never sells short; a short position on these companies is a later step and has not been tested.
+These are the 10 lowest scores, as many as the picks, among the companies of the S\&P MidCap 400 that are scored on 18 September 2026, whether or not anyone holds them: Chewy (CHWY), Avis Budget Group (CAR), DigitalOcean (DOCN), Talen Energy (TLN), Okta, Inc. (OKTA), Docusign (DOCU), SiriusXM (SIRI), UGI Corp (UGI), Guidewire Software (GWRE) and Hims \& Hers Health (HIMS) (Table \ref{tab:worst}). Financials, Real Estate and companies with too few rules to score are not scored and so cannot appear. Companies with the same score are ordered by symbol, so when several share the last place, the alphabetically first are shown. The list shows where the score ranks these companies today; it is not a recommendation to buy, sell or sell short anything. A score of 0 means only that no rule awarded the company any points; it says nothing about what the company is worth.
+
+The last column colours each score on the 0-to-1 scale against the sell threshold of 0.4. Green is a score above 0.4. Amber is a score from 0.2 up to and including 0.4: a company one would not buy, and would hold only if already owned. Red is a score below 0.2: a company one might start to think about selling. The colours are not the rule of the wallet with sells. That rule is mechanical: at or below 0.4 it sells part of a holding, the more the lower the score, and at 0 all of it, whatever the colour. The sell signal on these companies has not been tested: no test has measured what the lowest scores did afterwards. The cut-offs are those the score uses today and are not fixed. The wallet never sells short; a short position on these companies is a later step and has not been tested.
 
 \section{Wallet contents}
 Figure \ref{fig:contents} follows every company in the wallet with sells of the investor who started in 2020, month by month. A line starts or steps up when the company is bought, steps down when part of it is sold, and rises or falls with the price in between. The dashed lines follow the same money in the S\&P MidCap 400 and in Berkshire Hathaway, divided by the number of companies the wallet holds on the date, so they show what one holding would be worth in the index or in Berkshire. Appendix \ref{app:contents} gives each holding's value after every January's trades, the money put in and the proceeds of sales.
@@ -216,7 +221,7 @@ Figure \ref{fig:rules} compares the mean points per rule of the winners and of t
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\textwidth]{rules.png}
-\caption{Mean points per rule (0 to 5) of the picks that beat the S\&P MidCap 400 since purchase and of those that did not, each pick weighted by its dollars ahead or behind the index.}
+\caption{Mean points per rule of the picks that beat the S\&P MidCap 400 since purchase and of those that did not, each pick weighted by its dollars ahead or behind the index.}
 \label{fig:rules}
 \end{figure}
 \section{Price history of the picks}
@@ -284,7 +289,7 @@ No score picks every winner, and a winner is only known afterwards. Here the win
 
 On the S\&P 500 the score holds 10\% of the winners and ranks them slightly above the median (0.55 on a scale from 0 to 1). It found the chip makers (Nvidia 0.91, Lam Research 0.96, Micron 0.91) and missed the growth platforms: Amazon 0.08, Netflix 0.23 and Constellation Brands 0.32. On the S\&P 400 the winners score below the median (0.42): Paylocity 0.03, Repligen 0.16, Tenet 0.17 and Qualys 0.20. Health care is 17\% of the winners there and 3\% of our picks. On the S\&P 600 energy companies are 24\% of the winners and 2\% of our picks.
 
-The likely cause is in the rules. They are Graham's and Buffett's, and they reward cheap, low-debt, asset-rich companies. Many winners of the period were growth and quality companies that pay no dividend and trade at higher multiples. On the S\&P 400 they score 0.7 points lower than the average company on the dividend rule and 0.4 lower on debt cover, while our picks score 4.4 on debt cover against 2.1 for the average company. Dropping the dividend rules made no measurable difference, so they are not what holds the score back; the price rules are the more likely cause (Section \ref{sec:dialogue}). Companies that S\&P later added to the S\&P 500 scored lower than its existing members before they joined (0.42 against 0.51 on a scale from 0 to 1), which points the same way: the score undervalues growth.
+A possible cause is in the rules. They are Graham's and Buffett's, and they reward cheap, low-debt, asset-rich companies. Many winners of the period were growth and quality companies that pay no dividend and trade at higher multiples. On the S\&P 400 they score 0.7 points lower than the average company on the dividend rule and 0.4 lower on debt cover, while our picks score 4.4 on debt cover against 2.1 for the average company. On the earlier sixteen-rule score, dropping the dividend rules made no measurable difference on the S\&P 500 and the S\&P 400, so they are not what holds the score back there; on the S\&P 600 the bands excluded zero (+0.72 and -0.93). The price rules are one more possible cause: dropping them raised the best ten on the S\&P 500, but that held on the S\&P 500 only, showed nothing on the S\&P 400 and was contradicted on the S\&P 600, so it was not adopted (Section \ref{sec:dialogue}). Companies that S\&P later added to the S\&P 500 scored lower than its existing members before they joined (0.42 against 0.51 on a scale from 0 to 1), which fits the hypothesis that the score undervalues growth; it is a hypothesis, not a tested result.
 
 \section{How the model was tested}
 \label{sec:testing}
@@ -296,9 +301,9 @@ The likely cause is in the rules. They are Graham's and Buffett's, and they rewa
 \hline
 Test & What is checked & Result & Status \\
 \hline
-Winners removed & The wallet still beats its index with the 3 largest winners removed & S\&P 500: yes, by 1.9 to 3.7 points (2016 to 2023 starts). S\&P 400: no. S\&P 600: mixed & S\&P 500 passed; others not \\
-Company samples & 12 samples, each leaving out a random tenth of the companies & S\&P 500: ahead of the index in 12 of 12 & Passed on the S\&P 500 \\
-Unseen companies & The score frozen, then run once on a tenth of the companies never used & Positive, but two companies gave 99\% of the gain (earlier sixteen-rule score) & To rerun \\
+Winners removed & The wallet still beats its index with the 3 largest winners removed & S\&P 500: yes, by 1.9 to 3.7 points (2016 to 2023 starts). S\&P 400: no. S\&P 600: mixed & S\&P 500 passed in-sample; others not \\
+Company samples & Repeated samples, each leaving out a random part of the companies & S\&P 500: ahead of the index in every sample (the samples share most of their companies) & Passed on the S\&P 500, in-sample \\
+Unseen companies & The score frozen, then run once on a part of the companies never used & Positive, but two companies gave 99\% of the gain (earlier sixteen-rule score) & To rerun \\
 Other indices & The score beats random picks of its own index on the S\&P 400 and 600 & Not reproduced & Open \\
 Two periods & The edge appears before and after 2017 & Yes on the S\&P 500 (earlier sixteen-rule score) & To rerun \\
 Missed winners & Which winners the score missed, and why & Section \ref{sec:missed} & Done \\
@@ -307,15 +312,15 @@ Real-world check & Results compared with market events and institutional logic &
 \hline
 \end{tabular}
 \end{table}
-The score is judged only on what it did not know: companies and dates that were held out, against random picks of the same size, with the uncertainty stated and the number of designs tried counted. The tests follow a written protocol, and a test that failed is shown as failed. The numbers are from runs on 1 November 2026 on the ten default rules, with data as of 31 October 2026.
+This is a prototype, "first light": the first version of the model that is frozen and dated, with nothing earlier to compare it with. The figures below are in-sample stress and sampling diagnostics, compared with the index and not with random books of the same size, on a configuration that was chosen on this data after more than 100 designs were tried. The bands cover the sampling of companies only: they do not allow for the number of designs tried (multiple testing) or for the period, which the designs were chosen while looking at, so no result here is out of sample. The one held-out test, on companies the score never used, is on the earlier sixteen-rule score and is marked to rerun. The tests follow a written protocol, and a test that failed is shown as failed. The model has not cleared them: the tests below are open or failed in part. The numbers are from runs on 1 November 2026 on the ten default rules, with data as of 31 October 2026.
 
-On the S\&P 500 the picks beat the index in all 12 samples that each left out a random tenth of the companies, by 9 to 15 points a year on average depending on the start year, and by about 5 points in the worst sample. They still beat it with the three largest winners removed as if they had never existed (Applied Materials, Lam Research and Micron): by 3.7, 1.9 and 2.1 points a year for the investors who started in 2016, 2020 and 2023, and by 8.9 for 2025. With five removed (adding Nucor and Nvidia) the margin shrinks to 0.3 to 2.3 points for the first three. The edge is real on this index but thin, and concentrated in chip and materials companies that did well in a long bull market after 2009.
+On the S\&P 500 the picks beat the index in every one of a set of repeated samples that each left out a random part of the companies (the samples share most of their companies, so this is not independent confirmation), by 9 to 15 points a year on average depending on the start year, and by about 5 points in the worst sample. The investor who started in 2020 earns 27.7\% a year against 15.9\% in the index. The gain is concentrated: Micron makes up 24\% and Lam Research 16\% of the 2016 investor's gain. They still beat it with the three largest winners removed as if they had never existed (Applied Materials, Lam Research and Micron): by 3.7, 1.9 and 2.1 points a year for the investors who started in 2016, 2020 and 2023, and by 8.9 for 2025. With five removed (adding Nucor and Nvidia) the margin shrinks to 0.3 to 2.3 points for the first three. The edge is present in this sample of the index but thin, and concentrated in chip and materials companies that did well in a long bull market after 2009.
 
 The other two indices do not confirm it. On the S\&P 400 the picks beat their fund by 2 to 5 points a year for the 2016 to 2023 starts, and with the three largest winners removed the margin is gone (0.4, -0.4 and -0.1). On the S\&P 600 the investors who started in 2016 and 2020 are ahead by about 6 points, which survives the removal of the three largest winners, while those who started in 2023 and 2025 trail the fund. The lists of the S\&P 400 and 600 give no entry dates and lose the companies that grew into a larger index, so these two tests are biased and not yet a verdict on the rules. Companies that left the index are missing from every test, which flatters the results.
 
 \section{Midas and the Investor}
 \label{sec:dialogue}
-Every result in this report was questioned before it was believed. When something looked wrong, too good, different between indices or against what a long-term investor would say, Midas, who reads the numbers, put the question to the Investor. The Investor answers only from Warren Buffett's letters to shareholders and names the year. Midas then tested the answer and reported back. Three of the exchanges follow.
+Every result in this report was questioned before it was believed. When something looked wrong, too good, different between indices or against what a long-term investor would say, Midas, who reads the numbers, put the question to the Investor. The Investor answers only from Berkshire Hathaway's published letters to shareholders and names the year; the quotations imply no endorsement by Berkshire or Mr Buffett. Midas then tested the answer and reported back. Three of the exchanges follow. The figures in them are in-sample stress and sampling diagnostics, compared with the index and not with random books, on a configuration chosen on this data (Section \ref{sec:testing}).
 
 \textbf{Is the dividend rule holding the score back?}
 
@@ -323,25 +328,25 @@ Every result in this report was questioned before it was believed. When somethin
 
 \textbf{The Investor:} (1984) "Berkshire has earned well over market rates on retained earnings, thereby creating over one dollar of market value for every dollar retained. Under such circumstances, any distribution would have been contrary to the financial interest of shareholders, large or small."
 
-\textbf{Midas:} I dropped the two dividend rules from the sixteen-rule score and compared. On the S\&P 500 the best ten changed by -0.03 points a year, with a 99\% band from -1.05 to +0.41; on the S\&P 400 by -0.26. There is no measurable difference. The default now keeps only one dividend rule, the current dividend, and the other is a switch.
+\textbf{Midas:} I dropped the two dividend rules from the sixteen-rule score and compared. On the S\&P 500 the best ten changed by -0.03 points a year, with a 99\% band from -1.05 to +0.41; on the S\&P 400 by -0.26. There is no measurable difference on those two indices; on the S\&P 600 the bands excluded zero (+0.72 and -0.93). The default now keeps only one dividend rule, the current dividend, and the other is a switch.
 
 \textbf{Should a cheap price be the test of value?}
 
-\textbf{Midas:} Dropping the P/E and price-to-book rules raised the best ten on the S\&P 500 but lowered the broad ranking, and the missed winners were growth companies.
+\textbf{Midas:} Dropping the P/E and price-to-book rules raised the best ten on the S\&P 500 but lowered the broad ranking, and the missed winners were growth companies. That held on the S\&P 500 only, and I did not adopt it.
 
-\textbf{The Investor:} (1992) "Growth is always a component in the calculation of value." A low ratio of price to book value, a low price-earnings ratio or a high dividend yield are "far from determinative as to whether an investor is indeed buying something for what it is worth", and the opposite characteristics "are in no way inconsistent with a 'value' purchase". Yet "business growth, per se, tells us little about value". (2013) "Price is what you pay, value is what you get."
+\textbf{The Investor:} (1992) "Growth is always a component in the calculation of value." A low ratio of price to book value, a low price-earnings ratio or a high dividend yield are "far from determinative as to whether an investor is indeed buying something for what it is worth", and the opposite characteristics "are in no way inconsistent with a 'value' purchase". Yet "business growth, per se, tells us little about value". (2013, Graham's adage, which Buffett quotes as "Ben's adage") "Price is what you pay, value is what you get."
 
 \textbf{Midas:} I tested a price-to-earnings-growth measure. On all three indices it widened the broad ranking a little and left the best ten slightly lower, within the noise. Used only for companies that pass the quality rule, return on equity, both rose on the S\&P 500 and the S\&P 400, by 0.3 to 1 point a year. That is small and adds complexity, so it is a switch and not the default.
 
 \textbf{Is it too good to be true?}
 
-\textbf{Midas:} The picks beat the index in all 12 samples that each left out a random tenth of the companies. That looks too good, so I removed the biggest winners as if they had never existed.
+\textbf{Midas:} The picks beat the index in every one of a set of repeated samples that each left out a random part of the companies. The samples share most of their companies, so that is not independent confirmation, and it still looks too good, so I removed the biggest winners as if they had never existed.
 
 \textbf{The Investor:} (1987) "When shortages exist, however, even commodity businesses flourish", and "whenever shortages appear, the typical manager simply can't wait to expand capacity". (1989) "Time is the friend of the wonderful business, the enemy of the mediocre."
 
-\textbf{Midas:} With the three largest winners removed (Applied Materials, Lam Research and Micron) the wallet still beat the index by 3.7, 1.9 and 2.1 points a year for the investors who started in 2016, 2020 and 2023; with five removed, by 0.3 to 2.3 points. The edge is real on the S\&P 500 but thin, and it sits in chip and materials companies after 2009. On the S\&P 400 it disappears without its three largest winners. Treat it with care.
+\textbf{Midas:} The 1987 passage is about insurance; I apply it to chip makers by analogy. With the three largest winners removed (Applied Materials, Lam Research and Micron) the wallet still beat the index by 3.7, 1.9 and 2.1 points a year for the investors who started in 2016, 2020 and 2023; with five removed, by 0.3 to 2.3 points. The edge is present in this sample of the S\&P 500 but thin, and it sits in chip and materials companies after 2009. On the S\&P 400 it disappears without its three largest winners. Treat it with care.
 
-\textbf{What this suggests for you.} Hold for years, not months. Hold ten companies and not five, since the concentration is the main risk. Treat one or two big winners as luck until they have been tested the same way. Switch rules on or off for the kind of company you want, and read the tests in Section \ref{sec:testing} before relying on a number.
+\textbf{What the tests showed.} The results are for holding over years, not months: the picks are bought twice a year and not sold. The concentration is the main risk, and one or two big winners carry much of the gain, so they are treated as luck until tested the same way. The book holds ten companies, not five: ten was chosen for plausibility and diversification, although the five-company book scored higher in the tests. The tests cover the default ten rules; other switches were not tested as a set. This is what the tests showed, not advice; read the tests in Section \ref{sec:testing} before relying on a number.
 
 \section{Where to read more}
 \label{sec:reading}
@@ -362,7 +367,7 @@ Risk awareness & Cycles and what can go wrong & Marks, The Most Important Thing;
 \hline
 \end{tabular}
 \end{table}
-Midas can work from the documents you give it. Download or bring the strategy literature you like, tell Midas the style, and it will answer from those pages and name the source. The Berkshire Hathaway letters are free to read on the company's site. Books are copyrighted: use your own copy. The list below is grouped by the kind of risk each approach accepts. It is a starting point only: the titles are given from general knowledge and have not been checked against the books, so check each one before relying on it.
+Planned, and not yet available: a member will be able to bring the strategy literature they like and ask for answers drawn from those pages, with the source named. The Berkshire Hathaway letters are free to read on the company's site. Books are copyrighted: use your own copy. The list below is grouped by the kind of risk each approach accepts. It is a starting point only: the titles are given from general knowledge and have not been checked against the books, so check each one before relying on it.
 
 \section{Conclusions}
 In this sample, the value picks bought twice a year and held are worth more today than the same money in the S\&P MidCap 400 or in Berkshire Hathaway for each of the four start years. That describes the past under rules and settings chosen while looking at it; it is not a test of the strategy. The lead is uneven: the 12 purchases of Reliance, Inc. (RS) make up 14\% of the 2020 investor's value, and the purchases of January 2017, January 2019, July 2023 and January 2024 trail the index.
@@ -628,9 +633,9 @@ Date & Companies & Score & Score 0 to 1 & Unweighted & Share passed & Same picks
 \end{table}
 A score must use only what was known on its date. Four guards are built in. A company's figures count from the day its annual report was filed with the SEC, and of all the figures filed for a year only the first reported is used, never a later restatement. Prices are the close on the scoring date and dividends are counted by their ex-date. Each January and July purchase uses the scores of the rebalance date two weeks before it. Rule weights come from the companies on the date alone.
 
-These guards are tested by cutting every input at a date as if it were that day (filings filed on or before it, prices and dividends up to it), scoring the companies again and comparing the scores with the full run (Table \ref{tab:lookahead}). Any difference means information from after the date reached a score. On 21 December 2018, 16 December 2022 and 19 December 2025 the picks were the same, and the scores were identical on 21 December 2018, 16 December 2022 and 19 December 2025. The same check runs as a unit test. A rule whose window reaches back further than a company's price history (the 20-year dividend record of a younger company) is not evaluated rather than failed.
+These guards are tested by cutting every input at a date as if it were that day (filings filed on or before it, prices and dividends up to it), scoring the companies again and comparing the scores with the full run (Table \ref{tab:lookahead}). Any difference means information from after the date reached a score. On 21 December 2018, 16 December 2022 and 19 December 2025 the picks were the same, and the scores were identical on 21 December 2018, 16 December 2022 and 19 December 2025. The same check runs as a unit test. A rule whose window reaches back further than a company's price history (a long dividend record of a younger company) is not evaluated rather than failed.
 
-Three sources of forward information are outside this test. Only today's S\&P MidCap 400 members are scored. The index's list gives no entry dates: a company counts from its latest addition in the list of changes, or from the start of that list (January 2012) when no addition is listed. The list holds selected changes only, so some companies count before they joined: a look-ahead that flatters the results. Companies that later left the index are missing, which flatters every result. Sectors are today's, used to leave out Financials and Real Estate in earlier years. And the score's design and settings were chosen while looking at 2016 to 2026, so no period tests it fairly: 2022 onwards, once meant as a held-out test, was used to choose between models.
+Three sources of forward information are outside this test. Only today's S\&P MidCap 400 members are scored. The index's list gives no entry dates: a company counts from its latest addition in the list of changes, or from the start of that list (January 2012) when no addition is listed. The list holds selected changes only, so some companies count before they joined: a look-ahead that flatters the results. Companies that later left the index are missing, which flatters every result. Sectors are today's, used to leave out Financials and Real Estate in earlier years. And the score's design and settings were chosen while looking at 2009 to 2026, so no period tests it fairly: 2022 onwards, once meant as a held-out test, was used to choose between models.
 
 \subsection{Companies missing from the data}
 \begin{table}[H]

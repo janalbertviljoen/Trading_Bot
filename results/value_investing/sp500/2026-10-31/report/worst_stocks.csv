@@ -1,11 +1,11 @@
-decision_date,score_date,symbol,score,side,weight,amount,date,gics_sector,score_share
-2026-10-30,2026-09-18,ECHO,0.8338,sell,0.1000,10.0000,2026-09-18,Communication Services,0.0300
-2026-10-30,2026-09-18,PANW,1.3937,sell,0.1000,10.0000,2026-09-18,Information Technology,0.0557
-2026-10-30,2026-09-18,GEV,1.6156,sell,0.1000,10.0000,2026-09-18,Industrials,0.0727
-2026-10-30,2026-09-18,SJM,1.9435,sell,0.1000,10.0000,2026-09-18,Consumer Staples,0.0520
-2026-10-30,2026-09-18,DELL,2.4495,sell,0.1000,10.0000,2026-09-18,Information Technology,0.0708
-2026-10-30,2026-09-18,EXC,3.3372,sell,0.1000,10.0000,2026-09-18,Utilities,0.1311
-2026-10-30,2026-09-18,ABBV,3.3892,sell,0.1000,10.0000,2026-09-18,Health Care,0.0906
-2026-10-30,2026-09-18,CAH,3.5706,sell,0.1000,10.0000,2026-09-18,Health Care,0.0955
-2026-10-30,2026-09-18,HLT,3.8491,sell,0.1000,10.0000,2026-09-18,Consumer Discretionary,0.1029
-2026-10-30,2026-09-18,LYV,3.8952,sell,0.1000,10.0000,2026-09-18,Communication Services,0.1041
+symbol,gics_sector,score,score_share,score_date
+ECHO,Communication Services,0.8338,0.0300,2026-09-18
+PANW,Information Technology,1.3937,0.0557,2026-09-18
+GEV,Industrials,1.6156,0.0727,2026-09-18
+SJM,Consumer Staples,1.9435,0.0520,2026-09-18
+DELL,Information Technology,2.4495,0.0708,2026-09-18
+EXC,Utilities,3.3372,0.1311,2026-09-18
+ABBV,Health Care,3.3892,0.0906,2026-09-18
+CAH,Health Care,3.5706,0.0955,2026-09-18
+HLT,Consumer Discretionary,3.8491,0.1029,2026-09-18
+LYV,Communication Services,3.8952,0.1041,2026-09-18

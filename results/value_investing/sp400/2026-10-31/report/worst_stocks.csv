@@ -1,11 +1,11 @@
-decision_date,score_date,symbol,score,side,weight,amount,date,gics_sector,score_share
-2026-10-30,2026-09-18,CHWY,1.2487,sell,0.1000,10.0000,2026-09-18,Consumer Discretionary,0.0882
-2026-10-30,2026-09-18,CAR,1.2693,sell,0.1000,10.0000,2026-09-18,Industrials,0.0366
-2026-10-30,2026-09-18,DOCN,1.2693,sell,0.1000,10.0000,2026-09-18,Information Technology,0.0366
-2026-10-30,2026-09-18,TLN,1.4120,sell,0.1000,10.0000,2026-09-18,Utilities,0.0738
-2026-10-30,2026-09-18,OKTA,2.3917,sell,0.1000,10.0000,2026-09-18,Information Technology,0.1689
-2026-10-30,2026-09-18,DOCU,2.9131,sell,0.1000,10.0000,2026-09-18,Information Technology,0.1245
-2026-10-30,2026-09-18,SIRI,2.9986,sell,0.1000,10.0000,2026-09-18,Communication Services,0.0865
-2026-10-30,2026-09-18,UGI,2.9986,sell,0.1000,10.0000,2026-09-18,Utilities,0.0865
-2026-10-30,2026-09-18,GWRE,3.3713,sell,0.1000,10.0000,2026-09-18,Information Technology,0.1441
-2026-10-30,2026-09-18,HIMS,3.3713,sell,0.1000,10.0000,2026-09-18,Health Care,0.2381
+symbol,gics_sector,score,score_share,score_date
+CHWY,Consumer Discretionary,1.2487,0.0882,2026-09-18
+CAR,Industrials,1.2693,0.0366,2026-09-18
+DOCN,Information Technology,1.2693,0.0366,2026-09-18
+TLN,Utilities,1.4120,0.0738,2026-09-18
+OKTA,Information Technology,2.3917,0.1689,2026-09-18
+DOCU,Information Technology,2.9131,0.1245,2026-09-18
+SIRI,Communication Services,2.9986,0.0865,2026-09-18
+UGI,Utilities,2.9986,0.0865,2026-09-18
+GWRE,Information Technology,3.3713,0.1441,2026-09-18
+HIMS,Health Care,3.3713,0.2381,2026-09-18
