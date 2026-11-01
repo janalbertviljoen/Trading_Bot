@@ -147,9 +147,6 @@ def _buyability(args: argparse.Namespace) -> int:
         )
         write_table(table, index.tables / f"buyability_{view}.parquet")
         result.weights.to_csv(folder / f"rule_weights_{view}.csv", float_format="%.4f")
-        result.static.rename("weight").to_csv(
-            folder / f"rule_weights_static_{view}.csv", float_format="%.4f"
-        )
         results[view] = replace(result, table=table)
     # The diagnostics describe the first view.
     first = results[views[0]]

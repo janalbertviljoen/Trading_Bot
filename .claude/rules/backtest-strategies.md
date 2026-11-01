@@ -19,8 +19,7 @@ paths:
   the rebalance date is used (no look-ahead).
 - Transaction costs are explicit and always applied; a result without costs is labelled
   as such.
-- Every result is benchmarked against the S&P 500 total-return index over the same
-  dates; the primary measure is out-of-sample excess return over it.
-- Optimisation is walk-forward with a hold-out period and a small grid; report the
-  number of combinations tried.
-- Any change to trade accounting, costs or the benchmark is a methodology change.
+- Benchmark, out-of-sample judging and optimisation follow the research protocol in
+  `midas/instructions/researcher.md`.
+- A change to the benchmark is a methodology change, like trade accounting and costs
+  (`AGENTS.md`, "Methodology vs refactor").

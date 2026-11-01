@@ -18,9 +18,9 @@ paths:
 - Vectorised over the ticker × date panel; no per-ticker Python loops in hot paths.
   Sort by ticker and date before `shift`, `diff`, rolling or cumulative operations, and
   group by ticker so nothing leaks across companies.
-- Point-in-time: a value at as-of date *t* uses only filings accepted on or before *t*.
+- Point-in-time as `midas/instructions/quant.md` defines it (rule 1).
 - Zero or negative denominators give NaN plus a diagnostics flag, never inf; keep
   clipping and bounds explicit.
-- Any change to a formula or threshold is a methodology change: say so.
-- A new or changed output column needs schema, contract, validation, tests and
-  documentation updated together.
+- A formula or threshold change is a methodology change (`AGENTS.md`, "Methodology vs
+  refactor"); a new or changed output column follows `developer.md`, "Coding
+  conventions".

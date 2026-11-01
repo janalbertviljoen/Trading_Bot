@@ -19,7 +19,7 @@ Compute ratios, flags or scores itself (``value_investing.layers``,
 
 Public API
 ----------
-Buyability(table, correlations, weights, static)
+Buyability(table, correlations, weights)
     The buyability table and the learned rule weights.
 buyability(tables, config, *, end, view, benchmark)
     The buyability table of one universe view from the first rebalance date to ``end``.
@@ -45,11 +45,7 @@ from Toolbox.value_investing.inputs import (
 from Toolbox.value_investing.layers.valuation import valuation
 from Toolbox.value_investing.rules import RULES, pass_column, value_column
 from Toolbox.value_investing.scoring import learned_score, rule_points, score
-from Toolbox.value_investing.weighting import (
-    correlation_weights,
-    rule_correlations,
-    static_weights,
-)
+from Toolbox.value_investing.weighting import correlation_weights, rule_correlations
 
 
 @dataclass(frozen=True)
@@ -64,14 +60,11 @@ class Buyability:
         Per date and rule, the rank correlation of points and forward excess return.
     weights : pd.DataFrame
         Per date and rule, the learned weight used on that date.
-    static : pd.Series
-        Per rule, the frozen weight behind ``score_ic_static``.
     """
 
     table: pd.DataFrame
     correlations: pd.DataFrame
     weights: pd.DataFrame
-    static: pd.Series
 
 
 def buyability(
@@ -106,11 +99,9 @@ def buyability(
         ``table``: columns ``symbol``, ``date``, ``gics_sector``, ``close``, the
         valuation ratios, ``<id>_value``, ``<id>_pass`` and ``<id>_points`` per rule,
         ``score``, ``score_<F>``, ``score_binned``, ``score_binned_weighted``,
-        ``score_weighted_share``, ``score_ic``, ``score_ic_static``,
-        ``n_passed`` and
-        ``n_available``; sorted
-        by symbol and date. With the correlations and the weights behind
-        ``score_ic`` and ``score_ic_static``.
+        ``score_weighted_share``, ``score_ic``, ``n_passed`` and ``n_available``;
+        sorted by symbol and date. With the correlations and the weights behind
+        ``score_ic``.
 
     Notes
     -----
@@ -171,16 +162,12 @@ def buyability(
     )
     ends = forward.groupby(level="date")["end"].first()
     weights = correlation_weights(correlations, ends, window=int(learning["window"]))
-    frozen = static_weights(
-        correlations, ends, until=pd.Timestamp(learning["static_until"])
+    scores["score_ic"] = learned_score(
+        points,
+        weights,
+        scores["n_available"],
+        min_available=int(config["score"]["min_available"]),
     )
-    for column, chosen in (("score_ic", weights), ("score_ic_static", frozen)):
-        scores[column] = learned_score(
-            points,
-            chosen,
-            scores["n_available"],
-            min_available=int(config["score"]["min_available"]),
-        )
     table = pd.concat([table, points], axis=1)
     table = pd.concat([table, scores], axis=1).reset_index()
     sectors = tables.universe[["symbol", "gics_sector"]].astype({"symbol": "string"})
@@ -191,5 +178,4 @@ def buyability(
         table=table[front + rest].sort_values(["symbol", "date"], ignore_index=True),
         correlations=correlations,
         weights=weights,
-        static=frozen.iloc[0] if len(frozen) else pd.Series(dtype="float64"),
     )

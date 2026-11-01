@@ -73,4 +73,4 @@ only move, map or validate data.
   calculation helpers give the formula, bounds and boundary behaviour (exact threshold,
   zero denominator).
 - A rule implementation names its rule ID and the spec or README section that defines
-  it (the reference chain, `midas/instructions/developer.md`).
+  it (the reference chain, `midas/instructions/scribe.md`).

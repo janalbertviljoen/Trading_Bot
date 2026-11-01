@@ -7,9 +7,8 @@ rarely: when the user asks, after a change to `.claude/settings.json` or
 
 ## Intent
 
-1. **Containment.** Agents read, write and run commands only inside the repository. The
-   rest of the machine is off limits: the user profile, other folders, credentials and
-   keys.
+1. **Containment.** Agents read, write and run commands only inside the repository
+   (`AGENTS.md`, "Prohibited").
 2. **No needless prompts.** Anything that stays inside the repository runs without
    asking. The user approves only what reaches outside, or touches protected baselines
    and vendor data.
@@ -34,8 +33,7 @@ comes from the sandbox plus `.claude/settings.json`. The planned settings
 
 1. Stay at the repository root and use relative paths; avoid `cd`.
 2. Read and search with the Read and Grep tools, not the shell or `python -c`.
-3. Bash for plain commands: `git`, `.venv/bin/python -m pytest`, `black`, `ruff`,
-   `pyright`.
+3. Bash for plain commands: `git` and the checks in `developer.md`, "Commands".
 4. No scratch files in `.claude/` or the repository; use the session scratchpad.
 5. Do not edit `.claude/settings.json` or a hook unless the user asks.
 6. If a prompt appears anyway, tell the user the exact command and take another route.

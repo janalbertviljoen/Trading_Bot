@@ -16,8 +16,8 @@ paths:
   accession number; first-reported values are kept, restatements are not applied
   (spec §3.3, §3.5).
 - Raw pulls are cached as immutable snapshots under `data/raw/<source>/<as_of>/` with a
-  manifest (source, query, as-of date, row count, hash). `data/` is git-ignored; vendor
-  data is never committed or sent elsewhere.
+  manifest (source, query, as-of date, row count, hash); `data/` is git-ignored
+  (`AGENTS.md`, "Prohibited").
 - File reading and writing goes through `skatkis.io`. Network access only through
   `skatkis.io.api.ApiClient`, the central API handler, or in source modules (for a
   vendor library such as `yfinance`); the vendor's endpoints and headers live in the
@@ -25,7 +25,7 @@ paths:
 - Raw snapshots keep the vendor's format as received (gzipped); tables from cleaning
   onwards are Parquet through `skatkis.io.tables`. Manifests hash the content, not the
   file bytes.
-- API keys come from the environment, read at the command-line boundary and passed in;
+- API keys come from the environment (`AGENTS.md`, "Prohibited") and are passed in;
   never hardcoded, logged or written to a snapshot. Respect vendor rate limits (SEC: a
   declared User-Agent, at most 10 requests per second).
 - Fail fast with diagnostics naming the ticker, date and field on a malformed response,

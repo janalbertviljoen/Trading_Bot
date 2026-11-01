@@ -5,8 +5,7 @@ paths:
 
 # Midas's records (`midas/`)
 
-- Only the secretary writes here: notes, change logs, change files, designs and the
-  agent instructions. Read `midas/instructions/secretary.md` first.
+- Only the secretary writes here, by `secretary.md` (imported below).
 - `midas/` holds no code and no vendor data.
 - Keep `midas/midas.md` current, with its decision log, whenever Midas's behaviour,
   profiles or controls change.
