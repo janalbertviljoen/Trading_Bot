@@ -1,0 +1,21 @@
+group,symbol,gics_sector,mean_score
+best,TR,Consumer Staples,0.96
+best,WHD,Energy,0.90
+best,CCS,Consumer Discretionary,0.86
+best,SEI,Energy,0.86
+best,BRC,Industrials,0.83
+best,UNF,Industrials,0.79
+best,VSNT,Communication Services,0.78
+best,JBSS,Consumer Staples,0.77
+best,BCC,Industrials,0.73
+best,UVV,Consumer Staples,0.71
+worst,SPHR,Communication Services,0.00
+worst,FUN,Consumer Discretionary,0.02
+worst,RXO,Industrials,0.03
+worst,LQDT,Industrials,0.06
+worst,RDNT,Health Care,0.07
+worst,VVX,Industrials,0.07
+worst,OPLN,Industrials,0.07
+worst,COTY,Consumer Staples,0.07
+worst,ETSY,Consumer Discretionary,0.07
+worst,CWST,Industrials,0.08

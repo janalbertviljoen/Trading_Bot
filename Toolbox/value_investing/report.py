@@ -68,11 +68,12 @@ SCORE_LABELS = {
 MAX_PANELS_IN_ROW = 3  # more start years than this are laid out two by two
 TOP_PICKS = 5  # the largest wins named in the text
 HALF_CENT = 0.005  # holdings below half a cent are left blank in the tables
-NAMES = {WALLET: "wallet", MANAGED: "managed", "^SP500TR": "sp", "BRK-B": "brk"}
+# Placeholder prefixes and table labels per holder; the index's benchmark (the first
+# comparison) is ``sp`` in the text and named by the index's label.
+NAMES = {WALLET: "wallet", MANAGED: "managed", "BRK-B": "brk"}
 LABELS = {
     WALLET: "Value wallet",
     MANAGED: "Value wallet with sells",
-    "^SP500TR": "S&P 500",
     "BRK-B": "Berkshire Hathaway",
 }
 
@@ -116,8 +117,9 @@ class ReportInputs:
         ``value_investing.holding.rule_profile`` output.
     weighting : pd.DataFrame
         ``value_investing.holding.rule_weighting`` output.
-    peers : Peers
-        The peer group compared with the picks.
+    peers : Peers or None
+        The peer group compared with the picks; None when no company of the group is
+        in the index, and the peer section is then left out.
     lookahead : pd.DataFrame
         ``value_investing.lookahead.truncation_check`` output.
     survivorship : pd.DataFrame
@@ -126,26 +128,39 @@ class ReportInputs:
         market value, the likely losers).
     reference : int
         The start year of the investor the abstract, the conclusions and the detailed
-        views follow (user, 2026-10-31: a recent one, so fewer failed companies are
-        missing).
+        views follow: a recent one, so fewer failed companies are missing.
     names : Mapping[str, str]
         Each company's full name by symbol, for the concluding parts.
+    index_label : str
+        The index's name (``S&P MidCap 400``), the ``{index}`` of the text.
+    benchmark_name : str
+        How the text names the benchmark (``{benchmark_name}``).
+    membership : str
+        The text's note on how membership dates are known (``{membership}``).
+    record_start : pd.Timestamp
+        The first date of the index's list of changes (``{record_start}``).
+    pick_scenario, pick_years, pick_ends : int
+        The price-history settings (``[report]``), named in the text.
     rules : Mapping[str, Mapping[str, Any]]
         Each rule's thresholds (``[rules.<ID>]``, with ``[valuation]`` merged in), to
         fill the rule descriptions.
     figures : Mapping[str, Path]
-        Saved figures: ``yearly``, ``rules``, ``weighting``, ``contents`` and
-        ``value_<start year>`` per scenario.
+        Saved figures: ``yearly``, ``rules``, ``weighting``, ``contents``,
+        ``pick_prices``, ``trade_amounts``, ``next_prices``, ``peers`` (when there is a
+        peer group) and ``value_<start year>`` per scenario.
     compare : Sequence[str]
-        The comparisons, S&P 500 first (``^SP500TR``, ``BRK-B``).
+        The comparisons: the index's benchmark first, then ``BRK-B``.
     amount : float
-        USD invested per year.
+        USD invested per decision.
     picks : int
-        Companies bought per year.
+        Companies bought per decision.
     end : pd.Timestamp
         Valuation date.
     threshold : float
         Score share at or below which a holding is sold in part.
+    verdict_band : float
+        The weight-gap rank correlation above which the weighting favours the rules
+        that told winners from losers, and below minus which it favours the wrong ones.
     """
 
     held: BuyAndHold
@@ -153,10 +168,17 @@ class ReportInputs:
     next_picks: pd.DataFrame
     profile: pd.DataFrame
     weighting: pd.DataFrame
-    peers: Peers
+    peers: Peers | None
     lookahead: pd.DataFrame
     survivorship: pd.DataFrame
     names: Mapping[str, str]
+    index_label: str
+    benchmark_name: str
+    membership: str
+    record_start: pd.Timestamp
+    pick_scenario: int
+    pick_years: int
+    pick_ends: int
     reference: int
     rules: Mapping[str, Mapping[str, Any]]
     figures: Mapping[str, Path]
@@ -165,6 +187,7 @@ class ReportInputs:
     picks: int
     end: pd.Timestamp
     threshold: float
+    verdict_band: float
 
 
 def report_facts(inputs: ReportInputs, names: Mapping[str, str]) -> dict[str, str]:
@@ -180,10 +203,19 @@ def report_facts(inputs: ReportInputs, names: Mapping[str, str]) -> dict[str, st
         "last_year": str(int(years.max())),
         "picks": str(inputs.picks),
         "amount": f"{inputs.amount:,.0f}",
+        "index": inputs.index_label,
+        "benchmark_name": inputs.benchmark_name,
+        "record_start": f"{inputs.record_start:%B %Y}",
+        "pick_scenario": str(inputs.pick_scenario),
+        "pick_years": str(inputs.pick_years),
+        "pick_ends": str(inputs.pick_ends),
     }
+    facts["membership"] = inputs.membership.format(record_start=facts["record_start"])
     summary = pd.concat([held.summary, inputs.managed.summary], ignore_index=True)
     for row in summary.to_dict("records"):
-        name = NAMES.get(str(row["holder"]), str(row["holder"]).lower())
+        name = {**NAMES, inputs.compare[0]: "sp"}.get(
+            str(row["holder"]), str(row["holder"]).lower()
+        )
         start = int(row["scenario"])
         facts[f"invested_{start}"] = f"{float(row['invested_usd']):,.0f}"
         facts[f"{name}_{start}"] = f"{float(row['value_usd']):,.0f}"
@@ -200,6 +232,10 @@ def report_facts(inputs: ReportInputs, names: Mapping[str, str]) -> dict[str, st
     by_company = (
         own_lots.groupby("symbol")["value_usd"].sum().sort_values(ascending=False)
     )
+    sectors = lots.groupby("gics_sector")["invested_usd"].sum()
+    facts["top_sectors"] = _listing(
+        [str(s) for s in sectors.sort_values(ascending=False).index[:3]]
+    )
     facts["best_pick"] = str(best["symbol"])
     facts["best_year"] = f"{pd.Timestamp(best['decision_date']):%B %Y}"
     facts["best_multiple"] = f"{float(best['multiple']):.0f}"
@@ -212,7 +248,7 @@ def report_facts(inputs: ReportInputs, names: Mapping[str, str]) -> dict[str, st
     facts["winners"] = str(int(beat.sum()))
     facts["losers"] = str(int((~beat).sum()))
     gap = inputs.profile.pivot_table(index="rule", columns="group", values="points")
-    difference = (gap["beat the S&P 500"] - gap["did not"]).sort_values()
+    difference = (gap["beat the index"] - gap["did not"]).sort_values()
     facts["winner_rules"] = _listing(
         [_named(r, names) for r in difference.index[::-1][:4]]
     )
@@ -224,7 +260,8 @@ def report_facts(inputs: ReportInputs, names: Mapping[str, str]) -> dict[str, st
     facts.update(_wallet_facts(inputs))
     facts.update(_dollar_facts(inputs))
     facts.update(_weighting_facts(inputs, names))
-    facts.update(_peer_facts(inputs, names))
+    if inputs.peers is not None:
+        facts.update(_peer_facts(inputs, inputs.peers, names))
     facts.update(_lookahead_facts(inputs))
     reference = str(inputs.reference)
     facts["ref_start"] = reference
@@ -266,10 +303,10 @@ def _dollar_facts(inputs: ReportInputs) -> dict[str, str]:
 
 
 def _dollar_table(inputs: ReportInputs) -> Table:
-    """Return the dollars ahead of the S&P 500 of the winning and losing picks."""
+    """Return the dollars ahead of the index of the winning and losing picks."""
     names = {
-        "beat": "Beat the S&P 500",
-        "lagged": "Lagged the S&P 500",
+        "beat": f"Beat the {inputs.index_label}",
+        "lagged": f"Lagged the {inputs.index_label}",
         "all": "All picks",
     }
     rows = [
@@ -325,26 +362,26 @@ def _full(inputs: ReportInputs, symbol: str) -> str:
     return f"{name} ({symbol})" if name else symbol
 
 
-def _peer_facts(inputs: ReportInputs, names: Mapping[str, str]) -> dict[str, str]:
+def _peer_facts(
+    inputs: ReportInputs, group: Peers, names: Mapping[str, str]
+) -> dict[str, str]:
     """Return the facts of the peer comparison: ranks and the peer wallet's value."""
-    ranks = inputs.peers.ranks.dropna(subset=["rank"]).sort_values("rank")
+    ranks = group.ranks.dropna(subset=["rank"]).sort_values("rank")
     facts = {
-        "peer_label": inputs.peers.label,
+        "peer_label": group.label,
         "peer_best": _full(inputs, str(ranks["symbol"].iloc[0])),
         "peer_best_rank": f"{float(ranks['rank'].iloc[0]):.0f}",
         "peer_worst": _full(inputs, str(ranks["symbol"].iloc[-1])),
         "peer_worst_rank": f"{float(ranks['rank'].iloc[-1]):.0f}",
         "peer_companies": f"{float(ranks['companies'].iloc[0]):.0f}",
     }
-    gap = inputs.peers.profile.pivot_table(
-        index="rule", columns="group", values="points"
-    )
+    gap = group.profile.pivot_table(index="rule", columns="group", values="points")
     order = (gap["picks"] - gap["peers"]).sort_values(ascending=False)
     facts["peer_behind"] = _listing([_named(str(r), names) for r in order.index[:4]])
     facts["peer_ahead"] = _listing(
         [_named(str(r), names) for r in order.index[::-1] if order[r] < 0][:3]
     )
-    for row in inputs.peers.summary.to_dict("records"):
+    for row in group.summary.to_dict("records"):
         if str(row["holder"]) != WALLET:
             continue
         start = int(row["scenario"])
@@ -467,19 +504,19 @@ def build_report(
             ],
         ),
         Section(
-            title=fill(text["peers"]["title"]),
-            text=fill(text["peers"]["text"]),
-            table=replace(
-                _peer_table(inputs),
-                caption=fill(text["peers"]["table_caption"]),
-                label="tab:peers",
-            ),
+            title=fill(text["history"]["title"]),
+            text=fill(text["history"]["text"]),
             figures=[
                 ReportFigure(
-                    inputs.figures["peers"],
-                    fill(text["peers"]["figure"]),
-                    label="fig:peers",
-                )
+                    inputs.figures["pick_prices"],
+                    fill(text["history"]["prices_figure"]),
+                    label="fig:pick-prices",
+                ),
+                ReportFigure(
+                    inputs.figures["trade_amounts"],
+                    fill(text["history"]["amounts_figure"]),
+                    label="fig:trade-amounts",
+                ),
             ],
         ),
         Section(
@@ -490,6 +527,13 @@ def build_report(
                 caption=fill(text["next"]["table_caption"]),
                 label="tab:next",
             ),
+            figures=[
+                ReportFigure(
+                    inputs.figures["next_prices"],
+                    fill(text["next"]["prices_figure"]),
+                    label="fig:next-prices",
+                )
+            ],
             subsections=[
                 Section(
                     title=fill(text["next"]["sell_title"]),
@@ -507,6 +551,31 @@ def build_report(
             text=fill(text["conclusions"]["text"]),
         ),
     ]
+    if inputs.peers is not None:
+        at = next(
+            i
+            for i, part in enumerate(sections)
+            if part.title == fill(text["history"]["title"])
+        )
+        sections.insert(
+            at,
+            Section(
+                title=fill(text["peers"]["title"]),
+                text=fill(text["peers"]["text"]),
+                table=replace(
+                    _peer_table(inputs, inputs.peers),
+                    caption=fill(text["peers"]["table_caption"]),
+                    label="tab:peers",
+                ),
+                figures=[
+                    ReportFigure(
+                        inputs.figures["peers"],
+                        fill(text["peers"]["figure"]),
+                        label="fig:peers",
+                    )
+                ],
+            ),
+        )
     appendix = [
         Section(
             title=fill(text["appendix"]["title"]),
@@ -533,7 +602,13 @@ def build_report(
             text="\n\n".join(
                 [
                     fill(text["weighting"]["text"]),
-                    fill(_verdict(inputs.weighting, text["weighting"]["verdicts"])),
+                    fill(
+                        _verdict(
+                            inputs.weighting,
+                            text["weighting"]["verdicts"],
+                            band=inputs.verdict_band,
+                        )
+                    ),
                 ]
             ),
             table=replace(
@@ -608,7 +683,7 @@ def _listing(items: Sequence[str]) -> str:
 
 def _picks_table(inputs: ReportInputs) -> Table:
     """Return the table of each year's picks and what the purchase is worth today."""
-    labels = {"^SP500TR": "S&P 500", "BRK-B": "Berkshire"}
+    labels = {inputs.compare[0]: inputs.index_label, "BRK-B": "Berkshire"}
     rows = [
         [
             f"{pd.Timestamp(row['decision_date']):%Y-%m}",
@@ -630,12 +705,16 @@ def _picks_table(inputs: ReportInputs) -> Table:
     )
 
 
-def _verdict(check: pd.DataFrame, verdicts: Mapping[str, str]) -> str:
-    """Return the text's verdict on the weighting from the weight-gap correlation."""
+def _verdict(check: pd.DataFrame, verdicts: Mapping[str, str], *, band: float) -> str:
+    """Return the text's verdict on the weighting from the weight-gap correlation.
+
+    Above ``band`` the weighting favours the right rules, below ``-band`` the wrong ones,
+    in between the two are unrelated.
+    """
     value = weighting_quality(check)["weight_vs_gap"]
-    if value > 0.3:  # noqa: PLR2004  bands of the verdict, named in the report text
+    if value > band:
         return str(verdicts["favours"])
-    if value < -0.3:  # noqa: PLR2004  band of the verdict, named in the report text
+    if value < -band:
         return str(verdicts["against"])
     return str(verdicts["unrelated"])
 
@@ -710,7 +789,9 @@ def _summary_table(inputs: ReportInputs) -> Table:
             rows.append(
                 [
                     str(start) if index == 0 else "",
-                    LABELS.get(holder, holder),
+                    {**LABELS, inputs.compare[0]: inputs.index_label}.get(
+                        holder, holder
+                    ),
                     f"{float(row['invested_usd']):,.0f}",
                     f"{float(row['value_usd']):,.0f}",
                     f"{float(row['multiple']):.2f}",
@@ -727,7 +808,7 @@ def _summary_table(inputs: ReportInputs) -> Table:
 
 
 def _contents_table(inputs: ReportInputs) -> Table:
-    """Return the earliest start year's wallet: each holding's value after each January.
+    """Return the reference investor's wallet: each holding's value after each January.
 
     One column per January decision (holdings after its sales and purchases) and one
     for the valuation date; the last rows give the money put in and the sale proceeds
@@ -780,7 +861,7 @@ def _contents_table(inputs: ReportInputs) -> Table:
 
 
 def _sales_table(inputs: ReportInputs) -> Table:
-    """Return the sales of the earliest start year's wallet, one row per year."""
+    """Return the sales of the reference investor's wallet, one row per sale."""
     trades = inputs.managed.trades
     first = inputs.reference
     sales = trades[(trades["scenario"] == first) & (trades["action"] == "sell")]
@@ -823,7 +904,7 @@ def _next_table(inputs: ReportInputs, sectors: Mapping[str, str]) -> Table:
 
 
 def _sell_check_table(inputs: ReportInputs) -> Table:
-    """Return the earliest start year's holdings that the rule would sell in part."""
+    """Return the reference investor's holdings that the rule would sell in part."""
     holdings = inputs.managed.holdings
     first = inputs.reference
     own = holdings[(holdings["scenario"] == first) & (holdings["sell_fraction"] > 0)]
@@ -905,7 +986,7 @@ def _lookahead_facts(inputs: ReportInputs) -> dict[str, str]:
     }
 
 
-def _peer_table(inputs: ReportInputs) -> Table:
+def _peer_table(inputs: ReportInputs, group: Peers) -> Table:
     """Return each peer's score, rank today and median rank on the decisions."""
     rows = [
         [
@@ -919,7 +1000,7 @@ def _peer_table(inputs: ReportInputs) -> Table:
             ),
             "" if pd.isna(r["median_rank"]) else f"{float(r['median_rank']):.0f}",
         ]
-        for r in inputs.peers.ranks.sort_values("rank").to_dict("records")
+        for r in group.ranks.sort_values("rank").to_dict("records")
     ]
     return Table(
         header=["Company", "Score", "Score 0 to 1", "Rank today", "Median rank"],
@@ -929,7 +1010,7 @@ def _peer_table(inputs: ReportInputs) -> Table:
 
 
 def _lots_table(inputs: ReportInputs, sectors: Mapping[str, str]) -> Table:
-    """Return every purchase of the earliest start year's wallet with sells.
+    """Return every purchase of the reference investor's wallet with sells.
 
     Each purchase shows what later sales took from it and what it keeps today;
     ``sectors`` shortens the sector names.

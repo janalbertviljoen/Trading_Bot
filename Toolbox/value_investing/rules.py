@@ -8,7 +8,7 @@ registry, without branching on IDs. Every rule function has the signature
 ``(inputs, ratios, **thresholds) -> DataFrame[value, passed]`` (``value_investing.flags``).
 Families group the rules for the score: ``G`` Graham's defensive investor, ``E`` his
 enterprising investor (with the net-net test, ch. 15), ``B`` Buffett and Munger, ``N``
-net income growth (VI_202610_005).
+net income growth (a convention of this repository, not from the sources).
 
 Owns
 ----

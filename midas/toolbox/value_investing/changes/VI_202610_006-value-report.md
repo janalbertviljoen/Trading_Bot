@@ -80,7 +80,7 @@ result compounds; shorts come later. Three investors are compared: one who start
 - 2026-10-31 (user): the forward-information check goes into the report's appendix and
   into the unit tests.
 - 2026-10-31: the user's message was cut off at "We can assume every puch"; read as
-  "every purchase is held to today", to confirm.
+  "every purchase is held to today", confirmed by the user on 2026-11-01.
 
 ## Notes
 
@@ -526,9 +526,55 @@ A report of about fourteen pages from `python -m Toolbox.value_investing report`
   on the valuation date) and the shared `DAYS_PER_YEAR`.
 - S10: reasons on the cast and on the second `noqa`.
 - S8 in part: the report's panel title says each January and July.
-- Open, for the documentation and tests steps: S3 to S9 (except the above), S11 and
-  S12, the documentation and unit tests listed in sections 4 of the report, and the
-  user's approval of the tag-choice fix (MD_202610_002).
+- Open, for the documentation and tests steps: the documentation and unit tests listed
+  in sections 4 of the report.
+
+### Fixes after the report (2026-11-01)
+
+- S3: one owner per concept: the forward return over a window
+  (`inputs.window_returns`, used by the rule weights, the paper test and the
+  correlation curve) and the rank correlation (`skatkis.analysis.rank_correlation`);
+  `min_companies` once, in `[score]`. `diagnostics.forward_excess` (to the next
+  rebalance date) stays: a different window, through the shared
+  `skatkis.financial_logic.forward_excess_return`.
+- S4: the short book's path (`evaluation.short_path`) and the survivorship counts
+  (`diagnostics.survivorship`) out of `__main__`; the universe built once
+  (`inputs.index_universe`), also by the look-ahead test.
+- S5: the `on_date` filter out of `pipeline` (`inputs.members_on_date`). The DAG and
+  caching stay deferred with spec §9.6; to confirm with the user as a decision.
+- S6: `year_tolerance_days`, `stale_days` (`[schedule]`), `min_companies` (`[score]`)
+  and `verdict_band` (`[report]`) in `config/rules.toml`. `PRICE_TOLERANCE_DAYS` (7)
+  stays in `value_investing.inputs` as a named constant (developer, 2026-11-01): it
+  aligns prices to dates (a price older than a week counts as missing), is used in
+  twelve places and is not a rule threshold. Change IDs stay in `config/*.toml`
+  comments as the trail behind each setting; config is not official documentation.
+- S7: G4 phased in (decision of VI_202610_002, 2026-11-01).
+- S8, S9: the docstrings listed corrected; no change ID, user attribution or `midas/`
+  path left in `Toolbox/`. S10 resolved: the verdict band is in config.
+- S11: the change files, notes and `quant.md` rules 2, 4 and 9 updated. S12: the
+  point-in-time fixture test is `tests/market_data/test_fundamentals.py`;
+  `tests/value_investing/test_lookahead.py` stays as the integration check on the
+  stored data.
+- N2: a lot whose prices end keeps its last price in `holding._value_path`, as in
+  `buy_and_sell`. This is trade accounting, so a methodology change (warden follow-up
+  S2): no effect on today's data (current members only); for the user to approve.
+- N3, N4: the loop variable renamed; `_evaluate` uses `evaluation_settings`, now in the
+  Public API. N7: the picks' leading sectors filled from the data (`{top_sectors}`).
+- Refactor check on the S&P 500 (data of 2026-10-31): every result file unchanged
+  apart from the `score_combined` rows of `model_comparison.csv` and
+  `ranked_positions.csv`, a model no longer in the code on `main`.
+- The tag choice (MD_202610_002) and G4 phase-in, approved by the user, were measured
+  together on the S&P 500: 6,035 of 20,290 company-dates changed score, 4,892 of them
+  G4 moving from failed to not evaluated; the 2016 investor's picks changed on 4 of 21
+  decisions; the wallets moved by under 2%. "Can only rise" holds for the plain
+  `score` only: the picks use `score_binned_weighted`, a sum of bucket points, where a
+  young company loses its G4 points (warden follow-up S1). The split per change and the
+  direction in `score_binned_weighted` are still to be measured.
+
+## Warden report (follow-up)
+
+The follow-up run of 2026-11-01 covers this change too; it is recorded in
+[VI_202610_007](VI_202610_007-pick-price-history.md#warden-report).
 
 ## Kickoff prompt
 
@@ -537,5 +583,6 @@ user.
 
 ## Done when
 
-- `report` writes a PDF of about five pages with the picks, the value over time for the
-  three start years against the S&P 500 and Berkshire, and the rules behind the winners.
+- `report` writes a PDF (about fourteen pages, by the user's later decisions) with the
+  picks, the value over time for the four start years against the S&P 500 and
+  Berkshire, and the rules behind the winners.

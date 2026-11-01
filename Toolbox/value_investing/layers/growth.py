@@ -3,8 +3,8 @@ value_investing/layers/growth.py
 --------------------------------
 Growth rules that are not in Graham's or Buffett's catalogue, one function per rule.
 
-Node ``metrics.growth``. NI1, net income growth over one year, was added by the user
-(VI_202610_005, 2026-10-31) to reward companies whose profit is rising; it has no
+Node ``metrics.growth``. NI1, net income growth over one year, is a convention of this
+repository, not from the sources: it rewards companies whose profit is rising; it has no
 published threshold, so it passes on any growth and is mainly graded in buckets
 (``value_investing.scoring.rule_points``). Same signature and result as the Graham
 rules (``value_investing.flags``).
@@ -41,7 +41,7 @@ from Toolbox.value_investing.inputs import RuleInputs
 
 
 def ni1_net_income_growth(inputs: RuleInputs, ratios: pd.DataFrame) -> pd.DataFrame:
-    """NI1 (VI_202610_005): net income growth from the year before to the latest year.
+    """NI1: net income growth from the year before to the latest year.
 
     Parameters
     ----------

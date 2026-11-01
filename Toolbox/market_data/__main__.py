@@ -9,7 +9,8 @@ Run from the repository root::
     export FRED_API_KEY=...                       # optional
     .venv/bin/python -m Toolbox.market_data update --as-of 2026-10-31 \
         --cik 320193 789019 21344 --ticker AAPL MSFT KO
-    .venv/bin/python -m Toolbox.market_data update --as-of 2026-10-31 --universe sp500
+    .venv/bin/python -m Toolbox.market_data update --as-of 2026-10-31 \
+        --index sp500 sp400 sp600
     .venv/bin/python -m Toolbox.market_data check --as-of 2026-10-31
 
 This is the command-line boundary: it reads the environment, the config file and the
@@ -53,6 +54,7 @@ from Toolbox.market_data.sources.prices import YahooChart, yahoo_client
 from Toolbox.market_data.update import (
     Storage,
     UpdateResult,
+    ticker_ciks,
     update_constituents,
     update_edgar,
     update_fx,
@@ -64,7 +66,6 @@ from Toolbox.skatkis.io.tables import read_table
 from Toolbox.skatkis.report import compile_pdf
 
 SOURCES = ("edgar", "prices", "fx")
-UNIVERSES = ("sp500",)
 LATEX_ENGINES = ("tectonic", "latexmk", "pdflatex")
 FX_SERIES = ("DEXSFUS",)
 
@@ -134,25 +135,44 @@ def _update(args: argparse.Namespace, storage: Storage) -> int:
     ciks: list[int | str] = list(args.cik)
     tickers: list[str] = list(args.ticker)
 
-    if args.universe == "sp500":
+    user_agent = os.environ.get("SEC_USER_AGENT", "")
+    if (args.index or "edgar" in args.source) and not user_agent:
+        print('EDGAR needs SEC_USER_AGENT, e.g. export SEC_USER_AGENT="Name you@email"')
+        return 2
+    if args.index:
+        indices = load_config(args.indices)
+        unknown = [key for key in args.index if key not in indices]
+        if unknown:
+            print(f"Unknown index {', '.join(unknown)}; known: {', '.join(indices)}")
+            return 2
         wiki = WikipediaPage(wikipedia_client(**sources["wikipedia"]))
-        members = update_constituents(args.as_of, storage=storage, provider=wiki)
-        results.append(members)
-        gics = gics_map(
-            read_table(members.folder / "constituents.parquet"),
-            funds=config["benchmarks"]["sectors"],
-            excluded=config["universe"]["excluded_sectors"],
+        sec = ticker_ciks(
+            args.as_of,
+            storage=storage,
+            client=edgar_client(user_agent, **sources["edgar"]),
         )
-        ciks += [int(cik) for cik in gics["cik"]]
-        tickers += [str(symbol) for symbol in gics["symbol"]]
+        for key in args.index:
+            index = indices[key]
+            members = update_constituents(
+                args.as_of,
+                storage=storage,
+                provider=wiki,
+                index=key,
+                pages=(str(index["members_page"]), str(index["changes_page"])),
+                ticker_ciks=sec,
+            )
+            results.append(members)
+            gics = gics_map(
+                read_table(members.folder / "constituents.parquet"),
+                funds=config["benchmarks"]["sectors"],
+                excluded=config["universe"]["excluded_sectors"],
+            )
+            ciks += [int(cik) for cik in gics["cik"]]
+            tickers += [str(symbol) for symbol in gics["symbol"]]
+            benchmarks.append(str(index["benchmark"]))
+        ciks = list(dict.fromkeys(ciks))
 
     if "edgar" in args.source and ciks:
-        user_agent = os.environ.get("SEC_USER_AGENT", "")
-        if not user_agent:
-            print(
-                'EDGAR needs SEC_USER_AGENT, e.g. export SEC_USER_AGENT="Name you@email"'
-            )
-            return 2
         client = edgar_client(user_agent, **sources["edgar"])
         results.append(
             update_edgar(ciks, as_of=args.as_of, storage=storage, client=client)
@@ -212,12 +232,18 @@ def _parser() -> argparse.ArgumentParser:
         help="price symbols (the market, sector and strategy benchmarks are always added)",
     )
     update.add_argument(
-        "--universe",
-        choices=UNIVERSES,
-        help="add the index members (outside the excluded sectors) to --cik and --ticker",
+        "--index",
+        nargs="*",
+        default=[],
+        help=(
+            "indices of config/indices.toml whose members (outside the excluded "
+            "sectors) and benchmark are added; the EDGAR and price tables of the "
+            "as-of date hold the companies of this run only, so give every index tracked"
+        ),
     )
     update.add_argument("--data-dir", type=Path, default=Path("data"))
     update.add_argument("--config", type=Path, default=Path("config/market_data.toml"))
+    update.add_argument("--indices", type=Path, default=Path("config/indices.toml"))
     check = commands.add_parser(
         "check", help="plot and check the data stored for an as-of date"
     )

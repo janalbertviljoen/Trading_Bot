@@ -5,21 +5,23 @@ The terminal command that scores buyability and writes its diagnostic plots.
 
 Run from the repository root, after ``python -m Toolbox.market_data update``::
 
-    .venv/bin/python -m Toolbox.value_investing buyability --as-of 2026-10-31
-    .venv/bin/python -m Toolbox.value_investing evaluate --as-of 2026-10-31
-    .venv/bin/python -m Toolbox.value_investing report --as-of 2026-10-31
+    .venv/bin/python -m Toolbox.value_investing buyability --as-of 2026-10-31 --index sp400
+    .venv/bin/python -m Toolbox.value_investing evaluate --as-of 2026-10-31 --index sp400
+    .venv/bin/python -m Toolbox.value_investing report --as-of 2026-10-31 --index sp400
 
-It reads the stored tables of the as-of date, runs ``value_investing.pipeline`` with
+Every command works on one index of ``config/indices.toml`` (``--index``, default
+``sp500``): its members are the universe and its benchmark the comparison. It reads the
+stored tables of the as-of date, runs ``value_investing.pipeline`` with
 ``config/rules.toml``, writes the buyability table to
-``data/interim/value_investing/<as_of>/buyability_<view>.parquet`` per universe view,
-and the plots and the
-sample to ``results/value_investing/<as_of>/buyability/``. ``evaluate`` reads that table
-and writes the paper test of the score (``value_investing.evaluation``) and the ledger
-of one wallet (``value_investing.ledger``: ``ledger.md``, ``ledger.csv``,
-``ledger_balance.csv``) to ``results/value_investing/<as_of>/evaluation/``. ``report``
-writes the buy-and-hold report (``value_investing.holding``, ``value_investing.report``)
-to ``results/value_investing/<as_of>/report/`` and compiles it when a LaTeX engine is
-found.
+``data/interim/value_investing/<as_of>/<index>/buyability_<view>.parquet`` per universe
+view, and the plots and the sample to ``results/value_investing/<index>/<as_of>/buyability/``.
+``evaluate`` reads that table and writes the paper test of the score
+(``value_investing.evaluation``) and the ledger of one wallet (``value_investing.ledger``:
+``ledger.md``, ``ledger.csv``, ``ledger_balance.csv``) to
+``results/value_investing/<index>/<as_of>/evaluation/``. ``report`` writes the
+buy-and-hold report (``value_investing.holding``, ``value_investing.report``) to
+``results/value_investing/<index>/<as_of>/report/`` and compiles it when a LaTeX engine
+is found.
 
 Owns
 ----
@@ -34,6 +36,9 @@ Public API
 ----------
 main(argv)
     Run ``buyability``, ``evaluate`` or ``report``; returns the exit code.
+evaluation_settings(rules)
+    The ``[evaluation]`` settings of ``config/rules.toml``, with ``[score]
+    min_companies``.
 
 Dependency rule
 ---------------
@@ -52,7 +57,6 @@ from typing import Any
 
 import pandas as pd
 
-from Toolbox.market_data.gics import gics_map
 from Toolbox.market_data.sources.prices import yahoo_symbol
 from Toolbox.skatkis.io.config import load_config
 from Toolbox.skatkis.io.figures import save_figure
@@ -68,12 +72,12 @@ from Toolbox.value_investing import (
     plots,
     report,
 )
-from Toolbox.value_investing.inputs import price_on
+from Toolbox.value_investing.inputs import index_universe, price_on
 from Toolbox.value_investing.pipeline import Buyability, Tables, buyability
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """Run the ``buyability`` or ``evaluate`` command."""
+    """Run the ``buyability``, ``evaluate`` or ``report`` command."""
     args = _parser().parse_args(argv)
     if args.command == "evaluate":
         return _evaluate(args)
@@ -85,16 +89,48 @@ def main(argv: Sequence[str] | None = None) -> int:
 LATEX_ENGINES = ("tectonic", "latexmk", "pdflatex")
 
 
+@dataclass(frozen=True)
+class _Index:
+    """The index a command works on, and where its tables and results live."""
+
+    key: str
+    label: str
+    benchmark: str
+    benchmark_name: str
+    membership: str
+    interim: Path
+    tables: Path
+    members: Path
+    results: Path
+
+
+def _index(args: argparse.Namespace) -> _Index:
+    """Return the ``--index`` entry of ``config/indices.toml`` and its folders."""
+    entry = load_config(args.indices)[args.index]
+    as_of = args.as_of.isoformat()
+    interim = args.data_dir / "interim"
+    return _Index(
+        key=args.index,
+        label=str(entry["label"]),
+        benchmark=str(entry["benchmark"]),
+        benchmark_name=str(entry["benchmark_name"]),
+        membership=str(entry["membership"]),
+        interim=interim,
+        tables=interim / "value_investing" / as_of / args.index,
+        members=interim / "constituents" / as_of / args.index,
+        results=args.results_dir / "value_investing" / args.index / as_of,
+    )
+
+
 def _buyability(args: argparse.Namespace) -> int:
     """Score buyability for the as-of date and write the table, sample and plots."""
     rules = load_config(args.rules)
     market = load_config(args.market_config)
-    as_of = args.as_of.isoformat()
-    interim = args.data_dir / "interim"
-    tables = _load_tables(interim, as_of, rules, market)
+    index = _index(args)
+    tables = _load_tables(index, args.as_of.isoformat(), rules, market)
     prices, universe = tables.prices, tables.universe
-    benchmark = str(market["benchmarks"]["market"])
-    folder = args.results_dir / "value_investing" / as_of / "buyability"
+    benchmark = index.benchmark
+    folder = index.results / "buyability"
     folder.mkdir(parents=True, exist_ok=True)
     views = [str(v) for v in rules["universe"]["views"]]
     results: dict[str, Buyability] = {}
@@ -109,9 +145,7 @@ def _buyability(args: argparse.Namespace) -> int:
         table = result.table.merge(
             excess.reset_index(), on=["symbol", "date"], how="left"
         )
-        write_table(
-            table, interim / "value_investing" / as_of / f"buyability_{view}.parquet"
-        )
+        write_table(table, index.tables / f"buyability_{view}.parquet")
         result.weights.to_csv(folder / f"rule_weights_{view}.csv", float_format="%.4f")
         result.static.rename("weight").to_csv(
             folder / f"rule_weights_static_{view}.csv", float_format="%.4f"
@@ -136,7 +170,9 @@ def _buyability(args: argparse.Namespace) -> int:
     )
     recent = table[table["date"] >= start]
     returns = diagnostics.score_returns(recent, bin_width=0.1)
-    ic = diagnostics.information_coefficient(table)
+    ic = diagnostics.information_coefficient(
+        table, min_companies=int(rules["score"]["min_companies"])
+    )
 
     chosen.to_csv(folder / "sample.csv", index=False, float_format="%.2f")
     returns.to_csv(folder / "score_returns.csv", index=False, float_format="%.4f")
@@ -174,31 +210,18 @@ def _buyability(args: argparse.Namespace) -> int:
 def _evaluate(args: argparse.Namespace) -> int:
     """Run the paper test of the stored buyability table and write tables and plots."""
     rules = load_config(args.rules)
-    market = load_config(args.market_config)
-    as_of = args.as_of.isoformat()
-    interim = args.data_dir / "interim"
+    index = _index(args)
     views = [str(v) for v in rules["universe"]["views"]]
     tables = {
-        view: read_table(
-            interim / "value_investing" / as_of / f"buyability_{view}.parquet"
-        )
-        for view in views
+        view: read_table(index.tables / f"buyability_{view}.parquet") for view in views
     }
     # The detailed evaluation describes the first view; the comparison covers all.
     table = tables[views[0]]
-    prices = read_table(interim / "yahoo" / as_of / "prices.parquet")
-    benchmark = str(market["benchmarks"]["market"])
-    raw = rules["evaluation"]
-    settings = evaluation.Evaluation(
-        first_year=int(raw["first_year"]),
-        held_out_from=int(raw["held_out_from"]),
-        buy_threshold=float(raw["buy_threshold"]),
-        sell_threshold=float(raw["sell_threshold"]),
-        position_usd=float(raw["position_usd"]),
-        horizons_months=tuple(int(m) for m in raw["horizons_months"]),
-        score_horizon_months=int(raw["score_horizon_months"]),
-        correlation_max_months=int(raw["correlation_max_months"]),
+    prices = read_table(
+        index.interim / "yahoo" / args.as_of.isoformat() / "prices.parquet"
     )
+    benchmark = index.benchmark
+    settings = evaluation_settings(rules)
     trading_days = prices[prices["symbol"] == benchmark]["date"]
     end = pd.Timestamp(trading_days.max())
     decisions = evaluation.decision_dates(
@@ -234,7 +257,7 @@ def _evaluate(args: argparse.Namespace) -> int:
     )
     book = _ledger(_Run(table, prices, decisions, settings, benchmark), rules)
 
-    folder = args.results_dir / "value_investing" / as_of / "evaluation"
+    folder = index.results / "evaluation"
     folder.mkdir(parents=True, exist_ok=True)
     score.to_csv(folder / "model_score.csv", index=False, float_format="%.4f")
     comparison.to_csv(folder / "model_comparison.csv", index=False, float_format="%.4f")
@@ -243,13 +266,15 @@ def _evaluate(args: argparse.Namespace) -> int:
     wallet_table.to_csv(folder / "wallets.csv", index=False, float_format="%.4f")
     curve.to_csv(folder / "correlation_curve.csv", index=False, float_format="%.4f")
     figures = {
-        "model_growth": plots.model_paths(paths),
-        "wallet_growth": plots.wallet_paths(wallet_table, horizon=horizon),
+        "model_growth": plots.model_paths(paths, benchmark=benchmark),
+        "wallet_growth": plots.wallet_paths(
+            wallet_table, horizon=horizon, benchmark=benchmark
+        ),
         "yearly_excess": plots.yearly_excess(wallet_table, horizon=horizon),
         "hit_rate_by_horizon": plots.horizon_profile(
             summary,
             y="hit_rate",
-            ylabel="Share of positions beating ^SP500TR",
+            ylabel=f"Share of positions beating {benchmark}",
             title="Hit rate per holding horizon",
             threshold=0.5,
         ),
@@ -257,14 +282,14 @@ def _evaluate(args: argparse.Namespace) -> int:
             summary,
             y="mean_excess",
             ylabel="Mean excess return per position",
-            title="Mean excess over ^SP500TR per holding horizon",
+            title=f"Mean excess over {benchmark} per holding horizon",
             threshold=0.0,
         ),
         "correlation_curve": plots.correlation_curve(curve),
     }
     for name, figure in figures.items():
         save_figure(figure, folder / f"{name}.png")
-    _write_ledger(book, rules, folder, views[0])
+    _write_ledger(book, rules, folder, views[0], benchmark)
 
     print(
         f"{len(decisions)} decision dates ({decisions[0]:%Y-%m-%d} to "
@@ -330,7 +355,7 @@ def _ledger(run: _Run, rules: dict[str, Any]) -> ledger.Ledger:
 
 
 def _write_ledger(
-    book: ledger.Ledger, rules: dict[str, Any], folder: Path, view: str
+    book: ledger.Ledger, rules: dict[str, Any], folder: Path, view: str, benchmark: str
 ) -> None:
     """Write the ledger's tables, its Markdown page and its balance plot."""
     book.positions.to_csv(folder / "ledger.csv", index=False, float_format="%.4f")
@@ -345,7 +370,7 @@ def _write_ledger(
         str(s): ledger.comparison_name(str(s)) for s in rules["ledger"]["compare"]
     }
     save_figure(
-        plots.balance(book.balance, title=title, others=others),
+        plots.balance(book.balance, title=title, others=others, benchmark=benchmark),
         folder / "ledger_balance.png",
     )
 
@@ -415,14 +440,12 @@ def _report(args: argparse.Namespace) -> int:
     """Write the buy-and-hold report's figures and LaTeX, and compile it to PDF."""
     rules = load_config(args.rules)
     as_of = args.as_of.isoformat()
-    interim = args.data_dir / "interim"
+    index = _index(args)
     view = str(rules["universe"]["views"][0])
-    table = read_table(
-        interim / "value_investing" / as_of / f"buyability_{view}.parquet"
-    )
-    prices = read_table(interim / "yahoo" / as_of / "prices.parquet")
+    table = read_table(index.tables / f"buyability_{view}.parquet")
+    prices = read_table(index.interim / "yahoo" / as_of / "prices.parquet")
     settings = rules["report"]
-    compare = [str(s) for s in settings["compare"]]
+    compare = [index.benchmark, *[str(s) for s in settings["compare"]]]
     start_years = [int(y) for y in settings["start_years"]]
     trading_days = prices[prices["symbol"] == compare[0]]["date"]
     end = pd.Timestamp(trading_days.max())
@@ -454,12 +477,12 @@ def _report(args: argparse.Namespace) -> int:
     weighting = holding.rule_weighting(held.lots, table, list(rules["rules"]))
     market = load_config(args.market_config)
     check = lookahead.truncation_check(
-        _load_tables(interim, as_of, rules, market),
+        _load_tables(index, as_of, rules, market),
         rules,
         table,
         [pd.Timestamp(d) for d in settings["lookahead_dates"]],
         view=view,
-        benchmark=str(market["benchmarks"]["market"]),
+        benchmark=index.benchmark,
         columns=[
             model.score_column,
             str(settings["share_column"]),
@@ -491,9 +514,10 @@ def _report(args: argparse.Namespace) -> int:
         right_on=["symbol", "date"],
     )
     upcoming = upcoming.rename(columns={str(settings["share_column"]): "score_share"})
+    changes = read_table(index.members / "changes.parquet")
     paths = pd.concat([held.paths, managed.paths], ignore_index=True)
 
-    folder = args.results_dir / "value_investing" / as_of / "report"
+    folder = index.results / "report"
     folder.mkdir(parents=True, exist_ok=True)
     figures = {
         "yearly": save_figure(
@@ -501,13 +525,13 @@ def _report(args: argparse.Namespace) -> int:
         ),
         "contents": save_figure(
             plots.wallet_contents(
-                managed.contents, held.paths, min(start_years), compare
+                managed.contents,
+                held.paths,
+                min(start_years),
+                compare,
+                limit=int(settings["pick_page"]),
             ),
             folder / "contents.png",
-        ),
-        "peers": save_figure(
-            plots.peer_profile(peer_view.profile, peer_view.label),
-            folder / "peers.png",
         ),
         "weighting": save_figure(
             plots.weighting_check(weighting), folder / "weighting.png"
@@ -517,9 +541,16 @@ def _report(args: argparse.Namespace) -> int:
             folder / "rules.png",
         ),
     }
+    figures.update(_price_figures(prices, managed.trades, upcoming, settings, folder))
+    if peer_view is not None:
+        figures["peers"] = save_figure(
+            plots.peer_profile(peer_view.profile, peer_view.label),
+            folder / "peers.png",
+        )
     for start in start_years:
         figures[f"value_{start}"] = save_figure(
-            plots.held_value(paths, start), folder / f"value_{start}.png"
+            plots.held_value(paths, start, index.benchmark),
+            folder / f"value_{start}.png",
         )
     held.lots.to_csv(folder / "purchases.csv", index=False, float_format="%.4f")
     summary = pd.concat([held.summary, managed.summary], ignore_index=True)
@@ -536,14 +567,19 @@ def _report(args: argparse.Namespace) -> int:
         weighting=weighting,
         peers=peer_view,
         lookahead=check,
-        survivorship=_survivorship(
-            interim / "constituents" / as_of / "changes.parquet", start_years
-        ),
+        survivorship=diagnostics.survivorship(changes, start_years),
         reference=int(settings["reference_start"]),
-        names=_company_names(interim / "constituents" / as_of / "constituents.parquet"),
+        names=_company_names(index.members / "constituents.parquet"),
+        index_label=index.label,
+        benchmark_name=index.benchmark_name,
+        membership=index.membership,
+        record_start=pd.Timestamp(changes["date"].min()),
+        pick_scenario=int(settings["pick_scenario"]),
+        pick_years=int(settings["pick_years"]),
+        pick_ends=int(settings["pick_ends"]),
         rules={
-            rule_id: {**rules["valuation"], **settings}
-            for rule_id, settings in rules["rules"].items()
+            rule_id: {**rules["valuation"], **thresholds}
+            for rule_id, thresholds in rules["rules"].items()
         },
         figures=figures,
         compare=compare,
@@ -551,12 +587,13 @@ def _report(args: argparse.Namespace) -> int:
         picks=model.names,
         end=end,
         threshold=float(settings["sell_threshold"]),
+        verdict_band=float(settings["verdict_band"]),
     )
     tex = report.build_report(
         inputs,
         load_config(args.report_text),
         folder=folder,
-        subtitle=f"Data as of {as_of}",
+        subtitle=f"{index.label}, data as of {as_of}",
     )
     print(summary.to_string(index=False, float_format="%.3f"))
     print("Next picks:")
@@ -564,28 +601,64 @@ def _report(args: argparse.Namespace) -> int:
     return _compile(tex, args.data_dir)
 
 
+def _price_figures(
+    prices: pd.DataFrame,
+    trades: pd.DataFrame,
+    upcoming: pd.DataFrame,
+    settings: dict[str, Any],
+    folder: Path,
+) -> dict[str, Path]:
+    """Write the price history of the picks, the USD traded and the next picks' prices."""
+    scenario = int(settings["pick_scenario"])
+    years = int(settings["pick_years"])
+    end = pd.Timestamp(prices["date"].max())
+    traded = trades[trades["scenario"] == scenario]
+    shown = {*traded["symbol"], *upcoming["symbol"]}
+    window = prices[
+        prices["symbol"].isin(shown)
+        & (prices["date"] > end - pd.DateOffset(years=years))
+        & (prices["date"] <= end)
+    ]
+    return {
+        "pick_prices": save_figure(
+            plots.pick_prices(
+                window,
+                traded,
+                scenario,
+                years,
+                page=int(settings["pick_page"]),
+                ends=int(settings["pick_ends"]),
+            ),
+            folder / "pick_prices.png",
+        ),
+        "trade_amounts": save_figure(
+            plots.trade_amounts(traded, scenario), folder / "trade_amounts.png"
+        ),
+        "next_prices": save_figure(
+            plots.next_prices(window, traded, upcoming, years),
+            folder / "next_prices.png",
+        ),
+    }
+
+
 def _load_tables(
-    interim: Path, as_of: str, rules: dict[str, Any], market: dict[str, Any]
+    index: _Index, as_of: str, rules: dict[str, Any], market: dict[str, Any]
 ) -> Tables:
-    """Return the stored tables of ``as_of`` the pipeline reads, with the universe."""
+    """Return the stored tables of ``as_of`` the pipeline reads, with the index's universe."""
+    interim = index.interim
     yahoo = interim / "yahoo" / as_of
-    constituents = read_table(interim / "constituents" / as_of / "constituents.parquet")
-    added = pd.DataFrame(
-        {
-            "symbol": [yahoo_symbol(str(s)) for s in constituents["symbol"]],
-            "date_added": constituents["date_added"].to_numpy(),
-        }
-    ).astype({"symbol": "string"})
-    universe = gics_map(
-        constituents,
+    universe = index_universe(
+        read_table(index.members / "constituents.parquet"),
+        read_table(index.members / "changes.parquet"),
         funds=market["benchmarks"]["sectors"],
         excluded=rules["universe"]["excluded_sectors"],
-    ).merge(added, on="symbol", how="left")
+    )
     return Tables(
         facts=read_table(interim / "edgar_companyfacts" / as_of / "facts.parquet"),
         prices=read_table(yahoo / "prices.parquet"),
         dividends=read_table(yahoo / "dividends.parquet"),
         splits=read_table(yahoo / "splits.parquet"),
+        listings=read_table(yahoo / "listings.parquet"),
         universe=universe,
     )
 
@@ -612,30 +685,6 @@ def _compile(tex: Path, data_dir: Path) -> int:
     return 0
 
 
-def _survivorship(path: Path, start_years: Sequence[int]) -> pd.DataFrame:
-    """Return, per start year, the companies that left the S&P 500 since then.
-
-    Read from the index's history of changes; a removal whose reason names the market
-    value (``market cap``) counts as ``market_cap``, the likely losers.
-    """
-    changes = read_table(path).dropna(subset=["removed_symbol"])
-    reason = changes["reason"].fillna("").str.lower()
-    rows = [
-        {
-            "start": start,
-            "removed": int((changes["date"].dt.year >= start).sum()),
-            "market_cap": int(
-                (
-                    (changes["date"].dt.year >= start)
-                    & reason.str.contains("market cap", regex=False)
-                ).sum()
-            ),
-        }
-        for start in sorted(start_years)
-    ]
-    return pd.DataFrame(rows)
-
-
 def _company_names(path: Path) -> dict[str, str]:
     """Return each company's full name by price symbol, from the constituents table."""
     constituents = read_table(path)
@@ -659,6 +708,7 @@ def evaluation_settings(rules: dict[str, Any]) -> evaluation.Evaluation:
         horizons_months=tuple(int(m) for m in raw["horizons_months"]),
         score_horizon_months=int(raw["score_horizon_months"]),
         correlation_max_months=int(raw["correlation_max_months"]),
+        min_companies=int(rules["score"]["min_companies"]),
     )
 
 
@@ -667,16 +717,22 @@ def _peer_view(
     held: holding.BuyAndHold,
     model: evaluation.Wallet,
     rules: dict[str, Any],
-) -> "report.Peers":
-    """Return the peer group's ranks, rule profile and wallet for the report."""
+) -> "report.Peers | None":
+    """Return the peer group's ranks, rule profile and wallet for the report.
+
+    None when no company of the group is in the scored table (the S&P 400 and 600 hold
+    none of the Magnificent 7).
+    """
     settings = rules["report"]
     group = [str(p) for p in settings["peers"]]
+    if not run.table["symbol"].isin(group).any():
+        return None
     wallet = holding.buy_and_hold(
         peers.peer_positions(
             run.table, group, run.decisions, score_column=model.score_column
         ),
         run.prices,
-        compare=[str(s) for s in settings["compare"]],
+        compare=[run.benchmark, *[str(s) for s in settings["compare"]]],
         amount_usd=float(settings["amount_usd"]),
         start_years=[int(y) for y in settings["start_years"]],
         end=pd.Timestamp(
@@ -786,10 +842,7 @@ def _model_paths(
                 positions, run.prices, model, settings, benchmark=run.benchmark
             )
             paths[model.label] = path
-            paths[f"{model.label}, short book"] = path.assign(
-                wallet_return=path["benchmark_return"] + path["short_excess"],
-                hit_rate=path["short_hit_rate"],
-            )
+            paths[f"{model.label}, short book"] = evaluation.short_path(path)
     return paths, pd.concat(frames, ignore_index=True)
 
 
@@ -806,7 +859,7 @@ def _parser() -> argparse.ArgumentParser:
     commands = parser.add_subparsers(dest="command", required=True)
     for name, help_text in (
         ("buyability", "score rules and plot diagnostics"),
-        ("evaluate", "paper-test the stored score against ^SP500TR"),
+        ("evaluate", "paper-test the stored score against the index's benchmark"),
         ("report", "write the buy-and-hold report (PDF)"),
     ):
         command = commands.add_parser(name, help=help_text)
@@ -814,6 +867,12 @@ def _parser() -> argparse.ArgumentParser:
         command.add_argument("--data-dir", type=Path, default=Path("data"))
         command.add_argument("--results-dir", type=Path, default=Path("results"))
         command.add_argument("--rules", type=Path, default=Path("config/rules.toml"))
+        command.add_argument(
+            "--index", default="sp500", help="an index of config/indices.toml"
+        )
+        command.add_argument(
+            "--indices", type=Path, default=Path("config/indices.toml")
+        )
         command.add_argument(
             "--market-config", type=Path, default=Path("config/market_data.toml")
         )

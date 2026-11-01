@@ -1,6 +1,0 @@
-decision_date,score_date,symbol,score,side,weight,amount,date,gics_sector,score_share
-2026-10-30,2026-09-18,FSLR,39.1825,buy,0.2028,20.2755,2026-09-18,Information Technology,0.7836
-2026-10-30,2026-09-18,CTSH,38.8808,buy,0.2012,20.1194,2026-09-18,Information Technology,0.7775
-2026-10-30,2026-09-18,SNA,38.7031,buy,0.2003,20.0274,2026-09-18,Industrials,0.8465
-2026-10-30,2026-09-18,SWKS,38.5248,buy,0.1994,19.9352,2026-09-18,Information Technology,0.7704
-2026-10-30,2026-09-18,RMD,37.9594,buy,0.1964,19.6426,2026-09-18,Health Care,0.7591

@@ -27,15 +27,18 @@ table. In one line each:
    result that used a later filing, SEC's `frame`, or today's figures is invalid, not
    just less accurate.
 2. **A value's period is `period_start` to `period_end`.** EDGAR's `fiscal_year` and
-   `fiscal_period` belong to the filing that reported it. A field follows the company's
-   most recently used tag (`market_data.clean.select_tags`).
+   `fiscal_period` belong to the filing that reported it. A field follows the tag the
+   company used most recently by the date, chosen from the filings made by then
+   (`market_data.fundamentals.annual_as_of`); later filings never decide it.
 3. **Never divide an adjusted price by an as-reported figure.** Yahoo prices and
    dividends are split-adjusted as of the fetch date; EDGAR per-share figures are not.
    Undo the split adjustment with the splits table, or compare company totals with
    market capitalisation (`market_data` README, "Yahoo Finance").
 4. **Returns come from `adj_close`**, the split- and dividend-adjusted series, and the
-   benchmark is `^SP500TR`, also a total-return series. Comparing a total return with a
-   price return flatters the strategy by the dividend yield.
+   benchmark is a total-return series set per index in `config/indices.toml`
+   (`^SP500TR` for the S&P 500; the funds IJH and IJR, net of their fee, for the S&P 400
+   and 600). Comparing a total return with a price return flatters the strategy by the
+   dividend yield.
 5. **USD is the main currency.** ZAR is secondary, for the refined analysis and the
    actual record, converted with `DEXSFUS`; report the as-of date of the rate used.
 6. **State the known biases with every result.** Delisted companies are missing from
@@ -46,8 +49,8 @@ table. In one line each:
 8. **Pin the snapshots.** Every result names the as-of date of each source snapshot it
    used; a new pull is a new as-of date, never an overwrite.
 9. **Out-of-sample or it did not happen.** Every strategy claim is judged on
-   out-of-sample excess return over `^SP500TR` (`researcher.md`); in-sample results are
-   diagnostics only.
+   out-of-sample excess return over the index's benchmark (`researcher.md`); in-sample
+   results are diagnostics only.
 
 ## When something does not fit
 

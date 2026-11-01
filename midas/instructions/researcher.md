@@ -18,6 +18,22 @@ costs. For value strategies the benchmark is the S&P 500 total-return index, and
 primary measure is out-of-sample excess return over it: the aim is to beat the S&P 500
 by a margin, not to maximise return at any risk.
 
+## Judge the model before tuning it
+
+The framework for judging a model comes before optimising its parameters (user,
+2026-10-31). A model that works on one universe is a proof of concept; the parameters
+(thresholds, weights, sell rule) are tuned only once the way of judging it is fixed:
+
+1. **Proof of concept** on one universe (the S&P 500).
+2. **Reliability** on companies the model was not developed on, from the same data
+   source, so that only the universe changes (the S&P 400 and 600, then a rule-based US
+   universe: MD_202610_004).
+3. **Look at what the model does**, not only its totals: each pick's price with the
+   wallet's buys and sales marked, how much was traded, and how long losers are held
+   (VI_202610_007). A pattern seen there is a hypothesis for step 4, never a rule set by
+   eye.
+4. **Then optimise**, out-of-sample, as in the workflow below.
+
 ## Workflow
 
 1. Use `list_datasets`; if none fit, `fetch_market_data` with a pinned `end_date`.

@@ -32,8 +32,10 @@ update_prices(tickers, *, as_of, storage, daily, monthly)
     ``dividends``, ``splits``.
 update_fx(series_ids, *, as_of, storage, provider)
     FRED series; table ``observations``.
-update_constituents(as_of, *, storage, provider)
-    S&P 500 members and index changes; tables ``constituents`` and ``changes``.
+ticker_ciks(as_of, *, storage, client)
+    SEC's current tickers and their CIKs, from a snapshot of the day.
+update_constituents(as_of, *, storage, provider, index, pages, ticker_ciks)
+    One index's members and changes; tables ``constituents`` and ``changes``.
 UpdateResult
     What one update fetched, reused and wrote.
 
@@ -50,8 +52,6 @@ from pathlib import Path
 import pandas as pd
 
 from Toolbox.market_data.sources.constituents import (
-    CHANGES_PAGE,
-    CONSTITUENTS_PAGE,
     WikipediaPage,
     parse_changes,
     parse_constituents,
@@ -60,9 +60,11 @@ from Toolbox.market_data.sources.edgar import (
     EdgarCompanyFacts,
     EdgarParseError,
     EdgarSubmissions,
+    EdgarTickers,
     format_cik,
     latest_periodic_filing,
     parse_companyfacts,
+    parse_ticker_ciks,
 )
 from Toolbox.market_data.sources.fred import FredSeries, load_fred
 from Toolbox.market_data.sources.prices import (
@@ -221,12 +223,15 @@ def update_prices(
     daily : YahooChart
         Daily bars from the start of the analysis period; gives the prices.
     monthly : YahooChart
-        Monthly bars over a longer period; gives the dividends and splits.
+        Monthly bars over a longer period; gives the dividends, the splits and the date
+        each symbol's history starts.
 
     Returns
     -------
     UpdateResult
-        Tables ``prices``, ``dividends`` and ``splits`` at ``<interim>/yahoo/<as_of>/``.
+        Tables ``prices``, ``dividends``, ``splits`` and ``listings`` (``symbol``,
+        ``first_date``: the first monthly bar, no earlier than the monthly provider's
+        start) at ``<interim>/yahoo/<as_of>/``.
     """
     store = storage.snapshots
     stored = [
@@ -252,6 +257,7 @@ def update_prices(
         "prices": _concat([d.prices for d, _ in parsed], empty.prices),
         "dividends": _concat([m.dividends for _, m in parsed], empty.dividends),
         "splits": _concat([m.splits for _, m in parsed], empty.splits),
+        "listings": _listings([m.prices for _, m in parsed]),
     }
     for name, table in tables.items():
         write_table(table, folder / f"{name}.parquet")
@@ -265,30 +271,86 @@ def update_prices(
     )
 
 
-def update_constituents(
-    as_of: date, *, storage: Storage, provider: WikipediaPage
+def _listings(monthly: Sequence[pd.DataFrame]) -> pd.DataFrame:
+    """Return each symbol's first monthly bar: columns ``symbol``, ``first_date``."""
+    frames = [m[["symbol", "date"]] for m in monthly if not m.empty]
+    if not frames:
+        return pd.DataFrame(
+            {
+                "symbol": pd.Series(dtype="string"),
+                "first_date": pd.Series(dtype="datetime64[ns]"),
+            }
+        )
+    first: pd.Series = pd.concat(frames).groupby("symbol")["date"].min()
+    return pd.DataFrame(
+        {
+            "symbol": pd.Series(first.index.astype(str), dtype="string"),
+            "first_date": first.to_numpy(),
+        }
+    )
+
+
+def ticker_ciks(as_of: date, *, storage: Storage, client: ApiClient) -> pd.DataFrame:
+    """Return SEC's current tickers and CIKs (``parse_ticker_ciks``), snapshotted on ``as_of``."""
+    content = fetch_snapshot(
+        EdgarTickers(client), "company_tickers", as_of, storage.snapshots
+    )
+    return parse_ticker_ciks(content)
+
+
+def update_constituents(  # noqa: PLR0913  one keyword per input of the update
+    as_of: date,
+    *,
+    storage: Storage,
+    provider: WikipediaPage,
+    index: str,
+    pages: tuple[str, str],
+    ticker_ciks: pd.DataFrame | None = None,
 ) -> UpdateResult:
-    """Fetch the S&P 500 members and index changes and write their tables.
+    """Fetch one index's members and changes and write their tables.
+
+    Parameters
+    ----------
+    as_of : date
+        The update date.
+    storage : Storage
+        Snapshot and table roots.
+    provider : WikipediaPage
+        The Wikipedia provider.
+    index : str
+        The index key (``sp500``), the folder of its tables.
+    pages : tuple[str, str]
+        The page titles of the members and of the changes (may be the same page).
+    ticker_ciks : pd.DataFrame, optional
+        ``parse_ticker_ciks`` output; fills the CIK of members whose page gives none,
+        matched on the symbol in SEC's form (``BRK.B`` as ``BRK-B``).
 
     Returns
     -------
     UpdateResult
-        Tables ``constituents`` and ``changes`` at ``<interim>/constituents/<as_of>/``.
+        Tables ``constituents`` and ``changes`` at
+        ``<interim>/constituents/<as_of>/<index>/``.
     """
     store = storage.snapshots
-    pages = (CONSTITUENTS_PAGE, CHANGES_PAGE)
     stored = [p for p in pages if store.latest_as_of(provider.name, p, as_of) == as_of]
+    members_page, changes_page = pages
     constituents = parse_constituents(
-        fetch_snapshot(provider, CONSTITUENTS_PAGE, as_of, store)
+        fetch_snapshot(provider, members_page, as_of, store)
     )
-    changes = parse_changes(fetch_snapshot(provider, CHANGES_PAGE, as_of, store))
-    folder = storage.folder("constituents", as_of)
+    if ticker_ciks is not None:
+        known = ticker_ciks.set_index("symbol")["cik"]
+        sec = constituents["symbol"].str.replace(".", "-", regex=False)
+        constituents["cik"] = constituents["cik"].fillna(
+            pd.Series(known.reindex(sec).to_numpy(), index=constituents.index)
+        )
+    changes = parse_changes(fetch_snapshot(provider, changes_page, as_of, store))
+    folder = storage.folder("constituents", as_of) / index
     write_table(constituents, folder / "constituents.parquet")
     write_table(changes, folder / "changes.parquet")
     return UpdateResult(
         source="constituents",
-        fetched=tuple(p for p in pages if p not in stored),
-        reused=tuple(stored),
+        fetched=tuple(p for p in dict.fromkeys(pages) if p not in stored),
+        reused=tuple(dict.fromkeys(stored)),
         tables={"constituents": len(constituents), "changes": len(changes)},
         folder=folder,
     )

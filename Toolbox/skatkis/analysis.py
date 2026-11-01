@@ -12,8 +12,9 @@ formatting per source, are in ``market_data.market_analysis``, which calls these
 
 Owns
 ----
-The plot layouts for series over time, coverage, normalised growth, scatter checks,
-grouped bars, two series on two axes and lag profiles; the lagged correlation.
+The plot layouts for series over time, coverage, value heat maps, small multiples,
+normalised growth, scatter checks, grouped bars, two series on two axes and lag
+profiles; the lagged correlation.
 
 Must not
 --------
@@ -27,6 +28,10 @@ plot_series(df, *, x, y, group, ...)
     A value over time, one line (or marker series) per group.
 plot_coverage(df, *, row, column, ...)
     A heat map of the number of observations per row and column, showing gaps.
+plot_heatmap(df, *, row, column, value, diverging, ...)
+    A heat map of a value summed per row and column, red to green around 0 if diverging.
+plot_small_multiples(df, *, x, y, panel, points, ...)
+    A value over time in one small panel per group, with marked points.
 plot_normalised(df, *, x, y, group, highlight, ...)
     Growth of one unit per group from their first common date.
 plot_scatter(df, *, x, y, group, diagonal, ...)
@@ -48,6 +53,8 @@ plot_lag_profile(df, *, lag, value, group, ...)
     A statistic per lag, one line per group, with the zero lag marked.
 lagged_correlation(a, b, lags)
     Correlation of ``a`` with ``b`` shifted by each lag.
+rank_correlation(a, b)
+    Spearman's rank correlation of two series.
 
 Computes
 --------
@@ -58,6 +65,9 @@ relative growth, relative performance : plot_relative
     from the first date the two have a value; above 1 the group did better.
 median and percentile band, cross-sectional spread : plot_spread
     Per date (and group), the median and the chosen quantiles of the value across rows.
+rank correlation, Spearman correlation, information coefficient : rank_correlation
+    Pearson's correlation of the average ranks of ``a`` and ``b`` (ties share a rank),
+    over the positions where both exist.
 lagged correlation, cross-correlation, lead-lag : lagged_correlation
     For each lag k, the Pearson correlation of a(t) with b(t + k) over the positions where
     both exist; k > 0 means ``a`` leads ``b`` by k steps.
@@ -254,6 +264,193 @@ def plot_coverage(
     axes.set_title(title)
     figure.tight_layout()
     return figure
+
+
+def plot_heatmap(
+    df: pd.DataFrame,
+    *,
+    row: str,
+    column: str,
+    value: str,
+    title: str = "",
+    label: str = "",
+    diverging: bool = False,
+    row_order: Sequence[object] | None = None,
+) -> Figure:
+    """Plot the sum of ``value`` per ``row`` and ``column`` as an annotated heat map.
+
+    Empty cells (no row of ``df``) show as gaps. Columns are sorted; rows are sorted, or
+    in ``row_order`` (top to bottom) when given.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Long table; not modified.
+    row, column : str
+        Columns giving the heat map's rows and columns.
+    value : str
+        The column summed in each cell and written in it, rounded to a whole number.
+    title, label : str
+        Title and colour bar label.
+    diverging : bool
+        Red for negative, green for positive sums on one scale symmetric around 0, so
+        the colour's depth compares sizes across signs; viridis otherwise.
+    row_order : Sequence, optional
+        Row values from top to bottom.
+    """
+    sums = df.pivot_table(index=row, columns=column, values=value, aggfunc="sum")
+    sums = sums.sort_index().reindex(sorted(sums.columns), axis=1)
+    if row_order is not None:
+        sums = sums.reindex([r for r in row_order if r in sums.index])
+    values = sums.to_numpy(dtype=float)
+    figure = Figure(
+        figsize=(
+            max(6.0, 0.6 * len(sums.columns) + 3),
+            max(2.5, 0.3 * len(sums.index) + 1.5),
+        )
+    )
+    axes = figure.add_subplot()
+    bound = float(np.nanmax(np.abs(values))) if np.isfinite(values).any() else 1.0
+    image = axes.imshow(
+        values,
+        aspect="auto",
+        cmap="RdYlGn" if diverging else "viridis",
+        vmin=-bound if diverging else None,
+        vmax=bound if diverging else None,
+    )
+    axes.set_xticks(
+        range(len(sums.columns)), [_tick(c) for c in sums.columns], rotation=90
+    )
+    axes.set_yticks(range(len(sums.index)), [str(i) for i in sums.index])
+    for i, j in zip(*np.nonzero(np.isfinite(values)), strict=True):
+        axes.text(j, i, f"{values[i, j]:.0f}", ha="center", va="center", fontsize=6)
+    figure.colorbar(image, ax=axes, label=label)
+    axes.set_title(title)
+    figure.tight_layout()
+    return figure
+
+
+def plot_small_multiples(
+    df: pd.DataFrame,
+    *,
+    x: str,
+    y: str,
+    panel: str,
+    points: pd.DataFrame | None = None,
+    point_kind: str = "kind",
+    point_size: str | None = None,
+    point_styles: Mapping[str, tuple[str, str]] | None = None,
+    panel_order: Sequence[str] | None = None,
+    panel_titles: Mapping[str, str] | None = None,
+    columns: int = 4,
+    title: str = "",
+    ylabel: str = "",
+) -> Figure:
+    """Plot ``y`` against ``x`` in one small panel per ``panel`` value, with marked points.
+
+    Each panel has its own vertical scale. Panels run left to right and top to bottom,
+    in ``panel_order`` when given (values not in it are left out), sorted otherwise.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Long table of the lines; not modified.
+    x, y : str
+        Columns for the horizontal axis (usually a date) and the value.
+    panel : str
+        Column whose values get one panel each (e.g. a company).
+    points : pd.DataFrame, optional
+        Points drawn on the panels, with the columns ``x``, ``y``, ``panel`` and
+        ``point_kind``.
+    point_kind : str
+        Column of ``points`` naming each point's kind (e.g. buy or sell).
+    point_size : str, optional
+        Column of ``points`` that sets each marker's area, in proportion to the largest
+        value; one size otherwise.
+    point_styles : Mapping[str, tuple[str, str]], optional
+        Colour and marker per kind (``{"buy": ("green", "^")}``); kinds not listed are
+        drawn as black dots.
+    panel_order : Sequence[str], optional
+        The panels to draw, in order.
+    panel_titles : Mapping[str, str], optional
+        A title per panel value; the value itself otherwise.
+    columns : int
+        Panels per row.
+    title, ylabel : str
+        Figure title and the label of every panel's vertical axis.
+    """
+    present = {str(v) for v in df[panel].dropna()}
+    names = (
+        [str(n) for n in panel_order if str(n) in present]
+        if panel_order is not None
+        else sorted(present)
+    )
+    titles = dict(panel_titles or {})
+    rows = max(1, -(-len(names) // columns))
+    figure = Figure(figsize=(2.6 * columns, 2.0 * rows + 0.6))
+    grid = figure.subplots(rows, columns, squeeze=False)
+    styles = dict(point_styles or {})
+    largest = (
+        float(points[point_size].abs().max())
+        if points is not None and point_size and not points.empty
+        else 0.0
+    )
+    for index, axes in enumerate(grid.flat):
+        if index >= len(names):
+            axes.set_visible(False)
+            continue
+        name = names[index]
+        line: pd.DataFrame = df[df[panel].astype(str) == name].sort_values(x)
+        axes.plot(line[x], line[y], color="tab:blue", lw=1.0)
+        if points is not None:
+            own: pd.DataFrame = points[points[panel].astype(str) == name]
+            for kind in sorted({str(v) for v in own[point_kind]}):
+                part: pd.DataFrame = own[own[point_kind].astype(str) == kind]
+                colour, marker = styles.get(kind, ("black", "o"))
+                area: pd.Series | float = (
+                    15 + 85 * part[point_size].abs() / largest
+                    if point_size and largest > 0
+                    else 30.0
+                )
+                axes.scatter(
+                    part[x],
+                    part[y],
+                    s=area,
+                    c=colour,
+                    marker=marker,
+                    edgecolors="black",
+                    linewidths=0.4,
+                    zorder=3,
+                    label=kind,
+                )
+        axes.set_title(titles.get(name, name), fontsize=9)
+        axes.set_ylabel(ylabel, fontsize=7)
+        axes.tick_params(labelsize=6)
+        axes.tick_params(axis="x", rotation=45)
+        axes.grid(alpha=0.3)
+    handles = [
+        grid.flat[0].scatter(
+            [], [], c=colour, marker=marker, edgecolors="black", linewidths=0.4
+        )
+        for colour, marker in styles.values()
+    ]
+    if handles:
+        figure.legend(
+            handles,
+            list(styles),
+            loc="upper right",
+            ncols=len(handles),
+            fontsize=8,
+            frameon=False,
+        )
+    figure.suptitle(title, fontsize=11)
+    figure.tight_layout()
+    return figure
+
+
+def _tick(value: object) -> str:
+    """Return a tick label: a date as ``YYYY-MM-DD``, anything else as text."""
+    return f"{value:%Y-%m-%d}" if isinstance(value, pd.Timestamp) else str(value)
 
 
 def plot_normalised(
@@ -740,6 +937,15 @@ def lagged_correlation(a: pd.Series, b: pd.Series, lags: range) -> pd.Series:
     """
     values = {k: a.corr(b.shift(-k), min_periods=3) for k in lags}
     return pd.Series(values, name="correlation", dtype="float64").rename_axis("lag")
+
+
+def rank_correlation(a: pd.Series, b: pd.Series) -> float:
+    """Return Spearman's rank correlation of ``a`` and ``b``.
+
+    Pearson's correlation of their average ranks (ties share a rank), aligned on the
+    index; NaN with fewer than two common values or when a series is constant.
+    """
+    return float(a.rank().corr(b.rank()))
 
 
 def _style_key(axes: Axes, names: Sequence[str]) -> None:

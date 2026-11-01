@@ -6,10 +6,12 @@ Annual fundamentals as known on a date: the first slice of the point-in-time pan
 ``annual_series`` gives, per company and field, the first-reported 10-K value of each
 fiscal year with its filing date (``market_data.clean``). ``annual_as_of`` then answers,
 for each date, what the company had filed by that date: the latest fiscal year (lag 0)
-and the years before it (lag 1, 2, ...). A value counts from its filing date, same-day
-filings included, so a date never sees a later filing or a restatement. Flows are annual
-figures and balance-sheet values are fiscal-year-end figures; trailing twelve months and
-latest-quarter values follow with the full panel (MD_202610_002).
+and the years before it (lag 1, 2, ...). Everything is decided from the filings made by
+the date, same-day filings included: which XBRL tag a field follows (the company's most
+recently used tag by then), the values and the fiscal years seen. A date never sees a
+later filing, a later tag choice or a restatement. Flows are annual figures and
+balance-sheet values are fiscal-year-end figures; trailing twelve months and
+latest-quarter values are not built yet.
 
 Owns
 ----
@@ -25,12 +27,12 @@ Public API
 ----------
 annual_series(facts, fields)
     First-reported annual values of several fields, in one long table.
-annual_as_of(series, dates, *, depth, ...)
+annual_as_of(facts, fields, dates, *, depth, tolerance_days, stale_days)
     Per date, the last ``depth`` fiscal years filed by that date, with their lag.
 
 Dependency rule
 ---------------
-pandas and ``market_data.clean``.
+pandas, ``skatkis.financial_logic`` and ``market_data.clean``.
 """
 
 from collections.abc import Sequence
@@ -39,10 +41,8 @@ import numpy as np
 import pandas as pd
 
 from Toolbox.market_data.clean import annual_first_reported, select_tags
+from Toolbox.skatkis.financial_logic import DAYS_PER_YEAR
 
-DAYS_PER_YEAR = 365.25
-YEAR_TOLERANCE_DAYS = 45
-STALE_DAYS = 550
 AS_OF_COLUMNS = ["cik", "field", "date", "lag", "period_end", "filed", "value"]
 
 
@@ -70,20 +70,23 @@ def annual_series(facts: pd.DataFrame, fields: Sequence[str]) -> pd.DataFrame:
     return pd.concat(frames, ignore_index=True)[columns].astype({"field": "string"})
 
 
-def annual_as_of(
-    series: pd.DataFrame,
+def annual_as_of(  # noqa: PLR0913  one keyword per setting of the alignment
+    facts: pd.DataFrame,
+    fields: Sequence[str],
     dates: Sequence[pd.Timestamp],
     *,
     depth: int,
-    tolerance_days: int = YEAR_TOLERANCE_DAYS,
-    stale_days: int = STALE_DAYS,
+    tolerance_days: int,
+    stale_days: int,
 ) -> pd.DataFrame:
     """Return, per date, the last ``depth`` fiscal years each company had filed by then.
 
     Parameters
     ----------
-    series : pd.DataFrame
-        ``annual_series`` output; not modified.
+    facts : pd.DataFrame
+        The ``facts`` table; not modified.
+    fields : Sequence[str]
+        Canonical fields (``tag_map.TAG_MAP``).
     dates : Sequence[pd.Timestamp]
         The dates to align on (rebalance dates).
     depth : int
@@ -101,18 +104,19 @@ def annual_as_of(
 
     Notes
     -----
-    A value is seen on date t when filed <= t. The history is cut at the first gap: lag k
-    is kept only if its period end lies within ``tolerance_days`` of k years before
-    lag 0's and every lag before it was kept, so a missing fiscal year shortens the
-    history instead of shifting older years into its place. A company whose latest
-    fiscal year ended more than ``stale_days`` before t has no row on t.
+    On date t only facts with filed <= t are used, also to choose each field's tag
+    (``annual_series`` on those facts). The history is cut at the first gap: lag k is
+    kept only if its period end lies within ``tolerance_days`` of k years before lag 0's
+    and every lag before it was kept, so a missing fiscal year shortens the history
+    instead of shifting older years into its place. A company whose latest fiscal year
+    ended more than ``stale_days`` before t has no row on t.
     """
+    own = facts[facts["field"].isin(list(fields))]
     frames: list[pd.DataFrame] = []
     keys = ["cik", "field"]
     for day in dates:
-        known = series[series["filed"] <= day].sort_values(
-            [*keys, "period_end"], ascending=[True, True, False]
-        )
+        series = annual_series(own[own["filed"] <= day], fields)
+        known = series.sort_values([*keys, "period_end"], ascending=[True, True, False])
         lag = known.groupby(keys).cumcount()
         known = known.assign(lag=lag.to_numpy())[lag.to_numpy() < depth]
         latest = known.groupby(keys)["period_end"].transform("max")

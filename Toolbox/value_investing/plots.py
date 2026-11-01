@@ -23,24 +23,24 @@ score_spread(table)
 rule_rates(table, pass_columns, *, evaluable)
     Per rule, the share of companies passing (or evaluable) over time.
 sample_paths(paths, group)
-    Score and growth relative to ``^SP500TR`` of the sampled companies.
+    Score and growth relative to the benchmark of the sampled companies.
 sample_signal(paths, group)
-    Score times growth relative to ``^SP500TR`` of the sampled companies.
-wallet_paths(wallet_table, *, horizon)
-    Growth of the chained buy wallet, the sold stocks and ``^SP500TR``.
+    Score times growth relative to the benchmark of the sampled companies.
+wallet_paths(wallet_table, *, horizon, benchmark)
+    Growth of the chained buy wallet, the sold stocks and the benchmark.
 horizon_profile(summary, *, y, ylabel, title, threshold)
     A statistic per holding horizon, one line per side and period.
 yearly_excess(wallet_table, *, horizon)
     Excess return per decision year and side.
 correlation_curve(curve)
     Mean rank correlation of score and forward excess return per horizon.
-model_paths(paths)
-    Growth of 1 USD per model, chained over the yearly decisions, and ``^SP500TR``.
+model_paths(paths, *, benchmark)
+    Growth of 1 USD per model, chained over the yearly decisions, and the benchmark.
 rule_weights(weights)
     Each rule's learned weight in ``score_ic`` over time.
-balance(balance_table, *, title, others)
-    The wallet's balance and the same money in ``^SP500TR`` and other comparisons.
-held_value(paths, scenario)
+balance(balance_table, *, title, others, benchmark)
+    The wallet's balance and the same money in the benchmark and other comparisons.
+held_value(paths, scenario, benchmark)
     Buy and hold: value over time of the wallet and the comparisons, and money put in.
 yearly_purchases(yearly, compare)
     Buy and hold: what each year's purchase is worth today, per holder.
@@ -50,8 +50,14 @@ peer_profile(profile, label)
     Mean points per rule of a peer group against the picks.
 wallet_contents(contents, paths, scenario, compare)
     Each holding's value over time, and the comparisons per holding.
+pick_prices(prices, trades, scenario, years, *, page, ends)
+    Each traded company's price with the wallet's buys and sales marked, best first.
+next_prices(prices, trades, next_picks, years)
+    Each next pick's price in one row, earlier buys and the potential buy marked.
+trade_amounts(trades, scenario)
+    USD bought and sold per company and decision date, as a heat map.
 rule_profile(profile, names)
-    Mean points per rule of the picks that beat the S&P 500 and of those that did not.
+    Mean points per rule of the picks that beat the index and of those that did not.
 score_against_return(returns)
     Mean next-quarter excess return per score.
 information_coefficient(ic)
@@ -59,7 +65,7 @@ information_coefficient(ic)
 
 Dependency rule
 ---------------
-numpy, pandas, matplotlib and ``skatkis.analysis``.
+numpy, pandas, matplotlib, ``skatkis.analysis`` and ``skatkis.financial_logic``.
 """
 
 # matplotlib annotates its plotting methods with untyped **kwargs, which strict pyright
@@ -74,20 +80,23 @@ from matplotlib.figure import Figure
 
 from Toolbox.skatkis.analysis import (
     plot_bars,
+    plot_heatmap,
     plot_pair_series,
     plot_scatter,
     plot_series,
+    plot_small_multiples,
     plot_spread_pair,
 )
+from Toolbox.skatkis.financial_logic import holding_return
 
-# Benchmarks are drawn thick and black so they stand out (user, 2026-10-31): the S&P 500
-# dashed, Berkshire Hathaway dash-dot, also when divided per holding.
-REFERENCES = {
-    "^SP500TR": "--",
-    "^SP500TR per holding": "--",
-    "BRK-B": "-.",
-    "BRK-B per holding": "-.",
-}
+# Benchmarks are drawn thick and black so they stand out: the index's
+# benchmark dashed, Berkshire Hathaway dash-dot, also when divided per holding.
+STRATEGY_STYLES = {"BRK-B": "-.", "BRK-B per holding": "-."}
+
+
+def _references(benchmark: str) -> dict[str, str]:
+    """Return the line style of each benchmark: the index's dashed, Berkshire dash-dot."""
+    return {benchmark: "--", f"{benchmark} per holding": "--", **STRATEGY_STYLES}
 
 
 def score_spread(table: pd.DataFrame) -> Figure:
@@ -97,7 +106,7 @@ def score_spread(table: pd.DataFrame) -> Figure:
         x="date",
         left="score",
         right="n_available",
-        title="Buyability score across the S&P 500 (ex Financials, Real Estate)",
+        title="Buyability score across the index (ex Financials, Real Estate)",
         left_label="Score (share of evaluable rules passed)",
         right_label="Rules evaluable",
     )
@@ -135,7 +144,7 @@ def rule_rates(
 
 
 def sample_paths(paths: pd.DataFrame, group: str) -> Figure:
-    """Plot score (solid) and growth relative to ``^SP500TR`` (dashed) per company."""
+    """Plot score (solid) and growth relative to the benchmark (dashed) per company."""
     own = paths[paths["group"] == group]
     return plot_pair_series(
         own,
@@ -143,23 +152,23 @@ def sample_paths(paths: pd.DataFrame, group: str) -> Figure:
         left="score",
         right="relative_growth",
         group="symbol",
-        title=f"The ten {group}-scoring companies: score and growth over ^SP500TR",
+        title=f"The ten {group}-scoring companies: score and growth over the benchmark",
         left_label="Score (share passed)",
-        right_label="Growth relative to ^SP500TR",
+        right_label="Growth relative to the benchmark",
         log_right=True,
     )
 
 
 def sample_signal(paths: pd.DataFrame, group: str) -> Figure:
-    """Plot score * growth relative to ``^SP500TR`` since 2016, one line per company."""
+    """Plot score * growth relative to the benchmark since 2016, one line per company."""
     own = paths[paths["group"] == group]
     return plot_series(
         own,
         x="date",
         y="signal",
         group="symbol",
-        title=f"The ten {group}-scoring companies: score * growth over ^SP500TR",
-        ylabel="Score * growth relative to ^SP500TR",
+        title=f"The ten {group}-scoring companies: score * growth over the benchmark",
+        ylabel="Score * growth relative to the benchmark",
     )
 
 
@@ -203,8 +212,8 @@ def information_coefficient(ic: pd.DataFrame) -> Figure:
     )
 
 
-def wallet_paths(wallet_table: pd.DataFrame, *, horizon: int) -> Figure:
-    """Plot growth of 1 USD: the chained buy wallet, the sold stocks and ``^SP500TR``."""
+def wallet_paths(wallet_table: pd.DataFrame, *, horizon: int, benchmark: str) -> Figure:
+    """Plot growth of 1 USD: the chained buy wallet, the sold stocks and the benchmark."""
     own = wallet_table[wallet_table["horizon_months"] == horizon].sort_values(
         "decision_date"
     )
@@ -212,7 +221,7 @@ def wallet_paths(wallet_table: pd.DataFrame, *, horizon: int) -> Figure:
     series = {
         "buy wallet (score >= threshold)": own[own["side"] == "buy"]["stock_return"],
         "sold stocks (score <= threshold)": own[own["side"] == "sell"]["stock_return"],
-        "^SP500TR": own[own["side"] == "buy"]["benchmark_return"],
+        benchmark: own[own["side"] == "buy"]["benchmark_return"],
     }
     for name, returns in series.items():
         part = own.loc[returns.index]
@@ -226,7 +235,7 @@ def wallet_paths(wallet_table: pd.DataFrame, *, horizon: int) -> Figure:
         x="date",
         y="growth",
         group="series",
-        references=REFERENCES,
+        references=_references(benchmark),
         markers=True,
         log=True,
         title=f"Growth of 1 USD, re-chosen each January, held {horizon} months",
@@ -280,32 +289,32 @@ def correlation_curve(curve: pd.DataFrame) -> Figure:
     )
 
 
-def model_paths(paths: Mapping[str, pd.DataFrame]) -> Figure:
-    """Plot growth of 1 USD per model and ``^SP500TR``, chained over the decisions.
+def model_paths(paths: Mapping[str, pd.DataFrame], *, benchmark: str) -> Figure:
+    """Plot growth of 1 USD per model and the benchmark, chained over the decisions.
 
     Each path has ``decision_date``, ``end_date``, ``wallet_return`` and
     ``benchmark_return``, one row per yearly decision.
     """
     frames: list[pd.DataFrame] = []
-    benchmark: pd.DataFrame | None = None
+    market_path: pd.DataFrame | None = None
     for name, path in paths.items():
         own = path.sort_values("decision_date")
         dates = [own["decision_date"].iloc[0], *own["end_date"]]
         growth = [1.0, *(1 + own["wallet_return"]).cumprod()]
         frames.append(pd.DataFrame({"date": dates, "growth": growth, "model": name}))
-        if benchmark is None:
+        if market_path is None:
             market = [1.0, *(1 + own["benchmark_return"]).cumprod()]
-            benchmark = pd.DataFrame(
-                {"date": dates, "growth": market, "model": "^SP500TR"}
+            market_path = pd.DataFrame(
+                {"date": dates, "growth": market, "model": benchmark}
             )
-    if benchmark is not None:
-        frames.append(benchmark)
+    if market_path is not None:
+        frames.append(market_path)
     return plot_series(
         pd.concat(frames, ignore_index=True),
         x="date",
         y="growth",
         group="model",
-        references=REFERENCES,
+        references=_references(benchmark),
         markers=True,
         log=True,
         title="Growth of 1 USD per model, decided each January, held 12 months",
@@ -329,9 +338,13 @@ def rule_weights(weights: pd.DataFrame) -> Figure:
 
 
 def balance(
-    balance_table: pd.DataFrame, *, title: str, others: Mapping[str, str]
+    balance_table: pd.DataFrame,
+    *,
+    title: str,
+    others: Mapping[str, str],
+    benchmark: str,
 ) -> Figure:
-    """Plot the wallet's balance, ``^SP500TR``'s and each comparison's, in USD.
+    """Plot the wallet's balance, the benchmark's and each comparison's, in USD.
 
     ``others`` maps a comparison's label (``BRK-B``) to its column prefix (``brk_b``).
     """
@@ -339,7 +352,7 @@ def balance(
     first = own.iloc[0]
     series = [
         ("value wallet", "start_usd", "end_usd"),
-        ("^SP500TR", "benchmark_start_usd", "benchmark_end_usd"),
+        (benchmark, "benchmark_start_usd", "benchmark_end_usd"),
         *((label, f"{p}_start_usd", f"{p}_end_usd") for label, p in others.items()),
     ]
     frames = [
@@ -357,14 +370,14 @@ def balance(
         x="date",
         y="usd",
         group="wallet",
-        references=REFERENCES,
+        references=_references(benchmark),
         markers=True,
         title=title,
         ylabel="Balance, USD",
     )
 
 
-def held_value(paths: pd.DataFrame, scenario: int) -> Figure:
+def held_value(paths: pd.DataFrame, scenario: int, benchmark: str) -> Figure:
     """Plot the value of the wallet and each comparison for one start year, in USD."""
     years = pd.DatetimeIndex(paths["date"]).year
     mask = (paths["scenario"] == scenario).to_numpy() & (years >= scenario)
@@ -378,7 +391,7 @@ def held_value(paths: pd.DataFrame, scenario: int) -> Figure:
         x="date",
         y="value_usd",
         group="holder",
-        references=REFERENCES,
+        references=_references(benchmark),
         title=f"100 USD each January and July from {scenario}",
         ylabel="Value, USD",
         panel=True,
@@ -399,7 +412,7 @@ def yearly_purchases(yearly: pd.DataFrame, compare: Sequence[str]) -> Figure:
         x="bought",
         y="usd",
         group="holder",
-        references=REFERENCES,
+        references=_references(compare[0]),
         markers=True,
         log=True,
         title="What each 100 USD purchase is worth today",
@@ -414,7 +427,7 @@ def rule_profile(profile: pd.DataFrame, names: Mapping[str, str]) -> Figure:
     a short label.
     """
     gap = profile.pivot_table(index="rule", columns="group", values="points")
-    order = (gap["beat the S&P 500"] - gap["did not"]).sort_values(ascending=False)
+    order = (gap["beat the index"] - gap["did not"]).sort_values(ascending=False)
     ranked = profile.assign(
         rule=pd.Categorical(profile["rule"], categories=list(order.index), ordered=True)
     ).sort_values(["rule", "group"])
@@ -424,7 +437,7 @@ def rule_profile(profile: pd.DataFrame, names: Mapping[str, str]) -> Figure:
         x="rule",
         y="points",
         group="group",
-        title="Rule points of the picks that beat the S&P 500 and of those that did not,"
+        title="Rule points of the picks that beat the index and of those that did not,"
         " weighted by dollars",
         ylabel="Mean points (0 to 5), dollar-weighted",
     )
@@ -440,7 +453,7 @@ def weighting_check(check: pd.DataFrame) -> Figure:
         thresholds={"no gap": 0.0},
         title="Rule weight against how well the rule told winners from losers",
         xlabel="Mean weight on the picks' dates (1 - pass rate)",
-        ylabel="Points gap: picks that beat the S&P 500 less the others",
+        ylabel="Points gap: picks that beat the index less the others",
     )
 
 
@@ -449,6 +462,8 @@ def wallet_contents(
     paths: pd.DataFrame,
     scenario: int,
     compare: Sequence[str],
+    *,
+    limit: int,
 ) -> Figure:
     """Plot each holding's value over time and each comparison divided by the holdings.
 
@@ -461,7 +476,9 @@ def wallet_contents(
     scenario : int
         The start year shown.
     compare : Sequence[str]
-        The comparisons (``^SP500TR``, ``BRK-B``).
+        The comparisons: the index's benchmark first, then ``BRK-B``.
+    limit : int
+        Most holdings drawn; with more, the ``limit`` worth most on the last date.
 
     Notes
     -----
@@ -471,6 +488,14 @@ def wallet_contents(
     """
     own = contents[(contents["scenario"] == scenario) & (contents["symbol"] != "cash")]
     held = own.groupby("date")["symbol"].nunique()
+    title = f"Wallet with sells from {scenario}: value of each holding"
+    if own["symbol"].nunique() > limit:
+        latest = pd.DataFrame(own).sort_values("date").groupby("symbol")["value_usd"]
+        kept = [str(s) for s in latest.last().nlargest(limit).index]
+        own = own[own["symbol"].isin(kept)]
+        title = (
+            f"Wallet with sells from {scenario}: the {limit} holdings worth most today"
+        )
     frames = [own.assign(kind="holding")[["date", "symbol", "value_usd", "kind"]]]
     for symbol in compare:
         path = paths[(paths["scenario"] == scenario) & (paths["holder"] == symbol)]
@@ -491,14 +516,14 @@ def wallet_contents(
         x="date",
         y="value_usd",
         group="symbol",
-        references=REFERENCES,
+        references=_references(compare[0]),
         style="kind",
         style_order=["holding", "benchmark per holding"],
         log=True,
-        title=f"Wallet with sells from {scenario}: value of each holding",
+        title=title,
         ylabel="Value, USD (log scale)",
     )
-    # Mark where each company enters the wallet, in its line's colour (user, 2026-10-31).
+    # Mark where each company enters the wallet, in its line's colour.
     first = own.sort_values("date").drop_duplicates("symbol")
     entries = {
         str(symbol): (pd.Timestamp(day), float(value))
@@ -521,6 +546,156 @@ def wallet_contents(
                 zorder=4,
             )
     return figure
+
+
+def pick_prices(  # noqa: PLR0913  one keyword per layout setting
+    prices: pd.DataFrame,
+    trades: pd.DataFrame,
+    scenario: int,
+    years: int,
+    *,
+    page: int,
+    ends: int,
+) -> Figure:
+    """Plot each company's price with the wallet's buys (green) and sales (red) on it.
+
+    Panels run from the best to the worst price change over the window, each titled
+    with its symbol and that change.
+
+    Parameters
+    ----------
+    prices : pd.DataFrame
+        Columns ``symbol``, ``date``, ``close`` (split-adjusted, USD) of the companies
+        shown, over the window.
+    trades : pd.DataFrame
+        ``Managed.trades`` of the scenario: ``decision_date``, ``symbol``, ``action``,
+        ``usd``.
+    scenario : int
+        The start year of the investor whose trades are marked.
+    years : int
+        The window's length, for the title.
+    page : int
+        Most panels shown; with more companies only the ``ends`` best and the ``ends``
+        worst are drawn.
+    ends : int
+        Companies kept at each end when the panels do not fit on a page.
+
+    Notes
+    -----
+    A trade is drawn at the price on its decision date, its marker's area in proportion
+    to the USD traded; a trade without a price that day is not drawn.
+    """
+    points = trades.merge(
+        prices,
+        left_on=["symbol", "decision_date"],
+        right_on=["symbol", "date"],
+    )
+    change = _price_change(prices)
+    title = (
+        f"Price over {years} years of the companies traded by the investor "
+        f"from {scenario} and the next picks"
+    )
+    if len(change) > page:
+        change = pd.concat([change.head(ends), change.tail(ends)])
+        title = (
+            f"Price over {years} years: the {ends} best and {ends} worst of the "
+            f"companies traded by the investor from {scenario} and the next picks"
+        )
+    return plot_small_multiples(
+        prices,
+        x="date",
+        y="close",
+        panel="symbol",
+        points=points,
+        point_kind="action",
+        point_size="usd",
+        point_styles={"buy": ("tab:green", "^"), "sell": ("tab:red", "v")},
+        panel_order=[str(s) for s in change.index],
+        panel_titles={str(s): f"{s}  {c:+.0%}" for s, c in change.items()},
+        title=title,
+        ylabel="USD",
+    )
+
+
+def next_prices(
+    prices: pd.DataFrame, trades: pd.DataFrame, next_picks: pd.DataFrame, years: int
+) -> Figure:
+    """Plot each next pick's price in one row: earlier buys green, the next buy orange.
+
+    Parameters
+    ----------
+    prices : pd.DataFrame
+        Columns ``symbol``, ``date``, ``close`` (split-adjusted, USD) over the window.
+    trades : pd.DataFrame
+        ``Managed.trades`` of one investor; its buys of the picks are marked.
+    next_picks : pd.DataFrame
+        The next picks (``symbol``), in the order shown.
+    years : int
+        The window's length, for the title.
+
+    Notes
+    -----
+    The potential buy is marked at the last price, the latest known before the next
+    decision. The tiles have the same size, one per pick, side by side.
+    """
+    symbols = [str(s) for s in next_picks["symbol"]]
+    own = prices[prices["symbol"].isin(symbols)]
+    buys = trades[(trades["action"] == "buy") & trades["symbol"].isin(symbols)]
+    earlier = buys.merge(
+        own, left_on=["symbol", "decision_date"], right_on=["symbol", "date"]
+    ).assign(kind="earlier buy")
+    last = own.sort_values("date").groupby("symbol", as_index=False).last()
+    points = pd.concat(
+        [
+            earlier[["symbol", "date", "close", "kind"]],
+            last[["symbol", "date", "close"]].assign(kind="potential buy"),
+        ],
+        ignore_index=True,
+    )
+    change = _price_change(own)
+    return plot_small_multiples(
+        own,
+        x="date",
+        y="close",
+        panel="symbol",
+        points=points,
+        point_kind="kind",
+        point_styles={
+            "earlier buy": ("tab:green", "^"),
+            "potential buy": ("tab:orange", "o"),
+        },
+        panel_order=symbols,
+        panel_titles={str(s): f"{s}  {c:+.0%}" for s, c in change.items()},
+        columns=max(1, len(symbols)),
+        title=f"The next picks: price over {years} years",
+        ylabel="USD",
+    )
+
+
+def _price_change(prices: pd.DataFrame) -> pd.Series:
+    """Return each symbol's price change over the window, best first."""
+    ends = prices.sort_values("date").groupby("symbol")["close"]
+    return holding_return(ends.first(), ends.last()).sort_values(ascending=False)
+
+
+def trade_amounts(trades: pd.DataFrame, scenario: int) -> Figure:
+    """Plot the USD bought (green) and sold (red) per company and decision date.
+
+    ``trades`` is ``Managed.trades`` of the scenario; a sale counts as negative USD.
+    """
+    signed = trades.assign(
+        usd=trades["usd"].where(trades["action"] == "buy", -trades["usd"]),
+        decision_date=pd.to_datetime(trades["decision_date"]),
+    )
+    return plot_heatmap(
+        signed,
+        row="symbol",
+        column="decision_date",
+        value="usd",
+        diverging=True,
+        title=f"USD bought and sold by the investor from {scenario}",
+        label="USD bought (+) and sold (-)",
+    )
 
 
 def peer_profile(profile: pd.DataFrame, label: str) -> Figure:

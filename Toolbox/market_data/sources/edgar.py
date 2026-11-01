@@ -31,6 +31,10 @@ latest_periodic_filing(content)
     The date of the latest 10-K or 10-Q in a ``submissions`` payload.
 parse_tickers(content)
     The company's current ticker symbols from a ``submissions`` payload.
+EdgarTickers(client)
+    The ``DataProvider`` for SEC's list of current tickers and their CIKs.
+parse_ticker_ciks(content)
+    That list as a table: ``symbol``, ``cik``.
 parse_companyfacts(content, tag_map)
     Raw JSON to one row per reported value of a mapped tag.
 load_companyfacts(ciks, *, provider, store, as_of, tag_map)
@@ -58,6 +62,7 @@ from Toolbox.skatkis.io.snapshots import SnapshotStore, fetch_snapshot
 
 COMPANYFACTS_URL = "https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json"
 SUBMISSIONS_URL = "https://data.sec.gov/submissions/CIK{cik}.json"
+TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
 PERIODIC_FORMS = frozenset({"10-K", "10-Q", "10-K/A", "10-Q/A"})
 SEC_MAX_REQUESTS_PER_SECOND = 10.0
 CIK_DIGITS = 10
@@ -227,6 +232,46 @@ def parse_tickers(content: bytes) -> list[str]:
         return [str(t) for t in cast(list[object], json.loads(content)["tickers"])]
     except (json.JSONDecodeError, KeyError, TypeError) as error:
         raise EdgarParseError(f"submissions payload lacks tickers ({error})") from error
+
+
+@dataclass(frozen=True)
+class EdgarTickers(DataProvider):
+    """``DataProvider`` for SEC's list of current tickers; the query names the snapshot."""
+
+    client: ApiClient
+    url: str = TICKERS_URL
+
+    @property
+    def name(self) -> str:
+        """Snapshot folder name: ``edgar_tickers``."""
+        return "edgar_tickers"
+
+    def fetch(self, query: str, as_of: date) -> RawPayload:
+        """Return ``company_tickers.json``; SEC serves only today's list."""
+        return RawPayload(content=self.client.get(self.url), extension="json")
+
+
+def parse_ticker_ciks(content: bytes) -> pd.DataFrame:
+    """Return SEC's current tickers with their CIKs.
+
+    Returns
+    -------
+    pd.DataFrame
+        Columns ``symbol`` (string, as SEC lists it: ``BRK-B``) and ``cik`` (Int64);
+        a ticker listed twice keeps its first CIK.
+
+    Raises
+    ------
+    EdgarParseError
+        If the payload is not the ticker list.
+    """
+    try:
+        entries = cast(dict[str, dict[str, Any]], json.loads(content)).values()
+        rows = [(str(e["ticker"]), int(e["cik_str"])) for e in entries]
+    except (json.JSONDecodeError, KeyError, TypeError, AttributeError) as error:
+        raise EdgarParseError(f"not SEC's ticker list ({error})") from error
+    frame = pd.DataFrame(rows, columns=["symbol", "cik"]).drop_duplicates("symbol")
+    return frame.astype({"symbol": "string", "cik": "Int64"}).reset_index(drop=True)
 
 
 def parse_companyfacts(

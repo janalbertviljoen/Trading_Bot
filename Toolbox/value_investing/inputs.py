@@ -13,8 +13,9 @@ layers compute from it.
 
 Owns
 ----
-The rebalance calendar, the rule inputs per company and date, and the derived total
-liabilities.
+The rebalance calendar, the rule inputs per company and date, the derived total
+liabilities, which rows a company was already an index member on, and the forward
+return over a window.
 
 Must not
 --------
@@ -26,27 +27,43 @@ Public API
 ----------
 rebalance_dates(start, end, months)
     The third Friday of each rebalance month between two dates.
-Tables(facts, prices, dividends, splits, universe)
+Tables(facts, prices, dividends, splits, listings, universe)
     The stored tables the inputs are built from.
 RuleInputs
     Price, annual history and dividends per company and rebalance date.
-rule_inputs(tables, dates, *, depth)
+rule_inputs(tables, dates, *, depth, tolerance_days, stale_days)
     Build ``RuleInputs`` from the stored tables.
 price_on(prices, symbols, dates, *, column)
     The last price on or before each date, per symbol.
+index_universe(constituents, changes, *, funds, excluded)
+    The companies scored: an index's members with their CIK, sector and join date.
+members_on_date(index, universe)
+    Which (company, date) rows fall on or after the company joined the index.
+window_returns(prices, index, *, benchmark, months)
+    Each company's total return over the next months, the benchmark's and the excess.
+
+Computes
+--------
+forward return, forward excess return over a window : window_returns
+    r = P(s + m) / P(s) - 1 and b likewise for the benchmark (``adj_close`` levels, m
+    months, ``skatkis.financial_logic.holding_return``); excess = r - b, missing when
+    the window ends after the benchmark's last price.
 
 Dependency rule
 ---------------
-pandas and ``market_data``.
+pandas, ``market_data`` and ``skatkis.financial_logic``.
 """
 
-from collections.abc import Sequence
+from collections.abc import Collection, Mapping, Sequence
 from dataclasses import dataclass
 
 import pandas as pd
 
-from Toolbox.market_data.fundamentals import annual_as_of, annual_series
+from Toolbox.market_data.fundamentals import annual_as_of
+from Toolbox.market_data.gics import fill_date_added, gics_map
 from Toolbox.market_data.metrics import split_factors
+from Toolbox.market_data.sources.prices import yahoo_symbol
+from Toolbox.skatkis.financial_logic import holding_return
 
 PER_SHARE_FIELDS = ("eps_diluted",)
 SHARE_FIELDS = ("shares_outstanding",)
@@ -63,6 +80,8 @@ FIELDS = (
     "intangible_assets",
     "shares_outstanding",
 )
+# Data alignment, not a rule threshold: a price older than this on a date counts as
+# missing, so a company that stopped trading has no price there.
 PRICE_TOLERANCE_DAYS = 7
 FRIDAY = 4
 
@@ -99,12 +118,16 @@ class RuleInputs:
         Columns ``symbol``, ``ex_date``, ``amount`` (USD per share, split-adjusted).
     dates : tuple[pd.Timestamp, ...]
         The rebalance dates.
+    listed : pd.Series
+        The first date of each company's price history, indexed by ``symbol``; a
+        history before the price source's start shows that start.
     """
 
     price: pd.Series
     annual: pd.DataFrame
     dividends: pd.DataFrame
     dates: tuple[pd.Timestamp, ...]
+    listed: pd.Series
 
     @property
     def index(self) -> pd.MultiIndex:
@@ -138,20 +161,28 @@ class Tables:
         Columns ``symbol``, ``ex_date``, ``amount``.
     splits : pd.DataFrame
         Columns ``symbol``, ``date``, ``numerator``, ``denominator``.
+    listings : pd.DataFrame
+        Columns ``symbol``, ``first_date``: the start of each price history.
     universe : pd.DataFrame
         Columns ``symbol``, ``cik``, ``gics_sector`` and ``date_added`` (when the
-        company joined the S&P 500): the companies scored.
+        company joined the index): the companies scored.
     """
 
     facts: pd.DataFrame
     prices: pd.DataFrame
     dividends: pd.DataFrame
     splits: pd.DataFrame
+    listings: pd.DataFrame
     universe: pd.DataFrame
 
 
 def rule_inputs(
-    tables: Tables, dates: Sequence[pd.Timestamp], *, depth: int
+    tables: Tables,
+    dates: Sequence[pd.Timestamp],
+    *,
+    depth: int,
+    tolerance_days: int,
+    stale_days: int,
 ) -> RuleInputs:
     """Build the rule inputs for ``tables.universe`` on ``dates``.
 
@@ -163,6 +194,10 @@ def rule_inputs(
         Rebalance dates.
     depth : int
         Fiscal years of history kept (the longest rule window).
+    tolerance_days, stale_days : int
+        Passed to ``market_data.fundamentals.annual_as_of``: how far a fiscal year end
+        may lie from whole years before the latest, and the oldest the latest fiscal
+        year may be on a date.
 
     Returns
     -------
@@ -178,7 +213,14 @@ def rule_inputs(
     """
     ciks = tables.universe[["symbol", "cik"]].astype({"cik": "int64"})
     own_facts = tables.facts[tables.facts["cik"].isin(ciks["cik"])]
-    known = annual_as_of(annual_series(own_facts, FIELDS), dates, depth=depth)
+    known = annual_as_of(
+        own_facts,
+        FIELDS,
+        dates,
+        depth=depth,
+        tolerance_days=tolerance_days,
+        stale_days=stale_days,
+    )
     known = known.merge(ciks, on="cik")
     factor = split_factors(tables.splits, known, symbol="symbol", date="filed")
     per_share = known["field"].isin(PER_SHARE_FIELDS).to_numpy()
@@ -209,6 +251,9 @@ def rule_inputs(
         annual=annual.sort_index(axis=1),
         dividends=own_dividends[["symbol", "ex_date", "amount"]],
         dates=tuple(dates),
+        listed=tables.listings.set_index(tables.listings["symbol"].astype("string"))[
+            "first_date"
+        ],
     )
 
 
@@ -238,3 +283,105 @@ def price_on(
         tolerance=pd.Timedelta(days=PRICE_TOLERANCE_DAYS),
     ).dropna(subset=[column])
     return merged.set_index(["symbol", "date"])[column].sort_index()
+
+
+def window_returns(
+    prices: pd.DataFrame, index: pd.MultiIndex, *, benchmark: str, months: int
+) -> pd.DataFrame:
+    """Return each row's total return over the next ``months``, the benchmark's and the excess.
+
+    Parameters
+    ----------
+    prices : pd.DataFrame
+        Columns ``symbol``, ``date``, ``adj_close``, including ``benchmark``.
+    index : pd.MultiIndex
+        (``symbol``, ``date``) rows: the company and the window's start.
+    benchmark : str
+        Total-return benchmark symbol.
+    months : int
+        Length of the window.
+
+    Returns
+    -------
+    pd.DataFrame
+        On ``index``: ``end`` (the window's end date), ``own_return`` and
+        ``benchmark_return`` (fractions, missing where a level is missing) and
+        ``excess`` (their difference, also missing when the window ends after the
+        benchmark's last price).
+    """
+    frame = index.to_frame(index=False)
+    frame["end"] = frame["date"] + pd.DateOffset(months=months)
+    last = prices.loc[prices["symbol"] == benchmark, "date"].max()
+    days = sorted({*frame["date"], *frame["end"]})
+    symbols = pd.concat([frame["symbol"], pd.Series([benchmark])]).drop_duplicates()
+    levels = price_on(prices, symbols, days, column="adj_close")
+
+    def level(symbol: pd.Series, day: pd.Series) -> pd.Series:
+        keys = pd.MultiIndex.from_arrays([symbol.astype("string"), day])
+        return pd.Series(levels.reindex(keys).to_numpy(dtype=float), index=frame.index)
+
+    market = pd.Series(benchmark, index=frame.index)
+    own = holding_return(
+        level(frame["symbol"], frame["date"]), level(frame["symbol"], frame["end"])
+    )
+    index_return = holding_return(
+        level(market, frame["date"]), level(market, frame["end"])
+    )
+    excess = (own - index_return).where(frame["end"] <= last)
+    return pd.DataFrame(
+        {
+            "end": frame["end"].to_numpy(),
+            "own_return": own.to_numpy(),
+            "benchmark_return": index_return.to_numpy(),
+            "excess": excess.to_numpy(),
+        },
+        index=index,
+    )
+
+
+def members_on_date(index: pd.MultiIndex, universe: pd.DataFrame) -> pd.Series:
+    """Return which (``symbol``, ``date``) rows lie on or after the company joined the index.
+
+    ``universe`` has ``symbol`` and ``date_added``. A company without a ``date_added``
+    is never a member, so all its rows are False.
+    """
+    added = universe.set_index(universe["symbol"].astype("string"))["date_added"]
+    first = added.reindex(index.get_level_values("symbol")).to_numpy()
+    member = index.get_level_values("date") >= first
+    return pd.Series(member, index=index)
+
+
+def index_universe(
+    constituents: pd.DataFrame,
+    changes: pd.DataFrame,
+    *,
+    funds: Mapping[str, str],
+    excluded: Collection[str],
+) -> pd.DataFrame:
+    """Return the companies scored: an index's members with CIK, sector and join date.
+
+    Parameters
+    ----------
+    constituents, changes : pd.DataFrame
+        The index's members and changes (``market_data.sources.constituents``).
+    funds : Mapping[str, str]
+        GICS sector to its fund (``[benchmarks.sectors]``).
+    excluded : Collection[str]
+        GICS sectors left out (``[universe] excluded_sectors``).
+
+    Returns
+    -------
+    pd.DataFrame
+        ``market_data.gics.gics_map`` output with ``date_added``, missing join dates
+        taken from the changes (``market_data.gics.fill_date_added``).
+    """
+    members = fill_date_added(constituents, changes)
+    added = pd.DataFrame(
+        {
+            "symbol": [yahoo_symbol(str(s)) for s in members["symbol"]],
+            "date_added": members["date_added"].to_numpy(),
+        }
+    ).astype({"symbol": "string"})
+    return gics_map(members, funds=funds, excluded=excluded).merge(
+        added, on="symbol", how="left"
+    )

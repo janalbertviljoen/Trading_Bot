@@ -1,0 +1,32 @@
+# The indices the tools track (MD_202610_004): one universe and one value report each.
+# Members and changes come from Wikipedia (the tables with id="constituents" and
+# id="changes", on one page or two); members without a CIK on the page get it from SEC's
+# ticker list. The benchmark is a total-return series: Yahoo has no history for
+# ^SP400TR and ^SP600TR, so the S&P 400 and 600 use the iShares core funds, whose
+# adjusted close includes dividends (less a 0.05% yearly fee). benchmark_name and
+# membership are the report's wording for each; {record_start} is filled with the month
+# the index's list of changes starts.
+
+[sp500]
+label = "S&P 500"
+members_page = "List of S&P 500 companies"
+changes_page = "Historical components of the S&P 500"
+benchmark = "^SP500TR"
+benchmark_name = "the S&P 500 total-return index"
+membership = "Each company counts from the date it entered the index, as the index's list gives it."
+
+[sp400]
+label = "S&P MidCap 400"
+members_page = "List of S&P 400 companies"
+changes_page = "List of S&P 400 companies"
+benchmark = "IJH"
+benchmark_name = "the iShares Core S&P Mid-Cap fund (IJH), dividends reinvested, net of its 0.05% yearly fee"
+membership = "The index's list gives no entry dates: a company counts from its latest addition in the list of changes, or from the start of that list ({record_start}) when no addition is listed. The list holds selected changes only, so some companies count before they joined: a look-ahead that flatters the results."
+
+[sp600]
+label = "S&P SmallCap 600"
+members_page = "List of S&P 600 companies"
+changes_page = "List of S&P 600 companies"
+benchmark = "IJR"
+benchmark_name = "the iShares Core S&P Small-Cap fund (IJR), dividends reinvested, net of its 0.05% yearly fee"
+membership = "The index's list gives no entry dates: a company counts from its latest addition in the list of changes, or from the start of that list ({record_start}) when no addition is listed. The list holds selected changes only, so some companies count before they joined: a look-ahead that flatters the results."

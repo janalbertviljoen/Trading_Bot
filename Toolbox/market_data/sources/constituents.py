@@ -1,15 +1,17 @@
 """
 market_data/sources/constituents.py
 -----------------------------------
-S&P 500 membership from Wikipedia: the current members with their GICS classification,
+Index membership from Wikipedia: the current members with their GICS classification,
 and the history of additions and removals.
 
 The provider fetches a page's wikitext through the MediaWiki API with the central
-``ApiClient``; snapshots store the JSON as received. Two pages are used: "List of S&P 500
-companies" (the current members: symbol, GICS sector and sub-industry, date added, CIK)
-and "Historical components of the S&P 500" (each change: effective date, symbol added,
-symbol removed, reason). The CIK links a member to its EDGAR filings; the GICS sector is
-the grouping used for analysis.
+``ApiClient``; snapshots store the JSON as received. Per index (``config/indices.toml``)
+two tables are read: the members (``id="constituents"``: symbol, security, GICS sector
+and sub-industry, and where the page has them the date added and the CIK) and the
+changes (``id="changes"``: effective date, symbol added, symbol removed, reason), on
+one page or two. Member columns are found by their header, since the pages differ (the
+S&P 400 page has no CIK column, only an SEC link). The CIK links a member to its EDGAR
+filings; the GICS sector is the grouping used for analysis.
 
 Owns
 ----
@@ -28,7 +30,7 @@ wikipedia_client(*, max_requests_per_second, ...)
 WikipediaPage(client)
     The ``DataProvider`` for one page's wikitext; the query is the page title.
 parse_constituents(content)
-    The current members table.
+    The current members table, columns found by header.
 parse_changes(content)
     The additions and removals table.
 
@@ -49,11 +51,8 @@ from Toolbox.skatkis.io.api import ApiClient
 from Toolbox.skatkis.io.provider import DataProvider, RawPayload
 
 API_URL = "https://en.wikipedia.org/w/api.php"
-USER_AGENT = "trading-bot/0.1 (personal research; S&P 500 membership)"
-CONSTITUENTS_PAGE = "List of S&P 500 companies"
-CHANGES_PAGE = "Historical components of the S&P 500"
-CONSTITUENT_CELLS = 8
-CHANGE_CELLS = 7
+USER_AGENT = "trading-bot/0.1 (personal research; index membership)"
+CHANGE_CELLS = 6
 
 CONSTITUENT_COLUMNS: dict[str, str] = {
     "symbol": "string",
@@ -64,7 +63,8 @@ CONSTITUENT_COLUMNS: dict[str, str] = {
     "cik": "Int64",
 }
 """Current members: ``symbol`` as listed (``BRK.B``), GICS sector and sub-industry,
-the date the company joined the index (missing where not given) and its CIK."""
+the date the company joined the index (missing where the page does not give it) and its
+CIK (missing where the page gives none)."""
 
 CHANGE_COLUMNS: dict[str, str] = {
     "date": "datetime64[ns]",
@@ -128,7 +128,7 @@ class WikipediaPage(DataProvider):
 
 
 def parse_constituents(content: bytes) -> pd.DataFrame:
-    """Return the current members from the "List of S&P 500 companies" payload.
+    """Return the current members from an index's member list payload.
 
     Returns
     -------
@@ -138,21 +138,38 @@ def parse_constituents(content: bytes) -> pd.DataFrame:
     Raises
     ------
     ConstituentsParseError
-        If the payload has no table with ``id="constituents"``.
+        If the payload has no table with ``id="constituents"``, or the table lacks a
+        symbol, security or GICS column.
+
+    Notes
+    -----
+    ``date_added`` is missing when the page has no "Date added" column. The CIK comes
+    from the "CIK" column, else from the ``CIK=`` number in the "SEC filings" link;
+    a link that gives the ticker instead leaves it missing.
     """
+    wikitext = _wikitext(content)
+    header = _header(wikitext, "constituents")
+    needed = ("symbol", "security", "gics sector", "gics sub-industry")
+    missing = [name for name in needed if name not in header]
+    if missing:
+        raise ConstituentsParseError(f"members table lacks {', '.join(missing)}")
     rows = [
         cells
-        for cells in _table_rows(_wikitext(content), "constituents")
-        if len(cells) >= CONSTITUENT_CELLS
+        for cells in _table_rows(wikitext, "constituents")
+        if len(cells) >= len(header)
     ]
+
+    def cell(cells: list[str], name: str) -> str:
+        return cells[header[name]] if name in header else ""
+
     frame = pd.DataFrame(
         {
-            "symbol": [_symbol(c[0]) for c in rows],
-            "security": [_plain(c[1]) for c in rows],
-            "gics_sector": [_plain(c[2]) for c in rows],
-            "gics_sub_industry": [_plain(c[3]) for c in rows],
-            "date_added": [_date(c[5]) for c in rows],
-            "cik": [int(d) if (d := _plain(c[6])).isdigit() else None for c in rows],
+            "symbol": [_symbol(cell(c, "symbol")) for c in rows],
+            "security": [_plain(cell(c, "security")) for c in rows],
+            "gics_sector": [_plain(cell(c, "gics sector")) for c in rows],
+            "gics_sub_industry": [_plain(cell(c, "gics sub-industry")) for c in rows],
+            "date_added": [_date(cell(c, "date added")) for c in rows],
+            "cik": [_cik(cell(c, "cik"), cell(c, "sec filings")) for c in rows],
         }
     )
     frame = frame.astype(CONSTITUENT_COLUMNS)
@@ -160,13 +177,14 @@ def parse_constituents(content: bytes) -> pd.DataFrame:
 
 
 def parse_changes(content: bytes) -> pd.DataFrame:
-    """Return the index changes from the "Historical components of the S&P 500" payload.
+    """Return the index changes from the payload with the ``id="changes"`` table.
 
     Returns
     -------
     pd.DataFrame
-        Columns and dtypes of ``CHANGE_COLUMNS``, newest first as on the page. Rows
-        whose date cell spans several rows take the date of the row above.
+        Columns and dtypes of ``CHANGE_COLUMNS``, newest first as on the page. A row
+        whose first cell is not a date continues a date cell spanning several rows and
+        takes the date of the row above.
 
     Raises
     ------
@@ -177,9 +195,9 @@ def parse_changes(content: bytes) -> pd.DataFrame:
     previous_date: pd.Timestamp | None = None
     for row in _table_rows(_wikitext(content), "changes"):
         cells = row
-        if len(row) == CHANGE_CELLS - 1 and previous_date is not None:
+        if row and _date(row[0]) is None and previous_date is not None:
             cells = [previous_date.strftime("%B %d, %Y"), *row]
-        if len(cells) < CHANGE_CELLS - 1:
+        if len(cells) < CHANGE_CELLS:
             continue
         day = _date(cells[0])
         if day is None:
@@ -225,6 +243,30 @@ def _table_rows(wikitext: str, table_id: str) -> list[list[str]]:
             cells.extend(part for part in re.split(r"\|\|", line.lstrip("|")))
         rows.append([_drop_attributes(cell) for cell in cells])
     return rows
+
+
+def _header(wikitext: str, table_id: str) -> dict[str, int]:
+    """Return each header cell's lower-case text and its column position."""
+    start = wikitext.find(f'id="{table_id}"')
+    if start < 0:
+        raise ConstituentsParseError(f'no table with id="{table_id}"')
+    end = wikitext.find("\n|}", start)
+    for block in wikitext[start:end].split("\n|-")[1:]:
+        lines = [line for line in block.split("\n") if line.startswith("!")]
+        if lines:
+            cells = [
+                part for line in lines for part in re.split(r"!!", line.lstrip("!"))
+            ]
+            return {_plain(_drop_attributes(c)).lower(): i for i, c in enumerate(cells)}
+    return {}
+
+
+def _cik(column: str, link: str) -> int | None:
+    """Return the CIK from its own cell, else from the ``CIK=`` number of an SEC link."""
+    if (digits := _plain(column)).isdigit():
+        return int(digits)
+    match = re.search(r"CIK=0*(\d+)\b", link)
+    return int(match.group(1)) if match else None
 
 
 def _drop_attributes(cell: str) -> str:

@@ -4,8 +4,8 @@ value_investing/peers.py
 A peer group set against the picks: its score and rank, its rule points, and a wallet
 that buys it.
 
-The report compares the picks with a named group of companies, the Magnificent 7
-(user, 2026-10-31): where they rank on the score, which rules give them fewer points
+The report compares the picks with a named group of companies, the Magnificent 7:
+where they rank on the score, which rules give them fewer points
 than the picks, and what the same money would have become in them, bought on the same
 decision dates and held (``value_investing.holding.buy_and_hold``). A peer counts on a
 decision date only when it is in the universe with a score, so a company that joined

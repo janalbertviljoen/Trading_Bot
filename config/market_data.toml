@@ -63,6 +63,8 @@ strategies = ["BRK-B"]
 "Utilities" = "XLU"
 
 [analysis]
+# The index whose members the market analysis covers (config/indices.toml).
+index = "sp500"
 # The report's main text ranks and plots the most recent years; the appendix the full
 # history (for back-testing and optimisation).
 recent_years = 5

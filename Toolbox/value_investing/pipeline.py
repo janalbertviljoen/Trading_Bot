@@ -35,13 +35,18 @@ from typing import Any
 
 import pandas as pd
 
-from Toolbox.value_investing.inputs import Tables, rebalance_dates, rule_inputs
+from Toolbox.value_investing.inputs import (
+    Tables,
+    members_on_date,
+    rebalance_dates,
+    rule_inputs,
+    window_returns,
+)
 from Toolbox.value_investing.layers.valuation import valuation
 from Toolbox.value_investing.rules import RULES, pass_column, value_column
 from Toolbox.value_investing.scoring import learned_score, rule_points, score
 from Toolbox.value_investing.weighting import (
     correlation_weights,
-    forward_excess,
     rule_correlations,
     static_weights,
 )
@@ -117,7 +122,13 @@ def buyability(
     dates = rebalance_dates(
         pd.Timestamp(schedule["start"]), end, list(schedule["months"])
     )
-    inputs = rule_inputs(tables, dates, depth=int(schedule["history_years"]))
+    inputs = rule_inputs(
+        tables,
+        dates,
+        depth=int(schedule["history_years"]),
+        tolerance_days=int(schedule["year_tolerance_days"]),
+        stale_days=int(schedule["stale_days"]),
+    )
     ratios = valuation(inputs, average_years=int(config["valuation"]["average_years"]))
     columns: dict[str, pd.Series] = {"close": inputs.price}
     families: dict[str, str] = {}
@@ -129,12 +140,11 @@ def buyability(
         families[pass_column(rule_id)] = rule.family
     table = pd.concat([pd.DataFrame(columns), ratios], axis=1)
     if view == "on_date":
-        added = tables.universe.set_index(tables.universe["symbol"].astype("string"))[
-            "date_added"
+        table = table.loc[
+            members_on_date(
+                pd.MultiIndex.from_frame(table.index.to_frame()), tables.universe
+            )
         ]
-        first = added.reindex(table.index.get_level_values("symbol")).to_numpy()
-        member = table.index.get_level_values("date") >= first
-        table = table.loc[pd.Series(member, index=table.index)]
     points = rule_points(
         table,
         {rule_id: RULES[rule_id].higher_is_better for rule_id in config["rules"]},
@@ -148,13 +158,17 @@ def buyability(
         buckets=int(config["score"]["buckets"]),
     )
     learning = config["learning"]
-    forward = forward_excess(
+    forward = window_returns(
         tables.prices,
         pd.MultiIndex.from_frame(table.index.to_frame(index=False)),
         benchmark=benchmark,
         months=int(learning["months"]),
     )
-    correlations = rule_correlations(points, forward["excess"])
+    correlations = rule_correlations(
+        points,
+        forward["excess"],
+        min_companies=int(config["score"]["min_companies"]),
+    )
     ends = forward.groupby(level="date")["end"].first()
     weights = correlation_weights(correlations, ends, window=int(learning["window"]))
     frozen = static_weights(
